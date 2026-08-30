@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Performance } from '@/types';
+import { Performance, Venue } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import PerformanceModal from '@/components/audience/PerformanceModal';
 import { Users, Sparkles, Calendar, MapPin, Ticket, ExternalLink, ArrowRight } from 'lucide-react';
