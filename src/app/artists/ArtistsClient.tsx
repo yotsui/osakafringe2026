@@ -10,9 +10,10 @@ import { Users, Sparkles, Calendar, MapPin, Ticket, ExternalLink, ArrowRight } f
 
 interface ArtistsClientProps {
   performances: Performance[];
+  venues?: Venue[];
 }
 
-export default function ArtistsClient({ performances }: ArtistsClientProps) {
+export default function ArtistsClient({ performances, venues }: ArtistsClientProps) {
   const { t, getText } = useLanguage();
   const [selectedPerformance, setSelectedPerformance] = useState<Performance | null>(null);
 
