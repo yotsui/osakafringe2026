@@ -37,9 +37,9 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-pink-100 shadow-sm transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* Main Logo (Date-included: OCT8 - NOV8, 2026 大阪文化万博 | osaka fringe) */}
-          <div className="w-52 sm:w-64 py-2">
+        <div className="flex items-center justify-between h-16 sm:h-20">
+          {/* Main Official Vector Logo (OCT8 - NOV8, 2026 大阪文化万博 | osaka fringe) */}
+          <div className="w-48 sm:w-56 md:w-64 py-1">
             <BrandLogo variant="main-date" />
           </div>
 

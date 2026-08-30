@@ -18,7 +18,7 @@ export default function Footer() {
           
           {/* Logo & About */}
           <div className="md:col-span-2 space-y-4">
-            <div className="w-56">
+            <div className="w-56 sm:w-64">
               <BrandLogo variant="main-date" />
             </div>
             <p className="text-xs text-slate-500 max-w-md leading-relaxed font-medium">
