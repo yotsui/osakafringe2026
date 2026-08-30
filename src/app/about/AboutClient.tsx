@@ -1,11 +1,21 @@
 'use client';
 
 import React from 'react';
+import { SiteInfo, Banner } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
+import BannerSection from '@/components/common/BannerSection';
 import { Sparkles, Globe, MapPin, Users, Building, Landmark, Coffee } from 'lucide-react';
 
-export default function AboutClient() {
-  const { t } = useLanguage();
+interface AboutClientProps {
+  siteInfo: SiteInfo;
+  banners: Banner[];
+}
+
+export default function AboutClient({ siteInfo, banners }: AboutClientProps) {
+  const { t, getText } = useLanguage();
+
+  const aboutTitle = getText(siteInfo.aboutTitle, siteInfo.aboutTitleEn);
+  const aboutText = getText(siteInfo.aboutText, siteInfo.aboutTextEn);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
@@ -26,14 +36,10 @@ export default function AboutClient() {
       <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-slate-900 via-purple-950/60 to-slate-900 border border-purple-800/50 p-8 sm:p-12 shadow-2xl space-y-6">
         <div className="max-w-3xl space-y-4">
           <h2 className="text-2xl sm:text-3xl font-black text-white">
-            熱気と表現があふれ出す、オープンアクセス芸術祭
+            {aboutTitle}
           </h2>
           <p className="text-sm sm:text-base text-slate-300 leading-relaxed whitespace-pre-line">
-            「フリンジ（Fringe）」とは、劇場だけでなく街中のあらゆる場所を舞台に、プロ・アマ問わずアーティストが自由に参加できるオープンアクセス型の芸術祭です。
-
-            街全体が劇場化し、都市が一体となって共創することで、持続可能な文化経済圏を生み出します。
-            劇場や美術館だけでなく、広場、歴史的建築、カフェ、オフィスビル、路地裏まで。
-            大阪のあらゆる空間がパフォーマンスの場となり、国内外から集まるアーティストが多様な表現を繰り広げます。
+            {aboutText}
           </p>
         </div>
       </div>
@@ -108,7 +114,7 @@ export default function AboutClient() {
               <span>【HISTORICAL】歴史的・象徴的空間</span>
             </div>
             <p className="text-xs text-slate-300 font-semibold">
-              登録有形文化財・近代建築（レトロビル）・神社仏閣
+              重要文化財・登録有形文化財・近代建築（レトロビル）・神社仏閣
             </p>
             <p className="text-xs text-slate-400 leading-relaxed">
               大阪の歴史的都市資産と現代アートを掛け合わせ、新たな文化価値を創出するプレミアム空間。
@@ -130,6 +136,9 @@ export default function AboutClient() {
           </div>
         </div>
       </div>
+
+      {/* Official Banners */}
+      <BannerSection banners={banners} />
     </div>
   );
 }
