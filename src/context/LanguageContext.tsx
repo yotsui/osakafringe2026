@@ -22,11 +22,11 @@ export const translations: Dictionary = {
   navContact: { ja: 'お問い合わせ', en: 'Contact' },
   
   // Hero & Home
-  heroTagline: { ja: '熱気と驚きが交差する、大阪の街角ステージ', en: 'Where Energy Meets Wonder: Osaka Street Stage' },
-  heroSubtitle: { ja: '世界中から集まるアーティストと観客が創るオープンアートフェスティバル', en: 'An open-access performing arts festival created by global artists & audience' },
+  heroTagline: { ja: '街の一角を、世界の舞台へ。', en: 'Turning Every Corner of Osaka into a World Stage.' },
+  heroSubtitle: { ja: '劇場だけでなく街中のあらゆる場所を舞台に。プロ・アマ問わずアーティストが自由に参加するオープンアクセス型芸術祭。', en: 'An open-access performing arts festival across converted heritage buildings, cafes, alleys, and rooftops.' },
   heroOpenAudience: { ja: 'Audience Appで公演を探す', en: 'Find Shows on Audience App' },
   heroVenuesMap: { ja: '会場マップ・一覧', en: 'Venues & Map' },
-  heroLocationSummary: { ja: '大阪市内各所（中崎町・心斎橋・中之島・天王寺）', en: 'Various Osaka Venues (Nakazakicho, Shinsaibashi, Nakanoshima, Tennoji)' },
+  heroLocationSummary: { ja: '大阪市内各所（CORE・HISTORICAL・LOCALベニュー）', en: 'Various Venues across Osaka (CORE, HISTORICAL, LOCAL)' },
   pickUpShows: { ja: 'PICK UP SHOWS', en: 'PICK UP SHOWS' },
   pickUpTitle: { ja: '注目のハイライト公演', en: 'Featured Highlight Shows' },
   pickUpSubtitle: { ja: '見逃せないフェスティバル厳選パフォーマンス', en: 'Selected festival performances you cannot miss' },
@@ -150,21 +150,41 @@ export const translations: Dictionary = {
   feature3Title: { ja: '観客との共創', en: 'Co-created with Audience' },
   feature3Desc: { ja: '観客の投票によってアワードが決まり、次世代アーティストを共に育てます。', en: 'Audience votes directly decide awards, nurturing tomorrow’s stage stars together.' },
   
-  // Contact Page
+  // Contact Page (Formspree Integrated)
   contactPageBadge: { ja: 'CONTACT US', en: 'CONTACT US' },
   contactPageTitle: { ja: 'お問い合わせ', en: 'Contact Us' },
-  contactPageSubtitle: { ja: '公演へのご質問、取材・取材申請、ボランティア参加などお気軽にお寄せください。', en: 'Feel free to contact us regarding shows, media inquiries, or volunteering.' },
-  contactFormTitle: { ja: 'Googleフォームからのお問い合わせ', en: 'Inquiry via Google Forms' },
-  contactFormDesc: { ja: '通常2〜3営業日以内に担当者よりご返信いたします。', en: 'We typically respond within 2-3 business days.' },
-  openInNewTab: { ja: '別タブで開く', en: 'Open in New Tab' },
+  contactPageSubtitle: { ja: '公演へのご質問、会場パートナー・アーティスト参加、取材申請などお気軽にお寄せください。', en: 'Feel free to get in touch regarding shows, venue partnerships, artist registration, or media inquiries.' },
+  contactFormTitle: { ja: 'お問い合わせフォーム', en: 'Contact Form' },
+  contactFormDesc: { ja: '以下のフォームより送信してください。通常2〜3営業日以内に事務局よりご連絡いたします。', en: 'Please fill in the form below. We will get back to you within 2-3 business days.' },
+  formName: { ja: 'お名前', en: 'Your Name' },
+  formEmail: { ja: 'メールアドレス', en: 'Email Address' },
+  formType: { ja: 'お問い合わせ種別', en: 'Inquiry Type' },
+  formTypeGeneral: { ja: '一般・フェスティバル全般について', en: 'General / Festival Inquiries' },
+  formTypeShow: { ja: '公演・チケットについて', en: 'Shows & Tickets' },
+  formTypeVenue: { ja: '会場パートナーについて', en: 'Venue Partnership' },
+  formTypeArtist: { ja: '参加アーティスト・応募について', en: 'Artist Open Call & Participation' },
+  formTypeMedia: { ja: '取材・メディア掲載について', en: 'Press & Media Inquiries' },
+  formTypeVolunteer: { ja: 'ボランティア・サポーターについて', en: 'Volunteering & Support' },
+  formTypeOther: { ja: 'その他', en: 'Other' },
+  formSubject: { ja: '件名', en: 'Subject' },
+  formMessage: { ja: 'お問い合わせ内容', en: 'Message' },
+  formSubmit: { ja: 'メッセージを送信する', en: 'Send Message' },
+  formSending: { ja: '送信中...', en: 'Sending...' },
+  formSuccessTitle: { ja: 'お問い合わせを送信しました', en: 'Message Sent Successfully!' },
+  formSuccessDesc: { ja: 'お問い合わせありがとうございます。内容を確認のうえ、担当者より折り返しご連絡いたします。', en: 'Thank you for reaching out. Our team will review your inquiry and respond shortly.' },
+  formSendAnother: { ja: '新しいメッセージを送信する', en: 'Send Another Message' },
+  formErrorTitle: { ja: '送信に失敗しました', en: 'Failed to Send' },
+  formErrorDesc: { ja: '申し訳ありません。送信中にエラーが発生しました。時間をおいて再送信いただくか、直接 info@osakafringe.com までご連絡ください。', en: 'An error occurred while sending. Please try again or email us directly at info@osakafringe.com.' },
+  formRequired: { ja: '必須', en: 'Required' },
+  formOptional: { ja: '任意', en: 'Optional' },
   
   // Banners & Footer
   instagramBannerTitle: { ja: '公式Instagramでフェスティバルの熱気をチェック！', en: 'Catch the Festival Vibe on Official Instagram!' },
   tourismBannerTitle: { ja: '大阪観光局 公式ポータルサイト', en: 'Osaka Convention & Tourism Bureau' },
-  footerTagline: { ja: '大阪フリンジフェスティバル実行委員会', en: 'Osaka Fringe Festival Executive Committee' },
-  footerDesc: { ja: '大阪の街全体が舞台になるオープンアクセス芸術祭。演劇、ダンス、コメディ、音楽、アートがジャンルを超えて交差するフェスティバル。', en: 'An open-access performing arts festival turning all of Osaka into a vibrant stage across theater, dance, comedy, music, and art.' },
+  footerTagline: { ja: '大阪文化丁 - Osaka Fringe 2026 / 大阪文化フリンジ機構設立準備室', en: 'Osaka Fringe Festival Executive Committee' },
+  footerDesc: { ja: '大阪の街全体が舞台になるオープンアクセス芸術祭。演劇、ダンス、大道芸、音楽、古典芸能、紙芝居、作品展示がジャンルを超えて交差するフェスティバル。', en: 'An open-access performing arts festival turning all of Osaka into a vibrant stage across theater, dance, street circus, music, traditional arts, and art exhibitions.' },
   poweredByMicroCMS: { ja: 'Data powered by MicroCMS & Gemini AI Translation', en: 'Data powered by MicroCMS & Gemini AI Translation' },
-  allRightsReserved: { ja: '© 2026 Osaka Fringe Festival Executive Committee. All rights reserved.', en: '© 2026 Osaka Fringe Festival Executive Committee. All rights reserved.' }
+  allRightsReserved: { ja: '© osaka fringe2026 All Rights Reserved.', en: '© osaka fringe2026 All Rights Reserved.' }
 };
 
 interface LanguageContextType {
