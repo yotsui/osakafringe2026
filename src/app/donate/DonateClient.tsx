@@ -124,7 +124,7 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
 
             <div className="pt-4">
               <a
-                href={siteInfo.donationCrowdfundingUrl || 'https://camp-fire.jp'}
+                href={(siteInfo.donationCrowdfundUrl || siteInfo.donationCrowdfundingUrl) || 'https://camp-fire.jp'}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-black text-xs flex items-center justify-center gap-2 shadow-md transition-all"

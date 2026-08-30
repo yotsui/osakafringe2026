@@ -26,43 +26,9 @@
     },
     {
       "fieldId": "genre",
-      "name": "ジャンル",
-      "kind": "select",
-      "required": true,
-      "selectItems": [
-        {
-          "kind": "value",
-          "value": "street"
-        },
-        {
-          "kind": "value",
-          "value": "dance"
-        },
-        {
-          "kind": "value",
-          "value": "music"
-        },
-        {
-          "kind": "value",
-          "value": "theater"
-        },
-        {
-          "kind": "value",
-          "value": "traditional"
-        },
-        {
-          "kind": "value",
-          "value": "kamishibai"
-        },
-        {
-          "kind": "value",
-          "value": "exhibition"
-        },
-        {
-          "kind": "value",
-          "value": "other"
-        }
-      ]
+      "name": "ジャンル（street/dance/music/theater/traditional/kamishibai/exhibition/other）",
+      "kind": "text",
+      "required": true
     },
     {
       "fieldId": "genreCustom",

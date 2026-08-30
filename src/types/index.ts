@@ -124,6 +124,7 @@ export interface SiteInfo {
   donationTextEn?: string;
   donationBankInfo?: string;
   donationBankInfoEn?: string;
+  donationCrowdfundUrl?: string;
   donationCrowdfundingUrl?: string;
   googleFormUrl?: string;
   officialInstagramUrl?: string;

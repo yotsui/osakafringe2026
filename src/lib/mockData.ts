@@ -314,6 +314,7 @@ Your generous contributions directly support artist subsidies, venue technical s
   donationBankInfoEn: `[Bank Details]
 Resona Bank, Osaka Main Branch (Ordinary) #1234567
 Account Name: OSAKA FRINGE EXECUTIVE COMMITTEE`,
+  donationCrowdfundUrl: 'https://camp-fire.jp/example-osaka-fringe',
   donationCrowdfundingUrl: 'https://camp-fire.jp/example-osaka-fringe',
   googleFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLScX_ExampleFormId/viewform?embedded=true',
   officialInstagramUrl: 'https://www.instagram.com/osakafringe',

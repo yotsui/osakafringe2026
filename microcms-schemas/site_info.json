@@ -121,7 +121,7 @@
       "required": false
     },
     {
-      "fieldId": "donationCrowdfundingUrl",
+      "fieldId": "donationCrowdfundUrl",
       "name": "クラウドファンディングURL",
       "kind": "text",
       "required": false
