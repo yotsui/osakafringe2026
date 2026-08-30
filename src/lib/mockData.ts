@@ -3,24 +3,23 @@ import { Venue, Performance, Award, Banner, SiteInfo } from '@/types';
 export const mockVenues: Venue[] = [
   {
     id: 'nakazaki-hall',
-    name: '中崎町アートスペース SPACE ONE',
-    nameEn: 'Nakazakicho Art Space SPACE ONE',
+    name: '中崎町レトロビル・アートスペース SPACE ONE',
+    nameEn: 'Nakazakicho Heritage Art Space SPACE ONE',
     area: '中崎町・梅田',
     areaEn: 'Nakazakicho / Umeda',
     address: '大阪市北区中崎西2-4-12',
     addressEn: '2-4-12 Nakazaki-nishi, Kita-ku, Osaka',
     access: 'Osaka Metro 谷町線「中崎町駅」徒歩3分 / 各線「梅田駅」徒歩10分',
     accessEn: '3 min walk from Nakazakicho Station (Tanimachi Line) / 10 min from Umeda',
-    description: '中崎町のレトロな古民家をリノベーションした小劇場。濃密な空間で実験的な演劇・ダンスを上演。',
-    descriptionEn: 'An intimate renovated heritage house theater in retro Nakazakicho, ideal for experimental theater & contemporary dance.',
+    description: '【HISTORICAL】昭和初期の登録有形文化財・レトロ古民家をリノベーションした濃密な小劇場。歴史的空間と現代舞台表現が交差するプレミアムベニュー。',
+    descriptionEn: '[HISTORICAL] An intimate renovated heritage building in retro Nakazakicho, blending historic architectural atmosphere with avant-garde performance.',
     location: {
       lat: 34.7081,
       lng: 135.5034,
     },
-    websiteUrl: 'https://example.com/space-one',
-    snsTwitter: 'https://twitter.com/example',
-    snsInstagram: 'https://instagram.com/example',
-    snsFacebook: 'https://facebook.com/example',
+    websiteUrl: 'https://osakafringe.com',
+    snsTwitter: 'https://twitter.com/osakafringe',
+    snsInstagram: 'https://instagram.com/osakafringe',
     image: 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=800&q=80',
     images: [
       'https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=800&q=80',
@@ -39,14 +38,14 @@ export const mockVenues: Venue[] = [
     addressEn: 'B1F, 1-10-8 Nishi-Shinsaibashi, Chuo-ku, Osaka',
     access: 'Osaka Metro 御堂筋線・長堀鶴見緑地線「心斎橋駅」7番出口すぐ',
     accessEn: 'Directly outside Exit 7 of Shinsaibashi Station',
-    description: 'アメリカ村の中心にある音響・照明設備を備えたライブホール。スタンディングコメディや音楽ライブに最適。',
-    descriptionEn: 'A cutting-edge live space in the heart of America-mura, featuring top-notch acoustics for stand-up comedy and indie music.',
+    description: '【LOCAL】アメリカ村の中心にある地下ライブスペース。街の隙間をハックし、アーティストと観客が密に交わる熱気あふれる空間。',
+    descriptionEn: '[LOCAL] An energetic underground venue in America-mura, where artists and audience collide in an intimate atmosphere.',
     location: {
       lat: 34.6725,
       lng: 135.4983,
     },
-    websiteUrl: 'https://example.com/club-underground',
-    snsInstagram: 'https://instagram.com/example_under',
+    websiteUrl: 'https://osakafringe.com',
+    snsInstagram: 'https://instagram.com/osakafringe',
     image: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80',
     images: [
       'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80',
@@ -56,22 +55,22 @@ export const mockVenues: Venue[] = [
   },
   {
     id: 'nakanoshima-bank',
-    name: '中之島 リバーサイドカフェ & テラス',
-    nameEn: 'Nakanoshima Riverside Cafe & Terrace',
+    name: '中之島 ウォーターフロント・オープンデッキ',
+    nameEn: 'Nakanoshima Waterfront Open Deck',
     area: '中之島・北浜',
     areaEn: 'Nakanoshima / Kitahama',
     address: '大阪市北区中之島1-1-28',
     addressEn: '1-1-28 Nakanoshima, Kita-ku, Osaka',
     access: '京阪本線・Osaka Metro 堺筋線「北浜駅」徒歩2分',
     accessEn: '2 min walk from Kitahama Station',
-    description: '堂島川に面した開放的なオープンエア会場。屋外大道芸、サーカス、紙芝居、作品展示などの無料フリンジステージを展開。',
-    descriptionEn: 'An open-air waterfront stage along the river, hosting street performance, circus, kamishibai, and public art exhibitions.',
+    description: '【CORE】堂島川に面した開放的な公共ショーケース拠点。水都大阪の風を感じながら、大道芸・紙芝居・パブリックアートを展開。',
+    descriptionEn: '[CORE] A prime open-air showcase venue along the river, projecting festival energy into the cityscape with street circus, kamishibai & art installations.',
     location: {
       lat: 34.6937,
       lng: 135.5039,
     },
-    websiteUrl: 'https://example.com/nakanoshima-riverside',
-    snsTwitter: 'https://twitter.com/nakanoshima_stage',
+    websiteUrl: 'https://osakafringe.com',
+    snsTwitter: 'https://twitter.com/osakafringe',
     image: 'https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?auto=format&fit=crop&w=800&q=80',
     images: [
       'https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?auto=format&fit=crop&w=800&q=80',
@@ -82,7 +81,7 @@ export const mockVenues: Venue[] = [
   },
   {
     id: 'tennoji-warehouse',
-    name: '天王寺 アートファクトリー ルーフトップ',
+    name: '天王寺 アートファクトリー・ルーフトップ',
     nameEn: 'Tennoji Art Factory Rooftop',
     area: '天王寺・新世界',
     areaEn: 'Tennoji / Shinsekai',
@@ -90,13 +89,13 @@ export const mockVenues: Venue[] = [
     addressEn: 'Rooftop, 2-3-15 Osaka, Tennoji-ku, Osaka',
     access: 'JR・Osaka Metro「天王寺駅」北口より徒歩6分',
     accessEn: '6 min walk from Tennoji Station North Exit',
-    description: '通天閣を遠くに望む秘密基地のようなルーフトップ。夕暮れから夜にかけての古典芸能や作品展示を実施。',
-    descriptionEn: 'A creative rooftop space with views of Tsutenkaku Tower, creating magical dusk atmosphere for traditional arts and site-specific theater.',
+    description: '【LOCAL】通天閣を遠くに望む元倉庫の秘密基地ルーフトップ。夕暮れから夜にかけての古典芸能や作品展示を実施。',
+    descriptionEn: '[LOCAL] A converted rooftop space overlooking Tsutenkaku Tower, offering magical dusk atmosphere for traditional arts and site-specific performance.',
     location: {
       lat: 34.6531,
       lng: 135.5132,
     },
-    websiteUrl: 'https://example.com/tennoji-art-factory',
+    websiteUrl: 'https://osakafringe.com',
     image: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80',
     images: [
       'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80'
@@ -119,15 +118,15 @@ export const mockPerformances: Performance[] = [
     descriptionEn: 'An explosive non-stop spectacle blending Osaka urban legends, high-energy acrobatics, and electro-traditional rokyoku chanting.',
     venueId: 'nakazaki-hall',
     schedules: [
-      { date: '2026-09-18', startTime: '19:00', endTime: '20:15', venueId: 'nakazaki-hall', venueName: '中崎町アートスペース SPACE ONE', venueNameEn: 'Nakazakicho Art Space SPACE ONE', note: 'オープニング公演' },
-      { date: '2026-09-19', startTime: '14:00', endTime: '15:15', venueId: 'nakazaki-hall', venueName: '中崎町アートスペース SPACE ONE', venueNameEn: 'Nakazakicho Art Space SPACE ONE' },
+      { date: '2026-09-18', startTime: '19:00', endTime: '20:15', venueId: 'nakazaki-hall', venueName: '中崎町レトロビル・アートスペース SPACE ONE', venueNameEn: 'Nakazakicho Heritage Art Space SPACE ONE', note: 'オープニング公演' },
+      { date: '2026-09-19', startTime: '14:00', endTime: '15:15', venueId: 'nakazaki-hall', venueName: '中崎町レトロビル・アートスペース SPACE ONE', venueNameEn: 'Nakazakicho Heritage Art Space SPACE ONE' },
       { date: '2026-09-20', startTime: '18:00', endTime: '19:15', venueId: 'shinsaibashi-under', venueName: '心斎橋 CLUB UNDERGROUND', venueNameEn: 'Shinsaibashi CLUB UNDERGROUND', note: '千秋楽スペシャル' },
     ],
     ticketPrice: '前売 ¥2,500 / 当日 ¥3,000 / 学生 ¥1,500',
     ticketPriceEn: 'Adv: ¥2,500 / Door: ¥3,000 / Student: ¥1,500',
-    ticketUrl: 'https://example.com/tickets/perf-1',
-    websiteUrl: 'https://example.com/osakachaos',
-    snsTwitter: 'https://twitter.com/osakachaos',
+    ticketUrl: 'https://osakafringe.com',
+    websiteUrl: 'https://osakafringe.com',
+    snsTwitter: 'https://twitter.com/osakafringe',
     image: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=800&q=80',
     isFeatured: true,
     durationMinutes: 75,
@@ -145,13 +144,13 @@ export const mockPerformances: Performance[] = [
     descriptionEn: 'Award-winning Edinburgh Fringe street sensations bringing breathtaking aerial acrobatics and fire hoop artistry.',
     venueId: 'nakanoshima-bank',
     schedules: [
-      { date: '2026-09-18', startTime: '17:30', endTime: '18:15', venueId: 'nakanoshima-bank', venueName: '中之島 リバーサイドカフェ & テラス', venueNameEn: 'Nakanoshima Riverside Cafe & Terrace' },
-      { date: '2026-09-19', startTime: '16:00', endTime: '16:45', venueId: 'nakanoshima-bank', venueName: '中之島 リバーサイドカフェ & テラス', venueNameEn: 'Nakanoshima Riverside Cafe & Terrace' },
-      { date: '2026-09-21', startTime: '15:00', endTime: '15:45', venueId: 'tennoji-warehouse', venueName: '天王寺 アートファクトリー ルーフトップ', venueNameEn: 'Tennoji Art Factory Rooftop' },
+      { date: '2026-09-18', startTime: '17:30', endTime: '18:15', venueId: 'nakanoshima-bank', venueName: '中之島 ウォーターフロント・オープンデッキ', venueNameEn: 'Nakanoshima Waterfront Open Deck' },
+      { date: '2026-09-19', startTime: '16:00', endTime: '16:45', venueId: 'nakanoshima-bank', venueName: '中之島 ウォーターフロント・オープンデッキ', venueNameEn: 'Nakanoshima Waterfront Open Deck' },
+      { date: '2026-09-21', startTime: '15:00', endTime: '15:45', venueId: 'tennoji-warehouse', venueName: '天王寺 アートファクトリー・ルーフトップ', venueNameEn: 'Tennoji Art Factory Rooftop' },
     ],
     ticketPrice: '投げ銭制 (Free / Tip-based)',
     ticketPriceEn: 'Free entry / Tip-based',
-    ticketUrl: '', // チケット不要のため空（非表示テスト）
+    ticketUrl: '',
     image: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80',
     isFeatured: true,
     durationMinutes: 45,
@@ -174,7 +173,7 @@ export const mockPerformances: Performance[] = [
     ],
     ticketPrice: '¥2,000 (1ドリンク付)',
     ticketPriceEn: '¥2,000 (Includes 1 Drink)',
-    ticketUrl: 'https://example.com/tickets/perf-3',
+    ticketUrl: 'https://osakafringe.com',
     image: 'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?auto=format&fit=crop&w=800&q=80',
     isFeatured: true,
     durationMinutes: 60,
@@ -192,12 +191,12 @@ export const mockPerformances: Performance[] = [
     descriptionEn: 'Fusing traditional shamisen and Kamigata dance with modern improvisation against the evening Osaka skyline.',
     venueId: 'tennoji-warehouse',
     schedules: [
-      { date: '2026-09-20', startTime: '17:00', endTime: '18:00', venueId: 'tennoji-warehouse', venueName: '天王寺 アートファクトリー ルーフトップ', venueNameEn: 'Tennoji Art Factory Rooftop' },
-      { date: '2026-09-21', startTime: '17:30', endTime: '18:30', venueId: 'tennoji-warehouse', venueName: '天王寺 アートファクトリー ルーフトップ', venueNameEn: 'Tennoji Art Factory Rooftop' },
+      { date: '2026-09-20', startTime: '17:00', endTime: '18:00', venueId: 'tennoji-warehouse', venueName: '天王寺 アートファクトリー・ルーフトップ', venueNameEn: 'Tennoji Art Factory Rooftop' },
+      { date: '2026-09-21', startTime: '17:30', endTime: '18:30', venueId: 'tennoji-warehouse', venueName: '天王寺 アートファクトリー・ルーフトップ', venueNameEn: 'Tennoji Art Factory Rooftop' },
     ],
     ticketPrice: '¥2,000',
     ticketPriceEn: '¥2,000',
-    ticketUrl: 'https://example.com/tickets/perf-4',
+    ticketUrl: 'https://osakafringe.com',
     image: 'https://images.unsplash.com/photo-1528164344705-475426879c0d?auto=format&fit=crop&w=800&q=80',
     durationMinutes: 60,
   },
@@ -214,12 +213,12 @@ export const mockPerformances: Performance[] = [
     descriptionEn: 'Interactive picture storytelling performed from a vintage bicycle cart. Fun and nostalgic for all ages.',
     venueId: 'nakanoshima-bank',
     schedules: [
-      { date: '2026-09-19', startTime: '13:00', endTime: '13:40', venueId: 'nakanoshima-bank', venueName: '中之島 リバーサイドカフェ & テラス', venueNameEn: 'Nakanoshima Riverside Cafe & Terrace' },
-      { date: '2026-09-20', startTime: '13:00', endTime: '13:40', venueId: 'nakanoshima-bank', venueName: '中之島 リバーサイドカフェ & テラス', venueNameEn: 'Nakanoshima Riverside Cafe & Terrace' },
+      { date: '2026-09-19', startTime: '13:00', endTime: '13:40', venueId: 'nakanoshima-bank', venueName: '中之島 ウォーターフロント・オープンデッキ', venueNameEn: 'Nakanoshima Waterfront Open Deck' },
+      { date: '2026-09-20', startTime: '13:00', endTime: '13:40', venueId: 'nakanoshima-bank', venueName: '中之島 ウォーターフロント・オープンデッキ', venueNameEn: 'Nakanoshima Waterfront Open Deck' },
     ],
     ticketPrice: '無料 (Free)',
     ticketPriceEn: 'Free Admission',
-    ticketUrl: '', // 無料のため空
+    ticketUrl: '',
     image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80',
     durationMinutes: 40,
   },
@@ -236,10 +235,8 @@ export const mockPerformances: Performance[] = [
     descriptionEn: 'An immersive interactive art installation translating river water level and acoustic data into mesmerizing light sculptures.',
     venueId: 'nakanoshima-bank',
     schedules: [
-      { date: '2026-09-18', startTime: '11:00', endTime: '20:00', venueId: 'nakanoshima-bank', venueName: '中之島 リバーサイドカフェ & テラス', venueNameEn: 'Nakanoshima Riverside Cafe & Terrace', note: '終日展示' },
-      { date: '2026-09-19', startTime: '11:00', endTime: '20:00', venueId: 'nakanoshima-bank', venueName: '中之島 リバーサイドカフェ & テラス', venueNameEn: 'Nakanoshima Riverside Cafe & Terrace', note: '終日展示' },
-      { date: '2026-09-20', startTime: '11:00', endTime: '20:00', venueId: 'nakanoshima-bank', venueName: '中之島 リバーサイドカフェ & テラス', venueNameEn: 'Nakanoshima Riverside Cafe & Terrace', note: '終日展示' },
-      { date: '2026-09-21', startTime: '11:00', endTime: '20:00', venueId: 'nakanoshima-bank', venueName: '中之島 リバーサイドカフェ & テラス', venueNameEn: 'Nakanoshima Riverside Cafe & Terrace', note: '終日展示' },
+      { date: '2026-09-18', startTime: '11:00', endTime: '20:00', venueId: 'nakanoshima-bank', venueName: '中之島 ウォーターフロント・オープンデッキ', venueNameEn: 'Nakanoshima Waterfront Open Deck', note: '終日展示' },
+      { date: '2026-09-19', startTime: '11:00', endTime: '20:00', venueId: 'nakanoshima-bank', venueName: '中之島 ウォーターフロント・オープンデッキ', venueNameEn: 'Nakanoshima Waterfront Open Deck', note: '終日展示' },
     ],
     ticketPrice: '無料 (Free)',
     ticketPriceEn: 'Free Admission',
@@ -277,47 +274,51 @@ export const mockBanners: Banner[] = [
 ];
 
 export const mockSiteInfo: SiteInfo = {
-  siteTitle: 'OSAKA FRINGE FESTIVAL 2026',
-  siteTitleEn: 'OSAKA FRINGE FESTIVAL 2026',
-  heroTagline: '熱気と驚きが交差する、大阪の街角ステージ',
-  heroTaglineEn: 'Where Energy Meets Wonder: Osaka Street Stage',
-  heroSubtitle: '世界中から集まるアーティストと観客が創るオープンアートフェスティバル',
-  heroSubtitleEn: 'An open-access performing arts festival created by global artists & audience',
+  siteTitle: 'OSAKA FRINGE 2026 | SPILL OVER',
+  siteTitleEn: 'OSAKA FRINGE 2026 | SPILL OVER',
+  heroTagline: '街の一角を、世界の舞台へ。',
+  heroTaglineEn: 'Turning Every Corner of Osaka into a World Stage.',
+  heroSubtitle: '劇場だけでなく、街中のあらゆる場所を舞台に。プロ・アマ問わずアーティストが自由に参加するオープンアクセス型芸術祭。',
+  heroSubtitleEn: 'An open-access performing arts festival across converted heritage buildings, cafes, alleys, and rooftops.',
   festivalPeriod: '2026年9月18日(金) 〜 9月21日(月・祝)',
   festivalPeriodEn: 'September 18 (Fri) – September 21 (Mon), 2026',
-  locationSummary: '大阪市内各所（中崎町・心斎橋・中之島・天王寺）',
-  locationSummaryEn: 'Various Osaka Venues (Nakazakicho, Shinsaibashi, Nakanoshima, Tennoji)',
-  aboutTitle: 'Osaka Fringe Festival とは',
-  aboutTitleEn: 'What is Osaka Fringe Festival?',
-  aboutText: `大阪フリンジフェスティバルは、世界基準の「オープンアクセス（審査なしの表現の自由）」精神を受け継ぎ、大阪の街全体を舞台に変える舞台芸術の祭典です。
+  locationSummary: '大阪市内各所（CORE・HISTORICAL・LOCALベニュー）',
+  locationSummaryEn: 'Various Venues across Osaka (CORE, HISTORICAL, LOCAL)',
+  aboutTitle: '大阪文化丁 - Osaka Fringe 2026',
+  aboutTitleEn: 'Osaka Fringe Festival 2026: Spill Over',
+  aboutText: `「フリンジ（Fringe）」とは、劇場だけでなく街中のあらゆる場所を舞台に、プロ・アマ問わずアーティストが自由に参加できるオープンアクセス型の芸術祭です。
 
-劇場だけでなく、路地裏の古民家、カフェ、水辺のテラス、ビルの屋上まで、あらゆる空間がステージになります。
+街全体が劇場化し、都市が一体となって共創することで、持続可能な文化経済圏を生み出します。
 
-演劇、ダンス、大道芸、音楽、古典芸能、紙芝居、作品展示など、ジャンルの垣根を超えた表現者たちと観客がダイレクトに出会い、熱気と感動を分かち合います。`,
-  aboutTextEn: `The Osaka Fringe Festival is an open-access performing arts celebration inspired by global fringe traditions, transforming the entire city into an interconnected playground of creativity.
+劇場や美術館だけでなく、広場、歴史的建築、カフェ、オフィスビル、路地裏まで。
+大阪のあらゆる空間がパフォーマンスの場となり、国内外から集まるアーティストが多様な表現を繰り広げます。
 
-Beyond conventional theaters, our stages include converted heritage houses, alleyways, waterfront terraces, cafes, and creative rooftops.
+そして、このフェスティバルは、審査や選考を行わず、誰もが参加できる「オープンアクセス」の精神を基盤としています。
+プロフェッショナルから若手クリエイター、市民参加型プロジェクトまでが共存し、街に予測不能な創造性と熱気を生み出します。`,
+  aboutTextEn: `The Osaka Fringe Festival is an open-access arts celebration turning every corner of the city into a stage, welcoming artists of all genres, nationalities, and backgrounds without curation or borders.
 
-Featuring theater, contemporary dance, street circus, music, traditional arts, kamishibai, and art exhibitions, artists and audiences collide directly to share unforgettable moments.`,
+From historic registered cultural properties to lively cafes, warehouse rooftops, and public plazas, diverse spaces become intimate performance fields.
+
+Artists and audiences collide directly, igniting unpredictable creativity and shared excitement under the theme of "SPILL OVER".`,
   donationTitle: '大阪フリンジを育てる寄付・サポーター募集',
   donationTitleEn: 'Support Osaka Fringe: Donations & Partnership',
-  donationText: `大阪フリンジフェスティバルは、挑戦的な表現者を支え、誰もが気軽にアートと出会える街をつくるための非営利アートプロジェクトです。
+  donationText: `大阪フリンジフェスティバルは、街の隙間をハックし、自由な舞台芸術の発展と大阪の文化を世界へ発信するための非営利アートプロジェクトです。
 
 いただいたご寄付は、若手アーティストの参加支援、会場設営費、多言語アクセシビリティ環境の向上に大切に活用させていただきます。`,
-  donationTextEn: `The Osaka Fringe Festival is a non-profit initiative dedicated to empowering emerging creators and making performing arts accessible to everyone.
+  donationTextEn: `The Osaka Fringe Festival is a non-profit initiative dedicated to empowering emerging creators and making performing arts accessible to everyone worldwide.
 
 Your generous contributions directly support artist subsidies, venue technical setups, and multilingual visitor infrastructure.`,
   donationBankInfo: `【振込先口座】
 りそな銀行 大阪営業部（普）1234567
-口座名義：オオサカフリンジジッコウイインカイ`,
+口座名義：オオサカブンカフリンジキコウ セツリツジュンビシツ`,
   donationBankInfoEn: `[Bank Details]
 Resona Bank, Osaka Main Branch (Ordinary) #1234567
-Account Name: OSAKA FRINGE FESTIVAL JIKKOU IINKAI`,
+Account Name: OSAKA FRINGE EXECUTIVE COMMITTEE`,
   donationCrowdfundingUrl: 'https://camp-fire.jp/example-osaka-fringe',
   googleFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLScX_ExampleFormId/viewform?embedded=true',
   officialInstagramUrl: 'https://www.instagram.com/osakafringe',
   officialXUrl: 'https://twitter.com/osakafringe',
   officialWebsiteUrl: 'https://osakafringe.com',
   contactEmail: 'info@osakafringe.com',
-  awardsEnabled: false, // 過去アワードがないため、今年は非表示
+  awardsEnabled: false,
 };
