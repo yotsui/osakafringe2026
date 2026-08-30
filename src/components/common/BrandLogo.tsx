@@ -17,18 +17,18 @@ export default function BrandLogo({
   linkToHome = true,
   priority = true,
 }: BrandLogoProps) {
-  let src = '/images/logo_date_main.svg';
-  let alt = 'OCT8 - NOV8, 2026 大阪文化万博 | osaka fringe';
-  let aspectRatio = 'aspect-5/1';
+  let src = '/images/osakafringe3.svg';
+  let alt = 'OCT 8 - NOV 8, 2026 大阪文化万博 | osaka fringe';
+  let aspectRatio = 'aspect-[322/64]';
 
   if (variant === 'horizontal') {
-    src = '/images/logo_horizontal.svg';
-    alt = '大阪文化万博 | osaka fringe';
-    aspectRatio = 'aspect-5/1';
+    src = '/images/osakafringe2.svg';
+    alt = 'osaka fringe';
+    aspectRatio = 'aspect-[385/78]';
   } else if (variant === 'stacked') {
-    src = '/images/logo_date_main.svg';
-    alt = 'OSAKA FRINGE 2026';
-    aspectRatio = 'aspect-5/1';
+    src = '/images/osakafringe.svg';
+    alt = 'osaka fringe';
+    aspectRatio = 'aspect-[215/110]';
   }
 
   const content = (
@@ -38,7 +38,7 @@ export default function BrandLogo({
         src={src}
         alt={alt}
         fill
-        sizes="(max-width: 640px) 240px, 300px"
+        sizes="(max-width: 640px) 240px, 320px"
         priority={priority}
         className="object-contain object-left select-none drop-shadow-xs"
       />

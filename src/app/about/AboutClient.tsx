@@ -50,8 +50,8 @@ export default function AboutClient({ siteInfo, banners }: AboutClientProps) {
             </p>
           </div>
 
-          <div className="relative w-64 h-28 bg-white/10 rounded-3xl backdrop-blur-md p-4 flex items-center justify-center border border-white/20 flex-shrink-0">
-            <BrandLogo variant="main-date" linkToHome={false} className="w-full h-auto drop-shadow-md brightness-0 invert" />
+          <div className="relative w-52 h-32 bg-white/10 rounded-3xl backdrop-blur-md p-5 flex items-center justify-center border border-white/20 flex-shrink-0">
+            <BrandLogo variant="stacked" linkToHome={false} className="w-full h-auto drop-shadow-md brightness-0 invert" />
           </div>
         </div>
       </div>
