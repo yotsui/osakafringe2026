@@ -22,6 +22,8 @@ import {
   Coffee
 } from 'lucide-react';
 
+import { selectFeaturedPerformances } from '@/utils/performanceUtils';
+
 interface HomeClientProps {
   venues: Venue[];
   performances: Performance[];
@@ -39,10 +41,8 @@ export default function HomeClient({
 }: HomeClientProps) {
   const { t, getText } = useLanguage();
 
-  // Featured shows for home page
-  const featuredPerformances = performances.filter((p) => p.isFeatured).slice(0, 3);
-  const displayPerformances =
-    featuredPerformances.length > 0 ? featuredPerformances : performances.slice(0, 3);
+  // Smart selection for 3 featured shows (Filter past shows & fallback intelligently)
+  const displayPerformances = selectFeaturedPerformances(performances, 3);
 
   const aboutTitle = getText(siteInfo.aboutTitle, siteInfo.aboutTitleEn);
   const aboutText = getText(siteInfo.aboutText, siteInfo.aboutTextEn);
