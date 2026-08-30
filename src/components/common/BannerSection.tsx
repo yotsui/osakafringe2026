@@ -4,7 +4,8 @@ import React from 'react';
 import Image from 'next/image';
 import { Banner } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
-import { ExternalLink, Instagram, Landmark } from 'lucide-react';
+import { ExternalLink, Landmark } from 'lucide-react';
+import { InstagramIcon } from './SnsIcons';
 
 interface BannerSectionProps {
   banners: Banner[];
@@ -46,13 +47,13 @@ export default function BannerSection({ banners }: BannerSectionProps) {
               <div className="flex-1 space-y-2 text-left w-full">
                 <div className="flex items-center gap-2">
                   {banner.type === 'instagram' ? (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-pink-50 text-pink-600 text-[11px] font-extrabold border border-pink-200">
-                      <Instagram className="w-3 h-3" />
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-pink-50 text-pink-600 text-[11px] font-extrabold border border-pink-200">
+                      <InstagramIcon className="w-3.5 h-3.5" />
                       <span>Official Instagram</span>
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[11px] font-extrabold border border-slate-200">
-                      <Landmark className="w-3 h-3 text-pink-600" />
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[11px] font-extrabold border border-slate-200">
+                      <Landmark className="w-3.5 h-3.5 text-pink-600" />
                       <span>Official Partner</span>
                     </span>
                   )}

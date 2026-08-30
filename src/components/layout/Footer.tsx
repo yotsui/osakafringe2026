@@ -4,7 +4,8 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useLanguage } from '@/context/LanguageContext';
-import { Sparkles, Heart, Mail, Globe, MapPin, Instagram, ExternalLink } from 'lucide-react';
+import { Sparkles, Heart, Mail, Globe, MapPin, ExternalLink } from 'lucide-react';
+import { InstagramIcon } from '@/components/common/SnsIcons';
 
 export default function Footer() {
   const { t } = useLanguage();
@@ -93,7 +94,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="flex items-center gap-2.5 p-2.5 rounded-xl bg-white border border-pink-100 hover:border-pink-300 text-xs font-bold text-slate-700 hover:text-pink-600 transition-all shadow-2xs group"
               >
-                <Instagram className="w-4 h-4 text-pink-600" />
+                <InstagramIcon className="w-4 h-4 text-pink-600" />
                 <span>Instagram @osakafringe</span>
                 <ExternalLink className="w-3 h-3 ml-auto text-slate-400 group-hover:text-pink-600" />
               </a>

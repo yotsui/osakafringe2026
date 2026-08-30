@@ -11,13 +11,9 @@ import {
   ExternalLink, 
   Globe, 
   Navigation, 
-  Sparkles, 
-  Users, 
-  Images,
-  Instagram,
-  Facebook,
-  Twitter
+  Sparkles
 } from 'lucide-react';
+import { InstagramIcon, TwitterIcon } from '@/components/common/SnsIcons';
 
 interface VenuesClientProps {
   venues: Venue[];
@@ -156,7 +152,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                         className="p-2 rounded-xl bg-slate-100 hover:bg-pink-50 text-slate-700 hover:text-pink-600 transition-colors"
                         aria-label="X (Twitter)"
                       >
-                        <Twitter className="w-3.5 h-3.5" />
+                        <TwitterIcon className="w-3.5 h-3.5" />
                       </a>
                     )}
                     {venue.snsInstagram && (
@@ -167,7 +163,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                         className="p-2 rounded-xl bg-slate-100 hover:bg-pink-50 text-slate-700 hover:text-pink-600 transition-colors"
                         aria-label="Instagram"
                       >
-                        <Instagram className="w-3.5 h-3.5" />
+                        <InstagramIcon className="w-3.5 h-3.5" />
                       </a>
                     )}
                   </div>
