@@ -30,14 +30,38 @@
       "kind": "select",
       "required": true,
       "selectItems": [
-        "street",
-        "dance",
-        "music",
-        "theater",
-        "traditional",
-        "kamishibai",
-        "exhibition",
-        "other"
+        {
+          "kind": "value",
+          "value": "street"
+        },
+        {
+          "kind": "value",
+          "value": "dance"
+        },
+        {
+          "kind": "value",
+          "value": "music"
+        },
+        {
+          "kind": "value",
+          "value": "theater"
+        },
+        {
+          "kind": "value",
+          "value": "traditional"
+        },
+        {
+          "kind": "value",
+          "value": "kamishibai"
+        },
+        {
+          "kind": "value",
+          "value": "exhibition"
+        },
+        {
+          "kind": "value",
+          "value": "other"
+        }
       ]
     },
     {
