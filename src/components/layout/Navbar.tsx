@@ -1,102 +1,130 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
-import { Sparkles, Menu, X, Globe, MapPin, Search, Heart } from 'lucide-react';
+import { 
+  Sparkles, 
+  Menu, 
+  X, 
+  Globe, 
+  Heart, 
+  MapPin, 
+  Compass, 
+  Mail, 
+  Trophy,
+  Users
+} from 'lucide-react';
 
 export default function Navbar() {
-  const { language, setLanguage, t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const { language, setLanguage, t } = useLanguage();
 
-  const navLinks = [
-    { href: '/', label: t('navHome') },
-    { href: '/audience', label: t('navAudience'), highlight: true, icon: Search },
-    { href: '/about', label: t('navAbout') },
+  const navItems = [
+    { href: '/', label: t('navHome'), icon: Compass },
+    { href: '/audience', label: t('navAudience'), icon: Sparkles, highlight: true },
     { href: '/venues', label: t('navVenues'), icon: MapPin },
-    { href: '/artists', label: t('navArtists') },
-    { href: '/awards', label: t('navAwards') },
-    { href: '/donate', label: t('navDonate') },
-    { href: '/contact', label: t('navContact') },
+    { href: '/artists', label: t('navArtists'), icon: Users },
+    { href: '/about', label: t('navAbout'), icon: Sparkles },
+    { href: '/donate', label: t('navDonate'), icon: Heart },
+    { href: '/contact', label: t('navContact'), icon: Mail },
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-purple-900/40 text-white">
+    <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-pink-100 shadow-sm transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-pink-500 via-purple-600 to-amber-400 p-0.5 shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform">
-              <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-pink-400 group-hover:rotate-12 transition-transform" />
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-extrabold tracking-tight text-lg bg-gradient-to-r from-pink-400 via-purple-300 to-amber-300 bg-clip-text text-transparent">
-                OSAKA FRINGE
-              </span>
-              <span className="text-[10px] tracking-widest text-purple-300 uppercase -mt-1 font-semibold">
-                Festival 2026
-              </span>
+        <div className="flex items-center justify-between h-20">
+          {/* Main Logo (Date-included: OCT8 - NOV8, 2026 大阪文化万博 | osaka fringe) */}
+          <Link href="/" className="flex items-center gap-3 group py-2">
+            <div className="relative h-12 w-48 sm:w-64">
+              <Image
+                src="/images/logo_date_main_trans.png"
+                alt="OCT8 - NOV8, 2026 大阪文化万博 | osaka fringe"
+                fill
+                priority
+                className="object-contain object-left group-hover:scale-[1.02] transition-transform duration-200"
+              />
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href;
-              const Icon = link.icon;
+          <div className="hidden lg:flex items-center gap-1.5">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              const Icon = item.icon;
+              
+              if (item.highlight) {
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-gradient-to-r from-pink-600 via-rose-500 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold text-xs shadow-md shadow-pink-500/20 hover:shadow-pink-500/30 transition-all ml-1 mr-1"
+                  >
+                    <Icon className="w-3.5 h-3.5 animate-pulse" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              }
+
               return (
                 <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center space-x-1.5 ${
-                    link.highlight
-                      ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-white shadow-md shadow-pink-500/25 hover:from-pink-500 hover:to-purple-500 hover:scale-105'
-                      : isActive
-                      ? 'bg-purple-950/80 text-pink-400 border border-purple-700/50'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-900/60'
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                    isActive
+                      ? 'bg-pink-50 text-pink-600 font-extrabold'
+                      : 'text-slate-600 hover:text-pink-600 hover:bg-pink-50/50'
                   }`}
                 >
-                  {Icon && <Icon className="w-4 h-4" />}
-                  <span>{link.label}</span>
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-pink-600' : 'text-slate-400'}`} />
+                  <span>{item.label}</span>
                 </Link>
               );
             })}
-          </nav>
 
-          {/* Right Controls: Language Switcher & Mobile Menu Toggle */}
-          <div className="flex items-center space-x-3">
             {/* Language Switcher */}
-            <div className="flex items-center bg-slate-900 border border-purple-800/40 rounded-full p-1 text-xs font-semibold">
+            <div className="flex items-center bg-slate-100 p-1 rounded-full border border-slate-200 ml-2">
               <button
                 onClick={() => setLanguage('ja')}
-                className={`px-2.5 py-1 rounded-full transition-all ${
+                className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
                   language === 'ja'
                     ? 'bg-pink-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 JP
               </button>
               <button
                 onClick={() => setLanguage('en')}
-                className={`px-2.5 py-1 rounded-full transition-all ${
+                className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
                   language === 'en'
                     ? 'bg-pink-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 EN
               </button>
             </div>
+          </div>
 
-            {/* Mobile Menu Button */}
+          {/* Mobile menu and Lang button */}
+          <div className="flex lg:hidden items-center gap-2">
+            {/* Quick Lang Switch */}
+            <button
+              onClick={() => setLanguage(language === 'ja' ? 'en' : 'ja')}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-pink-50 border border-pink-200 text-pink-600 text-xs font-bold"
+            >
+              <Globe className="w-3.5 h-3.5" />
+              <span>{language.toUpperCase()}</span>
+            </button>
+
+            {/* Hamburger button */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="lg:hidden p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-900 focus:outline-none"
+              className="p-2 rounded-xl bg-slate-100 text-slate-700 hover:text-pink-600 hover:bg-pink-50 transition-colors"
               aria-label="Toggle Menu"
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -105,32 +133,56 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown */}
+      {/* Mobile Drawer */}
       {isOpen && (
-        <div className="lg:hidden border-t border-purple-900/40 bg-slate-950/95 backdrop-blur-xl px-4 pt-3 pb-6 space-y-2">
-          {navLinks.map((link) => {
-            const isActive = pathname === link.href;
-            const Icon = link.icon;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setIsOpen(false)}
-                className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-base font-medium transition-all ${
-                  link.highlight
-                    ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold shadow-lg shadow-pink-500/20'
-                    : isActive
-                    ? 'bg-purple-950/80 text-pink-400 border border-purple-800/50'
-                    : 'text-slate-200 hover:bg-slate-900'
+        <div className="lg:hidden bg-white border-b border-pink-100 px-4 pt-2 pb-6 space-y-2 shadow-xl animate-in slide-in-from-top-2 duration-200">
+          <div className="grid grid-cols-1 gap-1">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setIsOpen(false)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                    item.highlight
+                      ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-white font-black my-1'
+                      : isActive
+                      ? 'bg-pink-50 text-pink-600 font-extrabold'
+                      : 'text-slate-700 hover:bg-pink-50/50 hover:text-pink-600'
+                  }`}
+                >
+                  <Icon className={`w-4 h-4 ${item.highlight ? 'text-white' : isActive ? 'text-pink-600' : 'text-slate-400'}`} />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+
+          <div className="pt-3 border-t border-slate-100 flex items-center justify-between px-2">
+            <span className="text-xs font-bold text-slate-500">Language / 表示言語:</span>
+            <div className="flex items-center bg-slate-100 p-1 rounded-full border border-slate-200">
+              <button
+                onClick={() => setLanguage('ja')}
+                className={`px-3 py-1 rounded-full text-xs font-bold ${
+                  language === 'ja' ? 'bg-pink-600 text-white shadow-sm' : 'text-slate-600'
                 }`}
               >
-                {Icon && <Icon className="w-5 h-5" />}
-                <span>{link.label}</span>
-              </Link>
-            );
-          })}
+                日本語 (JP)
+              </button>
+              <button
+                onClick={() => setLanguage('en')}
+                className={`px-3 py-1 rounded-full text-xs font-bold ${
+                  language === 'en' ? 'bg-pink-600 text-white shadow-sm' : 'text-slate-600'
+                }`}
+              >
+                English (EN)
+              </button>
+            </div>
+          </div>
         </div>
       )}
-    </header>
+    </nav>
   );
 }

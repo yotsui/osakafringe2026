@@ -1,9 +1,17 @@
 @import "tailwindcss";
 
+:root {
+  --primary-pink: #e6007e;
+  --primary-pink-hover: #cc006f;
+  --pink-light: #fff0f6;
+  --pink-border: #fbcfe8;
+}
+
 body {
-  background-color: #020617;
-  color: #f8fafc;
+  background-color: #ffffff;
+  color: #1e293b;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  overflow-x: hidden;
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -27,4 +35,15 @@ body {
 
 .animate-fadeIn {
   animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Accent gradients */
+.bg-fringe-gradient {
+  background: linear-gradient(135deg, #e6007e 0%, #ff2e93 50%, #7c3aed 100%);
+}
+
+.text-fringe-gradient {
+  background: linear-gradient(135deg, #e6007e 0%, #ff2e93 50%, #9333ea 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

@@ -1,25 +1,27 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { Performance } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
-import {
-  X,
-  MapPin,
-  Calendar,
-  Clock,
-  Ticket,
+import { 
+  X, 
+  Calendar, 
+  MapPin, 
+  Clock, 
+  Ticket, 
+  Globe, 
+  Sparkles, 
   ExternalLink,
-  Navigation,
-  Heart,
-  Globe,
+  Share2,
+  Navigation
 } from 'lucide-react';
 
 interface PerformanceModalProps {
   performance: Performance | null;
   onClose: () => void;
-  isFavorite: boolean;
-  onToggleFavorite: (id: string) => void;
+  isFavorite?: boolean;
+  onToggleFavorite?: (id: string) => void;
 }
 
 export default function PerformanceModal({
@@ -28,196 +30,180 @@ export default function PerformanceModal({
   isFavorite,
   onToggleFavorite,
 }: PerformanceModalProps) {
-  const { getText, t } = useLanguage();
+  const { t, getText } = useLanguage();
 
   if (!performance) return null;
 
   const title = getText(performance.title, performance.titleEn);
-  const artist = getText(performance.artistName, performance.artistNameEn);
-  const desc = getText(performance.description, performance.descriptionEn);
+  const artistName = getText(performance.artistName, performance.artistNameEn);
   const genreCustom = getText(performance.genreCustom, performance.genreCustomEn);
+  const description = getText(performance.description, performance.descriptionEn);
   const ticketPrice = getText(performance.ticketPrice, performance.ticketPriceEn);
 
-  const genreKey = `genre_${performance.genre}` as any;
-  const genreLabel = genreCustom || t(genreKey) || performance.genre;
+  const fallbackVenueName = performance.venue ? getText(performance.venue.name, performance.venue.nameEn) : null;
+  const fallbackAddress = performance.venue ? getText(performance.venue.address, performance.venue.addressEn) : null;
+  const mapQuery = fallbackAddress || fallbackVenueName || 'Osaka';
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
-      <div
-        className="relative w-full max-w-2xl bg-slate-900 border border-purple-800/60 rounded-3xl overflow-hidden shadow-2xl my-8 max-h-[90vh] flex flex-col"
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-10 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+      <div 
+        className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl border border-pink-100 shadow-2xl space-y-6"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 z-20 p-2 rounded-full bg-slate-950/80 text-white hover:bg-pink-600 transition-colors border border-white/20"
-          aria-label="Close"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
-        {/* Top Image */}
-        <div className="relative h-64 sm:h-72 w-full flex-shrink-0 bg-slate-950">
-          <img
-            src={performance.image}
+        {/* Header Hero Image */}
+        <div className="relative aspect-16/9 w-full bg-slate-100">
+          <Image
+            src={performance.image || 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1200&q=80'}
             alt={title}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-black/50" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
 
-          {/* Badges on image */}
-          <div className="absolute top-4 left-4 flex items-center gap-2">
-            <span className="px-3.5 py-1.5 rounded-full bg-pink-600 text-white text-xs font-bold shadow-lg">
-              {genreLabel}
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-2.5 rounded-full bg-white/80 hover:bg-white text-slate-800 backdrop-blur-md shadow-md transition-colors"
+            aria-label="Close"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
+          {/* Badges & Favorite */}
+          <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+            <span className="px-3 py-1 rounded-full bg-pink-600 text-white text-xs font-black uppercase shadow-md">
+              {t(`genre_${performance.genre}`) || performance.genre}
             </span>
+            {genreCustom && (
+              <span className="px-3 py-1 rounded-full bg-slate-900/80 backdrop-blur-md text-pink-200 text-xs font-bold">
+                {genreCustom}
+              </span>
+            )}
           </div>
 
-          <button
-            onClick={() => onToggleFavorite(performance.id)}
-            className={`absolute bottom-4 right-4 p-3 rounded-full backdrop-blur-md transition-all shadow-xl ${
-              isFavorite
-                ? 'bg-pink-600 text-white'
-                : 'bg-slate-950/70 text-slate-300 hover:text-white border border-white/20'
-            }`}
-          >
-            <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
-          </button>
+          {/* Title on Hero */}
+          <div className="absolute bottom-6 left-6 right-6 space-y-1 text-white">
+            <p className="text-pink-300 text-xs font-black tracking-wider uppercase">
+              {artistName}
+            </p>
+            <h2 className="text-xl sm:text-3xl font-black leading-tight drop-shadow-md">
+              {title}
+            </h2>
+          </div>
         </div>
 
-        {/* Scrollable Content */}
-        <div className="p-6 sm:p-8 overflow-y-auto space-y-6 flex-1 text-slate-200">
-          {/* Titles */}
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-black text-white">{title}</h2>
-            <p className="text-base font-bold text-pink-400 mt-1">{artist}</p>
-          </div>
-
-          {/* Key metadata chips */}
-          <div className="grid grid-cols-2 gap-3">
-            {performance.durationMinutes && (
-              <div className="bg-slate-950 p-3 rounded-2xl border border-purple-900/40 flex items-center gap-2.5 text-xs">
-                <Clock className="w-4 h-4 text-pink-400 flex-shrink-0" />
-                <div>
-                  <span className="text-slate-400 block">{t('durationLabel')}</span>
-                  <span className="font-bold text-white">
-                    {performance.durationMinutes} {t('minutes')}
-                  </span>
-                </div>
-              </div>
-            )}
-
-            <div className="bg-slate-950 p-3 rounded-2xl border border-purple-900/40 flex items-center gap-2.5 text-xs">
-              <Ticket className="w-4 h-4 text-purple-400 flex-shrink-0" />
-              <div>
-                <span className="text-slate-400 block">{t('priceLabel')}</span>
-                <span className="font-bold text-white">
-                  {ticketPrice || t('inquirePrice')}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Schedules with Venue Integration */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-bold text-purple-300 flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-pink-400" />
-              <span>{t('scheduleList')}</span>
-            </h3>
-            <div className="space-y-2">
-              {performance.schedules.map((s, idx) => (
-                <div
-                  key={idx}
-                  className="bg-slate-950 p-3.5 rounded-2xl border border-purple-900/40 flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2"
+        {/* Modal Body */}
+        <div className="px-6 sm:px-8 pb-8 space-y-8">
+          
+          {/* Action Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-6 border-b border-slate-100">
+            <div className="flex items-center gap-2">
+              {onToggleFavorite && (
+                <button
+                  onClick={() => onToggleFavorite(performance.id)}
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                    isFavorite
+                      ? 'bg-pink-600 text-white shadow-md shadow-pink-500/30'
+                      : 'bg-slate-100 hover:bg-pink-50 text-slate-700 hover:text-pink-600'
+                  }`}
                 >
-                  <div className="flex items-center gap-2 text-white font-bold">
-                    <Clock className="w-3.5 h-3.5 text-pink-400" />
-                    <span>
-                      {s.date} {s.startTime} - {s.endTime}
-                    </span>
-                    {s.note && (
-                      <span className="px-2 py-0.5 rounded bg-purple-900/60 text-[10px] text-purple-300">
-                        {s.note}
-                      </span>
-                    )}
-                  </div>
-                  {s.venueName && (
-                    <div className="flex items-center gap-1.5 text-slate-300">
-                      <MapPin className="w-3.5 h-3.5 text-purple-400" />
-                      <span>{getText(s.venueName, s.venueNameEn)}</span>
-                    </div>
-                  )}
-                </div>
-              ))}
+                  <Sparkles className="w-4 h-4" />
+                  <span>{isFavorite ? 'お気に入り登録中' : 'お気に入りに追加'}</span>
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              {performance.ticketUrl && (
+                <a
+                  href={performance.ticketUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-black text-xs shadow-md transition-all"
+                >
+                  <Ticket className="w-4 h-4" />
+                  <span>{t('bookTickets')}</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              )}
             </div>
           </div>
 
           {/* Description */}
-          <div className="space-y-2">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+          <div className="space-y-3">
+            <h3 className="text-xs font-black text-pink-600 uppercase tracking-widest">
               {t('aboutTheShow')}
             </h3>
-            <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-line">
-              {desc}
+            <p className="text-sm sm:text-base text-slate-700 leading-relaxed whitespace-pre-line font-medium">
+              {description}
             </p>
           </div>
 
-          {/* Social Links */}
-          {(performance.websiteUrl || performance.snsTwitter || performance.snsInstagram || performance.snsYoutube) && (
-            <div className="space-y-2 pt-2 border-t border-purple-900/30">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                {t('officialLinks')}
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {performance.websiteUrl && (
-                  <a
-                    href={performance.websiteUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-xs text-slate-300 border border-purple-900/40 flex items-center gap-1.5"
-                  >
-                    <Globe className="w-3.5 h-3.5 text-pink-400" />
-                    <span>Website</span>
-                  </a>
-                )}
-                {performance.snsTwitter && (
-                  <a
-                    href={performance.snsTwitter}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-xs text-slate-300 border border-purple-900/40 flex items-center gap-1.5"
-                  >
-                    <span>Twitter / X</span>
-                  </a>
-                )}
-                {performance.snsInstagram && (
-                  <a
-                    href={performance.snsInstagram}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-xs text-slate-300 border border-purple-900/40 flex items-center gap-1.5"
-                  >
-                    <span>Instagram</span>
-                  </a>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+          {/* Schedules List with Specific Venues */}
+          <div className="space-y-4">
+            <h3 className="text-xs font-black text-pink-600 uppercase tracking-widest flex items-center gap-1.5">
+              <Calendar className="w-4 h-4" />
+              <span>{t('scheduleList')}</span>
+            </h3>
 
-        {/* Modal Footer (Ticket Reservation CTA - only if ticketUrl exists) */}
-        {performance.ticketUrl && performance.ticketUrl.trim() !== '' && (
-          <div className="p-4 sm:p-6 bg-slate-950 border-t border-purple-900/50 flex items-center justify-end">
-            <a
-              href={performance.ticketUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full sm:w-auto py-3 px-8 rounded-2xl bg-gradient-to-r from-pink-600 via-purple-600 to-pink-600 hover:opacity-95 text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-xl shadow-pink-600/25 transition-all"
-            >
-              <span>{t('bookTickets')}</span>
-              <ExternalLink className="w-4 h-4" />
-            </a>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {performance.schedules && performance.schedules.map((schedule, idx) => {
+                const sVenueName = getText(schedule.venueName, schedule.venueNameEn) || fallbackVenueName;
+                const sAddress = fallbackAddress;
+                const specificMapUrl = sVenueName ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(sVenueName + ' 大阪')}` : googleMapsUrl;
+
+                return (
+                  <div key={idx} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
+                    <div className="flex items-center justify-between text-xs font-black text-pink-600">
+                      <span>{schedule.date}</span>
+                      <span>{schedule.startTime} 〜 {schedule.endTime || ''}</span>
+                    </div>
+
+                    {sVenueName && (
+                      <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 truncate">
+                          <MapPin className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+                          <span className="truncate">{sVenueName}</span>
+                        </div>
+                        <a
+                          href={specificMapUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] font-bold text-pink-600 hover:text-pink-700 flex items-center gap-0.5 flex-shrink-0"
+                        >
+                          <span>Map</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
+                    )}
+
+                    {schedule.note && (
+                      <p className="text-[11px] text-pink-600 font-bold bg-pink-50 px-2 py-0.5 rounded inline-block">
+                        {schedule.note}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        )}
+
+          {/* Ticket Price & Duration Info */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 rounded-2xl bg-pink-50/50 border border-pink-100">
+            <div className="space-y-1">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{t('priceLabel')}</span>
+              <p className="text-sm font-black text-slate-900">{ticketPrice || t('inquirePrice')}</p>
+            </div>
+            {performance.durationMinutes && (
+              <div className="space-y-1">
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{t('durationLabel')}</span>
+                <p className="text-sm font-black text-slate-900">{performance.durationMinutes} {t('minutes')}</p>
+              </div>
+            )}
+          </div>
+
+        </div>
       </div>
     </div>
   );

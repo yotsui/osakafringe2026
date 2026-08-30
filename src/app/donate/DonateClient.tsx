@@ -3,7 +3,7 @@
 import React from 'react';
 import { SiteInfo } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
-import { Heart, Sparkles, ExternalLink, Building, CheckCircle } from 'lucide-react';
+import { Heart, Landmark, ExternalLink, Sparkles, CheckCircle2, ShieldCheck } from 'lucide-react';
 
 interface DonateClientProps {
   siteInfo: SiteInfo;
@@ -17,89 +17,123 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
   const bankInfo = getText(siteInfo.donationBankInfo, siteInfo.donationBankInfoEn);
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
       {/* Header */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-950 border border-pink-700/50 text-pink-300 text-xs font-bold">
-          <Heart className="w-3.5 h-3.5 fill-current" />
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-50 border border-pink-200 text-pink-600 text-xs font-black uppercase tracking-wider">
+          <Heart className="w-3.5 h-3.5 text-pink-600" />
           <span>{t('donatePageBadge')}</span>
         </div>
-        <h1 className="text-3xl sm:text-5xl font-black text-white">{title}</h1>
-        <p className="text-sm text-slate-400 max-w-xl mx-auto">
+        <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
+          {title || t('donatePageTitle')}
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-500 font-medium max-w-xl mx-auto">
           {t('donatePageSubtitle')}
         </p>
       </div>
 
-      {/* Main Card */}
-      <div className="bg-slate-900 border border-purple-900/40 rounded-3xl p-6 sm:p-10 space-y-8 shadow-2xl">
-        <div className="space-y-4">
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-pink-400" />
-            <span>{t('donatePurpose')}</span>
+      {/* Philosophy Card */}
+      <div className="bg-gradient-to-r from-pink-600 via-rose-500 to-purple-600 rounded-3xl p-8 sm:p-12 text-white shadow-xl shadow-pink-500/15 space-y-6">
+        <div className="max-w-3xl space-y-4">
+          <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-black">
+            MESSAGE
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-black">
+            街とアーティストの未来を共に創るパートナーへ
           </h2>
-          <p className="text-sm sm:text-base text-slate-300 leading-relaxed whitespace-pre-line">
+          <p className="text-sm sm:text-base text-pink-100 leading-relaxed font-medium whitespace-pre-line">
             {text}
           </p>
         </div>
+      </div>
 
-        {/* Impact List */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-purple-900/40">
-          <div className="p-4 bg-slate-950 rounded-2xl border border-purple-800/30 flex items-start gap-3">
-            <CheckCircle className="w-5 h-5 text-pink-400 flex-shrink-0 mt-0.5" />
-            <div className="text-xs text-slate-300">
-              <strong className="text-white block text-sm">{t('impact1Title')}</strong>
-              {t('impact1Desc')}
-            </div>
-          </div>
-          <div className="p-4 bg-slate-950 rounded-2xl border border-purple-800/30 flex items-start gap-3">
-            <CheckCircle className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
-            <div className="text-xs text-slate-300">
-              <strong className="text-white block text-sm">{t('impact2Title')}</strong>
-              {t('impact2Desc')}
-            </div>
-          </div>
+      {/* Purpose of donations */}
+      <div className="space-y-6">
+        <div className="text-center space-y-1">
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900">{t('donatePurpose')}</h2>
+          <p className="text-xs text-slate-500 font-medium">いただいたご支援の使途</p>
         </div>
 
-        {/* Donation Methods */}
-        <div className="space-y-6 pt-6 border-t border-purple-900/40">
-          <h3 className="text-base font-bold text-white">{t('donateMethods')}</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white border border-pink-100 rounded-3xl p-6 sm:p-8 space-y-3 shadow-xs">
+            <div className="w-12 h-12 rounded-2xl bg-pink-50 border border-pink-200 flex items-center justify-center text-pink-600">
+              <Sparkles className="w-6 h-6" />
+            </div>
+            <h3 className="text-base font-black text-slate-900">{t('impact1Title')}</h3>
+            <p className="text-xs text-slate-500 leading-relaxed font-medium">{t('impact1Desc')}</p>
+          </div>
 
-          {/* Crowdfunding CTA */}
-          {siteInfo.donationCrowdfundingUrl && (
-            <div className="p-6 bg-gradient-to-r from-pink-950 to-purple-950 rounded-2xl border border-pink-600/40 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div>
-                <h4 className="font-bold text-white text-base">{t('crowdfundingTitle')}</h4>
-                <p className="text-xs text-slate-300 mt-1">
-                  {t('crowdfundingDesc')}
-                </p>
+          <div className="bg-white border border-purple-100 rounded-3xl p-6 sm:p-8 space-y-3 shadow-xs">
+            <div className="w-12 h-12 rounded-2xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-600">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+            <h3 className="text-base font-black text-slate-900">{t('impact2Title')}</h3>
+            <p className="text-xs text-slate-500 leading-relaxed font-medium">{t('impact2Desc')}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Support Methods (Crowdfunding & Bank Transfer) */}
+      <div className="space-y-6">
+        <div className="text-center space-y-1">
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900">{t('donateMethods')}</h2>
+          <p className="text-xs text-slate-500 font-medium">ご都合に合わせた支援方法をお選びいただけます</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Bank Transfer */}
+          <div className="bg-slate-50 border border-pink-100 rounded-3xl p-8 space-y-6 shadow-xs">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-pink-600 text-white flex items-center justify-center">
+                <Landmark className="w-5 h-5" />
               </div>
+              <div>
+                <h3 className="text-base font-black text-slate-900">{t('bankTransferTitle')}</h3>
+                <p className="text-xs text-slate-500">直接口座へのご寄付</p>
+              </div>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-3">
+              <pre className="text-xs font-bold text-slate-800 whitespace-pre-wrap font-mono leading-relaxed">
+                {bankInfo || 'りそな銀行 大阪営業部\n普通口座 1234567\nオオサカブンカフリンジキコウ'}
+              </pre>
+            </div>
+
+            <p className="text-[11px] text-slate-500 font-medium">
+              {t('bankTransferNotice')}
+            </p>
+          </div>
+
+          {/* Crowdfunding */}
+          <div className="bg-slate-50 border border-pink-100 rounded-3xl p-8 space-y-6 shadow-xs flex flex-col justify-between">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-pink-600 text-white flex items-center justify-center">
+                  <Heart className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900">{t('crowdfundingTitle')}</h3>
+                  <p className="text-xs text-slate-500">リワード付き応援</p>
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                {t('crowdfundingDesc')}
+              </p>
+            </div>
+
+            <div className="pt-4">
               <a
-                href={siteInfo.donationCrowdfundingUrl}
+                href={siteInfo.donationCrowdfundingUrl || 'https://camp-fire.jp'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="py-3 px-6 rounded-xl bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-pink-600/30 transition-all flex-shrink-0"
+                className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-black text-xs flex items-center justify-center gap-2 shadow-md transition-all"
               >
                 <span>{t('viewProject')}</span>
                 <ExternalLink className="w-4 h-4" />
               </a>
             </div>
-          )}
-
-          {/* Bank Transfer Info */}
-          {bankInfo && (
-            <div className="p-5 bg-slate-950 rounded-2xl border border-purple-900/40 space-y-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-purple-300">
-                <Building className="w-4 h-4" />
-                <span>{t('bankTransferTitle')}</span>
-              </div>
-              <p className="text-xs text-slate-300 font-mono bg-slate-900 p-3 rounded-xl border border-purple-800/30">
-                {bankInfo}
-              </p>
-              <p className="text-[11px] text-slate-400">
-                {t('bankTransferNotice')}
-              </p>
-            </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

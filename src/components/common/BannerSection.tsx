@@ -1,9 +1,10 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { Banner } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
-import { ExternalLink, Compass, Camera } from 'lucide-react';
+import { ExternalLink, Instagram, Landmark } from 'lucide-react';
 
 interface BannerSectionProps {
   banners: Banner[];
@@ -12,59 +13,68 @@ interface BannerSectionProps {
 export default function BannerSection({ banners }: BannerSectionProps) {
   const { getText } = useLanguage();
 
-  if (!banners || banners.length === 0) return null;
+  if (!banners || banners.length === 0) {
+    return null;
+  }
 
   return (
-    <section className="py-12 bg-slate-950/60 border-t border-purple-900/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <p className="text-xs font-bold tracking-widest text-pink-400 uppercase">OFFICIAL PARTNERS & SOCIAL</p>
-          <h2 className="text-xl font-bold text-white mt-1">公式バナー・関連リンク</h2>
-        </div>
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {banners.map((banner) => {
+          const title = getText(banner.title, banner.titleEn);
+          const desc = getText(banner.description, banner.descriptionEn);
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {banners.map((banner) => {
-            const isInstagram = banner.type === 'instagram';
-            const title = getText(banner.title, banner.titleEn);
-            const desc = getText(banner.description, banner.descriptionEn);
+          return (
+            <a
+              key={banner.id}
+              href={banner.linkUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative overflow-hidden rounded-3xl bg-white border border-pink-100 hover:border-pink-300 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col sm:flex-row items-center p-5 gap-5"
+            >
+              {/* Thumbnail */}
+              <div className="relative w-full sm:w-36 h-28 flex-shrink-0 overflow-hidden rounded-2xl bg-slate-100">
+                <Image
+                  src={banner.imageUrl}
+                  alt={banner.alt || title}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
 
-            return (
-              <a
-                key={banner.id}
-                href={banner.linkUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-purple-950/70 border border-purple-800/40 p-6 flex flex-col sm:flex-row items-center gap-5 hover:border-pink-500/70 transition-all hover:shadow-xl hover:shadow-pink-500/10 hover:-translate-y-1"
-              >
-                {/* Visual Icon / Thumbnail */}
-                <div className="w-16 h-16 rounded-2xl flex-shrink-0 flex items-center justify-center bg-slate-800/80 border border-purple-700/50 shadow-inner group-hover:scale-105 transition-transform">
-                  {isInstagram ? (
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-yellow-500 via-pink-500 to-purple-600 flex items-center justify-center text-white">
-                      <Camera className="w-7 h-7" />
-                    </div>
+              {/* Text Info */}
+              <div className="flex-1 space-y-2 text-left w-full">
+                <div className="flex items-center gap-2">
+                  {banner.type === 'instagram' ? (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-pink-50 text-pink-600 text-[11px] font-extrabold border border-pink-200">
+                      <Instagram className="w-3 h-3" />
+                      <span>Official Instagram</span>
+                    </span>
                   ) : (
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white">
-                      <Compass className="w-7 h-7" />
-                    </div>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[11px] font-extrabold border border-slate-200">
+                      <Landmark className="w-3 h-3 text-pink-600" />
+                      <span>Official Partner</span>
+                    </span>
                   )}
                 </div>
+                <h3 className="text-sm sm:text-base font-black text-slate-900 group-hover:text-pink-600 transition-colors line-clamp-1">
+                  {title}
+                </h3>
+                {desc && (
+                  <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed font-medium">
+                    {desc}
+                  </p>
+                )}
+              </div>
 
-                {/* Content */}
-                <div className="flex-1 text-center sm:text-left">
-                  <div className="flex items-center justify-center sm:justify-start gap-1.5 text-xs font-semibold text-pink-400 mb-1">
-                    <span>{isInstagram ? 'Instagram Official' : 'Osaka Tourism Portal'}</span>
-                    <ExternalLink className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                  <h3 className="text-base font-bold text-white group-hover:text-pink-300 transition-colors">
-                    {title}
-                  </h3>
-                  {desc && <p className="text-xs text-slate-400 mt-1 leading-relaxed">{desc}</p>}
-                </div>
-              </a>
-            );
-          })}
-        </div>
+              {/* External Arrow Icon */}
+              <div className="hidden sm:flex items-center justify-center w-9 h-9 rounded-full bg-pink-50 text-pink-600 group-hover:bg-pink-600 group-hover:text-white transition-all flex-shrink-0">
+                <ExternalLink className="w-4 h-4" />
+              </div>
+            </a>
+          );
+        })}
       </div>
-    </section>
+    </div>
   );
 }

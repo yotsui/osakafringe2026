@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { SiteInfo } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
-import { Mail, Send, CheckCircle2, AlertCircle, RefreshCw, MessageSquare, PhoneCall } from 'lucide-react';
+import { Mail, Send, CheckCircle2, AlertCircle, RefreshCw, MessageSquare } from 'lucide-react';
 
 interface ContactClientProps {
   siteInfo: SiteInfo;
@@ -94,47 +94,47 @@ export default function ContactClient({ siteInfo }: ContactClientProps) {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
       {/* Header */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-950 border border-purple-700/50 text-purple-300 text-xs font-bold">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-50 border border-pink-200 text-pink-600 text-xs font-black uppercase tracking-wider">
           <Mail className="w-3.5 h-3.5" />
           <span>{t('contactPageBadge')}</span>
         </div>
-        <h1 className="text-3xl sm:text-5xl font-black text-white">{t('contactPageTitle')}</h1>
-        <p className="text-sm text-slate-400 max-w-xl mx-auto">
+        <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">{t('contactPageTitle')}</h1>
+        <p className="text-xs sm:text-sm text-slate-500 font-medium max-w-xl mx-auto">
           {t('contactPageSubtitle')}
         </p>
       </div>
 
-      <div className="bg-slate-900 border border-purple-900/40 rounded-3xl p-6 sm:p-12 shadow-2xl space-y-8">
+      <div className="bg-white border border-pink-100 rounded-3xl p-6 sm:p-12 shadow-sm space-y-8">
         {/* Info Box */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 bg-slate-950 rounded-2xl border border-purple-800/40">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 bg-pink-50/50 rounded-2xl border border-pink-100">
           <div className="flex items-center gap-3">
-            <MessageSquare className="w-6 h-6 text-pink-400 flex-shrink-0" />
+            <MessageSquare className="w-6 h-6 text-pink-600 flex-shrink-0" />
             <div>
-              <h3 className="text-sm font-bold text-white">{t('contactFormTitle')}</h3>
-              <p className="text-xs text-slate-400">{t('contactFormDesc')}</p>
+              <h3 className="text-sm font-black text-slate-900">{t('contactFormTitle')}</h3>
+              <p className="text-xs text-slate-500 font-medium">{t('contactFormDesc')}</p>
             </div>
           </div>
-          <div className="text-xs text-slate-400 flex items-center gap-2 self-start sm:self-center">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <div className="text-xs text-slate-600 font-bold flex items-center gap-2 self-start sm:self-center">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span>{siteInfo.contactEmail || 'info@osakafringe.com'}</span>
           </div>
         </div>
 
         {/* Formspree State Feedback or Form */}
         {status === 'success' ? (
-          <div className="py-12 px-6 text-center space-y-6 bg-slate-950/80 rounded-2xl border border-emerald-500/30 animate-in fade-in zoom-in duration-300">
-            <div className="w-16 h-16 rounded-full bg-emerald-950 border border-emerald-500/50 flex items-center justify-center text-emerald-400 mx-auto shadow-lg shadow-emerald-900/30">
+          <div className="py-12 px-6 text-center space-y-6 bg-emerald-50/50 rounded-2xl border border-emerald-200 animate-in fade-in zoom-in duration-300">
+            <div className="w-16 h-16 rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-600 mx-auto shadow-sm">
               <CheckCircle2 className="w-8 h-8" />
             </div>
             <div className="space-y-2 max-w-md mx-auto">
-              <h3 className="text-2xl font-black text-white">{t('formSuccessTitle')}</h3>
-              <p className="text-sm text-slate-300 leading-relaxed">
+              <h3 className="text-2xl font-black text-slate-900">{t('formSuccessTitle')}</h3>
+              <p className="text-sm text-slate-600 leading-relaxed font-medium">
                 {t('formSuccessDesc')}
               </p>
             </div>
             <button
               onClick={handleReset}
-              className="py-3 px-6 rounded-xl bg-purple-900/50 hover:bg-purple-800 border border-purple-600/50 text-white font-bold text-xs transition-colors"
+              className="py-3 px-6 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-black text-xs transition-colors shadow-sm"
             >
               {t('formSendAnother')}
             </button>
@@ -142,10 +142,10 @@ export default function ContactClient({ siteInfo }: ContactClientProps) {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
             {status === 'error' && (
-              <div className="p-4 bg-rose-950/80 border border-rose-700/50 rounded-xl flex items-start gap-3 text-rose-200 text-xs">
-                <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-400 mt-0.5" />
+              <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-3 text-rose-800 text-xs font-bold">
+                <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-500 mt-0.5" />
                 <div className="space-y-1">
-                  <p className="font-bold">{t('formErrorTitle')}</p>
+                  <p className="font-black">{t('formErrorTitle')}</p>
                   <p>{errorMessage || t('formErrorDesc')}</p>
                 </div>
               </div>
@@ -154,9 +154,9 @@ export default function ContactClient({ siteInfo }: ContactClientProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {/* Name */}
               <div className="space-y-2">
-                <label htmlFor="name" className="text-xs font-bold text-slate-300 flex items-center justify-between">
+                <label htmlFor="name" className="text-xs font-black text-slate-700 flex items-center justify-between">
                   <span>{t('formName')}</span>
-                  <span className="text-[10px] bg-pink-950 text-pink-400 border border-pink-700/50 px-2 py-0.5 rounded font-bold">
+                  <span className="text-[10px] bg-pink-50 text-pink-600 border border-pink-200 px-2 py-0.5 rounded font-black">
                     {t('formRequired')}
                   </span>
                 </label>
@@ -168,15 +168,15 @@ export default function ContactClient({ siteInfo }: ContactClientProps) {
                   value={formState.name}
                   onChange={handleChange}
                   placeholder="山田 太郎 / Taro Yamada"
-                  className="w-full bg-slate-950 border border-purple-900/50 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-colors"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all shadow-2xs"
                 />
               </div>
 
               {/* Email */}
               <div className="space-y-2">
-                <label htmlFor="email" className="text-xs font-bold text-slate-300 flex items-center justify-between">
+                <label htmlFor="email" className="text-xs font-black text-slate-700 flex items-center justify-between">
                   <span>{t('formEmail')}</span>
-                  <span className="text-[10px] bg-pink-950 text-pink-400 border border-pink-700/50 px-2 py-0.5 rounded font-bold">
+                  <span className="text-[10px] bg-pink-50 text-pink-600 border border-pink-200 px-2 py-0.5 rounded font-black">
                     {t('formRequired')}
                   </span>
                 </label>
@@ -188,7 +188,7 @@ export default function ContactClient({ siteInfo }: ContactClientProps) {
                   value={formState.email}
                   onChange={handleChange}
                   placeholder="example@osakafringe.com"
-                  className="w-full bg-slate-950 border border-purple-900/50 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-colors"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all shadow-2xs"
                 />
               </div>
             </div>
@@ -196,9 +196,9 @@ export default function ContactClient({ siteInfo }: ContactClientProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {/* Inquiry Type */}
               <div className="space-y-2">
-                <label htmlFor="type" className="text-xs font-bold text-slate-300 flex items-center justify-between">
+                <label htmlFor="type" className="text-xs font-black text-slate-700 flex items-center justify-between">
                   <span>{t('formType')}</span>
-                  <span className="text-[10px] bg-purple-950 text-purple-300 border border-purple-700/50 px-2 py-0.5 rounded font-bold">
+                  <span className="text-[10px] bg-pink-50 text-pink-600 border border-pink-200 px-2 py-0.5 rounded font-black">
                     {t('formRequired')}
                   </span>
                 </label>
@@ -207,7 +207,7 @@ export default function ContactClient({ siteInfo }: ContactClientProps) {
                   name="type"
                   value={formState.type}
                   onChange={handleChange}
-                  className="w-full bg-slate-950 border border-purple-900/50 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-colors"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:bg-white focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all shadow-2xs"
                 >
                   <option value="general">{t('formTypeGeneral')}</option>
                   <option value="shows">{t('formTypeShow')}</option>
@@ -221,9 +221,9 @@ export default function ContactClient({ siteInfo }: ContactClientProps) {
 
               {/* Subject */}
               <div className="space-y-2">
-                <label htmlFor="subject" className="text-xs font-bold text-slate-300 flex items-center justify-between">
+                <label htmlFor="subject" className="text-xs font-black text-slate-700 flex items-center justify-between">
                   <span>{t('formSubject')}</span>
-                  <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded font-bold">
+                  <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-bold">
                     {t('formOptional')}
                   </span>
                 </label>
@@ -234,16 +234,16 @@ export default function ContactClient({ siteInfo }: ContactClientProps) {
                   value={formState.subject}
                   onChange={handleChange}
                   placeholder="件名・タイトルをご記入ください"
-                  className="w-full bg-slate-950 border border-purple-900/50 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-colors"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all shadow-2xs"
                 />
               </div>
             </div>
 
             {/* Message */}
             <div className="space-y-2">
-              <label htmlFor="message" className="text-xs font-bold text-slate-300 flex items-center justify-between">
+              <label htmlFor="message" className="text-xs font-black text-slate-700 flex items-center justify-between">
                 <span>{t('formMessage')}</span>
-                <span className="text-[10px] bg-pink-950 text-pink-400 border border-pink-700/50 px-2 py-0.5 rounded font-bold">
+                <span className="text-[10px] bg-pink-50 text-pink-600 border border-pink-200 px-2 py-0.5 rounded font-black">
                   {t('formRequired')}
                 </span>
               </label>
@@ -255,7 +255,7 @@ export default function ContactClient({ siteInfo }: ContactClientProps) {
                 value={formState.message}
                 onChange={handleChange}
                 placeholder="お問い合わせ内容を詳しくご記入ください..."
-                className="w-full bg-slate-950 border border-purple-900/50 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-colors leading-relaxed"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all shadow-2xs leading-relaxed"
               ></textarea>
             </div>
 
@@ -264,7 +264,7 @@ export default function ContactClient({ siteInfo }: ContactClientProps) {
               <button
                 type="submit"
                 disabled={status === 'submitting'}
-                className="w-full py-4 px-8 rounded-2xl bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-500 hover:via-purple-500 hover:to-indigo-500 text-white font-black text-sm tracking-wide shadow-xl shadow-pink-950/50 flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="w-full py-4 px-8 rounded-2xl bg-gradient-to-r from-pink-600 via-rose-500 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-lg shadow-pink-500/25 flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {status === 'submitting' ? (
                   <>

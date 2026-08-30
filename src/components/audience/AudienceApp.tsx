@@ -1,21 +1,22 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
-import { Venue, Performance } from '@/types';
+import React, { useState, useMemo } from 'react';
+import { Performance, Venue } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import PerformanceCard from './PerformanceCard';
 import PerformanceModal from './PerformanceModal';
 import FestivalMap from './FestivalMap';
-import {
-  Search,
-  MapPin,
-  Calendar,
-  Sparkles,
-  Flame,
-  Heart,
-  Grid,
-  Map as MapIcon,
+import { 
+  Search, 
+  Filter, 
+  Sparkles, 
+  MapPin, 
+  Calendar, 
+  Flame, 
   RotateCcw,
+  Layers,
+  Map as MapIcon,
+  Heart
 } from 'lucide-react';
 
 interface AudienceAppProps {
@@ -23,47 +24,46 @@ interface AudienceAppProps {
   venues: Venue[];
 }
 
-export default function AudienceApp({ initialPerformances, venues }: AudienceAppProps) {
+export default function AudienceApp({
+  initialPerformances,
+  venues,
+}: AudienceAppProps) {
   const { t, getText } = useLanguage();
 
-  // Search & Filter States
-  const [keyword, setKeyword] = useState('');
+  // Filters State
   const [selectedGenre, setSelectedGenre] = useState<string>('all');
   const [selectedVenueId, setSelectedVenueId] = useState<string>('all');
   const [selectedDate, setSelectedDate] = useState<string>('all');
-  const [isTodayOnly, setIsTodayOnly] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<'search' | 'map' | 'favorites'>('search');
 
-  // View States
-  const [viewMode, setViewMode] = useState<'list' | 'map' | 'favorites'>('list');
-  const [selectedPerformance, setSelectedPerformance] = useState<Performance | null>(null);
-  const [favorites, setFavorites] = useState<string[]>([]);
-
-  // Load favorites from localStorage
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('osaka_fringe_favs');
-      if (saved) {
-        setFavorites(JSON.parse(saved));
+  // Favorites in state & localStorage
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('osaka_fringe_favs');
+        return saved ? JSON.parse(saved) : [];
+      } catch {
+        return [];
       }
-    } catch (e) {
-      console.error(e);
     }
-  }, []);
+    return [];
+  });
+
+  const [selectedPerformance, setSelectedPerformance] = useState<Performance | null>(null);
 
   const toggleFavorite = (id: string) => {
     setFavorites((prev) => {
       const next = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
-      try {
+      if (typeof window !== 'undefined') {
         localStorage.setItem('osaka_fringe_favs', JSON.stringify(next));
-      } catch (e) {
-        console.error(e);
       }
       return next;
     });
   };
 
-  // Extract all distinct dates
-  const allDates = useMemo(() => {
+  // Distinct festival dates
+  const festivalDates = useMemo(() => {
     const set = new Set<string>();
     initialPerformances.forEach((p) => {
       p.schedules.forEach((s) => set.add(s.date));
@@ -71,316 +71,278 @@ export default function AudienceApp({ initialPerformances, venues }: AudienceApp
     return Array.from(set).sort();
   }, [initialPerformances]);
 
-  // Determine "Today"
-  const todayDateStr = useMemo(() => {
-    const today = new Date().toISOString().split('T')[0];
-    if (allDates.includes(today)) return today;
-    return allDates[0] || '2026-09-18';
-  }, [allDates]);
-
   // Filter logic
   const filteredPerformances = useMemo(() => {
-    return initialPerformances.filter((p) => {
-      // 1. Favorites tab filter
-      if (viewMode === 'favorites' && !favorites.includes(p.id)) {
+    return initialPerformances.filter((perf) => {
+      // Favorites filter
+      if (activeTab === 'favorites' && !favorites.includes(perf.id)) {
         return false;
       }
 
-      // 2. Today's show filter
-      if (isTodayOnly) {
-        const hasToday = p.schedules.some((s) => s.date === todayDateStr);
-        if (!hasToday) return false;
-      }
-
-      // 3. Date filter (when not today only)
-      if (!isTodayOnly && selectedDate !== 'all') {
-        const hasDate = p.schedules.some((s) => s.date === selectedDate);
-        if (!hasDate) return false;
-      }
-
-      // 4. Genre filter (WHAT)
-      if (selectedGenre !== 'all' && p.genre !== selectedGenre) {
+      // Genre filter (8 genres)
+      if (selectedGenre !== 'all' && perf.genre !== selectedGenre) {
         return false;
       }
 
-      // 5. Venue filter (WHERE) - checks both default venueId and any schedule.venueId
+      // Venue filter
       if (selectedVenueId !== 'all') {
-        const matchesDefaultVenue = p.venueId === selectedVenueId;
-        const matchesScheduleVenue = p.schedules.some((s) => s.venueId === selectedVenueId);
+        const matchesDefaultVenue = perf.venueId === selectedVenueId;
+        const matchesScheduleVenue = perf.schedules.some((s) => s.venueId === selectedVenueId);
         if (!matchesDefaultVenue && !matchesScheduleVenue) {
           return false;
         }
       }
 
-      // 6. Keyword search (WHAT / Title / Artist / Description)
-      if (keyword.trim() !== '') {
-        const q = keyword.toLowerCase();
-        const matchTitle = p.title.toLowerCase().includes(q) || (p.titleEn && p.titleEn.toLowerCase().includes(q));
-        const matchArtist = p.artistName.toLowerCase().includes(q) || (p.artistNameEn && p.artistNameEn.toLowerCase().includes(q));
-        const matchDesc = p.description.toLowerCase().includes(q) || (p.descriptionEn && p.descriptionEn.toLowerCase().includes(q));
-        const matchCustom = p.genreCustom && p.genreCustom.toLowerCase().includes(q);
-        if (!matchTitle && !matchArtist && !matchDesc && !matchCustom) {
+      // Date filter
+      if (selectedDate !== 'all') {
+        const matchesDate = perf.schedules.some((s) => s.date === selectedDate);
+        if (!matchesDate) {
           return false;
         }
+      }
+
+      // Search query (keyword)
+      if (searchQuery.trim() !== '') {
+        const q = searchQuery.toLowerCase();
+        const titleJa = perf.title.toLowerCase();
+        const titleEn = (perf.titleEn || '').toLowerCase();
+        const artistJa = perf.artistName.toLowerCase();
+        const artistEn = (perf.artistNameEn || '').toLowerCase();
+        const descJa = perf.description.toLowerCase();
+        const descEn = (perf.descriptionEn || '').toLowerCase();
+
+        const matches =
+          titleJa.includes(q) ||
+          titleEn.includes(q) ||
+          artistJa.includes(q) ||
+          artistEn.includes(q) ||
+          descJa.includes(q) ||
+          descEn.includes(q);
+
+        if (!matches) return false;
       }
 
       return true;
     });
   }, [
     initialPerformances,
-    viewMode,
-    favorites,
-    isTodayOnly,
-    selectedDate,
-    todayDateStr,
     selectedGenre,
     selectedVenueId,
-    keyword,
+    selectedDate,
+    searchQuery,
+    activeTab,
+    favorites,
   ]);
 
   const resetFilters = () => {
-    setKeyword('');
     setSelectedGenre('all');
     setSelectedVenueId('all');
     setSelectedDate('all');
-    setIsTodayOnly(false);
+    setSearchQuery('');
   };
 
-  const hasActiveFilters =
-    keyword !== '' ||
-    selectedGenre !== 'all' ||
-    selectedVenueId !== 'all' ||
-    selectedDate !== 'all' ||
-    isTodayOnly;
+  const genres = [
+    { id: 'all', label: t('allGenres') },
+    { id: 'street', label: t('genre_street') },
+    { id: 'dance', label: t('genre_dance') },
+    { id: 'music', label: t('genre_music') },
+    { id: 'theater', label: t('genre_theater') },
+    { id: 'traditional', label: t('genre_traditional') },
+    { id: 'kamishibai', label: t('genre_kamishibai') },
+    { id: 'exhibition', label: t('genre_exhibition') },
+    { id: 'other', label: t('genre_other') },
+  ];
 
   return (
-    <div className="space-y-8">
-      {/* Search Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-950 via-slate-900 to-pink-950 border border-purple-800/40 p-6 sm:p-8 shadow-2xl">
-        <div className="relative z-10 max-w-3xl">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="px-3 py-1 rounded-full bg-pink-600/90 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1 shadow-md">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>AUDIENCE APP 2026</span>
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-            {t('audienceTitle')}
-          </h1>
-          <p className="text-sm text-purple-200 mt-2 leading-relaxed">
-            {t('audienceSubtitle')}
-          </p>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      {/* App Header */}
+      <div className="text-center space-y-2">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-50 border border-pink-200 text-pink-600 text-xs font-black uppercase tracking-wider">
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>{t('appCtaBadge')}</span>
+        </div>
+        <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
+          {t('audienceTitle')}
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+          {t('audienceSubtitle')}
+        </p>
+      </div>
+
+      {/* Main Tabs (Search / Map / Favorites) */}
+      <div className="flex items-center justify-center">
+        <div className="flex p-1.5 rounded-2xl bg-slate-100 border border-slate-200 shadow-inner max-w-md w-full">
+          <button
+            onClick={() => setActiveTab('search')}
+            className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all ${
+              activeTab === 'search'
+                ? 'bg-white text-pink-600 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5" />
+            <span>{t('tabSearch')}</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('map')}
+            className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all ${
+              activeTab === 'map'
+                ? 'bg-white text-pink-600 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <MapIcon className="w-3.5 h-3.5" />
+            <span>{t('tabMap')}</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('favorites')}
+            className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all ${
+              activeTab === 'favorites'
+                ? 'bg-pink-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Heart className="w-3.5 h-3.5" />
+            <span>{t('tabFavorites')} ({favorites.length})</span>
+          </button>
         </div>
       </div>
 
-      {/* Main Filter Console (WHAT / WHERE / WHEN) */}
-      <div className="bg-slate-900/95 border border-purple-800/50 rounded-3xl p-5 sm:p-7 shadow-xl space-y-6">
-        {/* Quick Tabs: Today / All Dates / Favorites */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-purple-900/40 pb-5">
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Today's Shows Quick Button */}
-            <button
-              onClick={() => {
-                setIsTodayOnly(!isTodayOnly);
-                if (!isTodayOnly) setSelectedDate('all');
-              }}
-              className={`px-4 py-2 rounded-2xl text-xs font-extrabold flex items-center gap-2 transition-all ${
-                isTodayOnly
-                  ? 'bg-gradient-to-r from-amber-500 to-pink-600 text-white shadow-lg shadow-pink-500/25 scale-105'
-                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-purple-800/40'
-              }`}
-            >
-              <Flame className={`w-4 h-4 ${isTodayOnly ? 'text-amber-300 animate-pulse' : 'text-amber-400'}`} />
-              <span>{t('todaysShows')} ({todayDateStr})</span>
-            </button>
-
-            {/* View Mode Switcher */}
-            <div className="flex items-center bg-slate-950 p-1 rounded-2xl border border-purple-900/40">
-              <button
-                onClick={() => setViewMode('list')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
-                  viewMode === 'list'
-                    ? 'bg-pink-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <Grid className="w-3.5 h-3.5" />
-                <span>{t('tabSearch')}</span>
-              </button>
-
-              <button
-                onClick={() => setViewMode('map')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
-                  viewMode === 'map'
-                    ? 'bg-purple-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <MapIcon className="w-3.5 h-3.5" />
-                <span>{t('tabMap')}</span>
-              </button>
-
-              <button
-                onClick={() => setViewMode('favorites')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
-                  viewMode === 'favorites'
-                    ? 'bg-pink-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <Heart className="w-3.5 h-3.5 fill-current text-pink-400" />
-                <span>{t('tabFavorites')} ({favorites.length})</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Reset Filters */}
-          {hasActiveFilters && (
-            <button
-              onClick={resetFilters}
-              className="text-xs text-slate-400 hover:text-pink-400 font-semibold flex items-center gap-1 transition-colors"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>{t('resetFilters')}</span>
-            </button>
-          )}
-        </div>
-
-        {/* 3 Pillars: WHAT / WHERE / WHEN */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* WHAT (Keyword & 8 Major Genres) */}
-          <div className="space-y-2">
-            <label className="text-xs font-extrabold text-pink-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Search className="w-3.5 h-3.5" />
-              <span>{t('filterWhat')}</span>
-            </label>
-            <div className="space-y-2">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={keyword}
-                  onChange={(e) => setKeyword(e.target.value)}
-                  placeholder={t('searchPlaceholder')}
-                  className="w-full bg-slate-950 border border-purple-800/40 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 transition-colors"
-                />
-                {keyword && (
-                  <button
-                    onClick={() => setKeyword('')}
-                    className="absolute right-3 top-2.5 text-slate-400 hover:text-white text-xs"
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
-              <select
-                value={selectedGenre}
-                onChange={(e) => setSelectedGenre(e.target.value)}
-                className="w-full bg-slate-950 border border-purple-800/40 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-pink-500 cursor-pointer"
-              >
-                <option value="all">{t('allGenres')}</option>
-                <option value="street">{t('genre_street')}</option>
-                <option value="dance">{t('genre_dance')}</option>
-                <option value="music">{t('genre_music')}</option>
-                <option value="theater">{t('genre_theater')}</option>
-                <option value="traditional">{t('genre_traditional')}</option>
-                <option value="kamishibai">{t('genre_kamishibai')}</option>
-                <option value="exhibition">{t('genre_exhibition')}</option>
-                <option value="other">{t('genre_other')}</option>
-              </select>
-            </div>
-          </div>
-
-          {/* WHERE (Venue & Area) */}
-          <div className="space-y-2">
-            <label className="text-xs font-extrabold text-purple-400 uppercase tracking-wider flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5" />
-              <span>{t('filterWhere')}</span>
-            </label>
-            <div className="space-y-2">
-              <select
-                value={selectedVenueId}
-                onChange={(e) => setSelectedVenueId(e.target.value)}
-                className="w-full bg-slate-950 border border-purple-800/40 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-purple-500 cursor-pointer"
-              >
-                <option value="all">{t('allVenues')}</option>
-                {venues.map((v) => (
-                  <option key={v.id} value={v.id}>
-                    {getText(v.area, v.areaEn)} - {getText(v.name, v.nameEn)}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => setViewMode('map')}
-                className="w-full py-2 bg-purple-950/60 hover:bg-purple-900/80 border border-purple-800/40 rounded-xl text-xs font-semibold text-purple-300 flex items-center justify-center gap-1.5 transition-colors"
-              >
-                <MapIcon className="w-3.5 h-3.5" />
-                <span>{t('tabMap')}</span>
-              </button>
-            </div>
-          </div>
-
-          {/* WHEN (Date Selector) */}
-          <div className="space-y-2">
-            <label className="text-xs font-extrabold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5" />
-              <span>{t('filterWhen')}</span>
-            </label>
-            <div className="space-y-2">
-              <select
-                value={isTodayOnly ? todayDateStr : selectedDate}
-                onChange={(e) => {
-                  setIsTodayOnly(false);
-                  setSelectedDate(e.target.value);
-                }}
-                disabled={isTodayOnly}
-                className={`w-full bg-slate-950 border border-purple-800/40 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500 cursor-pointer ${
-                  isTodayOnly ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-              >
-                <option value="all">{t('allDates')}</option>
-                {allDates.map((date) => (
-                  <option key={date} value={date}>
-                    {date} {date === todayDateStr ? '(Today)' : ''}
-                  </option>
-                ))}
-              </select>
-              <div className="text-[11px] text-slate-400 bg-slate-950 p-2 rounded-xl border border-purple-900/30">
-                {isTodayOnly ? t('showingTodayOnly') : t('showingAllDates')}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content Area: Map View or Performance Grid */}
-      {viewMode === 'map' ? (
-        <div className="space-y-4">
+      {/* Map View */}
+      {activeTab === 'map' ? (
+        <div className="space-y-6">
           <FestivalMap
             venues={venues}
             performances={initialPerformances}
-            selectedVenueId={selectedVenueId === 'all' ? null : selectedVenueId}
-            onSelectVenue={(id) => setSelectedVenueId(id)}
+            onSelectPerformance={(p) => setSelectedPerformance(p)}
           />
         </div>
       ) : (
-        <div className="space-y-6">
-          {/* Result Count Header */}
-          <div className="flex items-center justify-between text-xs text-slate-400 px-1">
-            <p>
-              {t('resultsCount')}:{' '}
-              <span className="text-base font-extrabold text-pink-400">
-                {filteredPerformances.length}
-              </span>{' '}
-              {t('showsUnit')}
-            </p>
-            {viewMode === 'favorites' && (
-              <span className="text-pink-400 font-semibold">{t('viewingFavorites')}</span>
+        /* Search / List / Favorites View */
+        <div className="space-y-8">
+          
+          {/* WHAT / WHERE / WHEN Filter Control Panel */}
+          <div className="bg-slate-50 border border-pink-100 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
+            {/* Search Input */}
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t('searchPlaceholder')}
+                className="w-full bg-white border border-slate-200 rounded-2xl pl-12 pr-4 py-3.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 shadow-2xs transition-colors"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 hover:text-slate-600"
+                >
+                  クリア
+                </button>
+              )}
+            </div>
+
+            {/* 3 Select Dropdowns: WHAT / WHERE / WHEN */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              
+              {/* WHAT: Genre */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-black text-slate-700 flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5 text-pink-600" />
+                  <span>{t('filterWhat')}</span>
+                </label>
+                <select
+                  value={selectedGenre}
+                  onChange={(e) => setSelectedGenre(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-pink-500 shadow-2xs"
+                >
+                  {genres.map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {g.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* WHERE: Venue */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-black text-slate-700 flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5 text-pink-600" />
+                  <span>{t('filterWhere')}</span>
+                </label>
+                <select
+                  value={selectedVenueId}
+                  onChange={(e) => setSelectedVenueId(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-pink-500 shadow-2xs"
+                >
+                  <option value="all">{t('allVenues')}</option>
+                  {venues.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {getText(v.name, v.nameEn)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* WHEN: Date */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-black text-slate-700 flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5 text-pink-600" />
+                  <span>{t('filterWhen')}</span>
+                </label>
+                <select
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-pink-500 shadow-2xs"
+                >
+                  <option value="all">{t('allDates')}</option>
+                  {festivalDates.map((date) => (
+                    <option key={date} value={date}>
+                      {date}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+            </div>
+
+            {/* Reset Button */}
+            {(selectedGenre !== 'all' || selectedVenueId !== 'all' || selectedDate !== 'all' || searchQuery) && (
+              <div className="flex justify-end pt-2">
+                <button
+                  onClick={resetFilters}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-200/80 hover:bg-slate-300 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>{t('resetFilters')}</span>
+                </button>
+              </div>
             )}
           </div>
 
-          {/* Cards Grid */}
-          {filteredPerformances.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Results Summary */}
+          <div className="flex items-center justify-between px-2">
+            <p className="text-xs font-black text-slate-600 uppercase tracking-wider">
+              {t('resultsCount')}: <span className="text-pink-600 text-sm">{filteredPerformances.length}</span> {t('showsUnit')}
+            </p>
+          </div>
+
+          {/* Performances Grid */}
+          {filteredPerformances.length === 0 ? (
+            <div className="py-20 text-center space-y-4 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
+              <p className="text-sm font-bold text-slate-500">{t('noResults')}</p>
+              <button
+                onClick={resetFilters}
+                className="px-6 py-2.5 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs shadow-sm transition-colors"
+              >
+                {t('showAllShows')}
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredPerformances.map((perf) => (
                 <PerformanceCard
                   key={perf.id}
@@ -391,22 +353,11 @@ export default function AudienceApp({ initialPerformances, venues }: AudienceApp
                 />
               ))}
             </div>
-          ) : (
-            <div className="py-20 text-center bg-slate-900/50 rounded-3xl border border-purple-900/30 space-y-3">
-              <Search className="w-10 h-10 text-slate-600 mx-auto" />
-              <p className="text-sm font-semibold text-slate-300">{t('noResults')}</p>
-              <button
-                onClick={resetFilters}
-                className="px-4 py-2 bg-pink-600 text-white rounded-xl text-xs font-bold shadow-md hover:bg-pink-500 transition-colors"
-              >
-                {t('showAllShows')}
-              </button>
-            </div>
           )}
         </div>
       )}
 
-      {/* Detail Modal */}
+      {/* Performance Modal */}
       <PerformanceModal
         performance={selectedPerformance}
         onClose={() => setSelectedPerformance(null)}
