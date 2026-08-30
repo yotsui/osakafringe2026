@@ -1,0 +1,121 @@
+{
+  "apiType": "list",
+  "fields": [
+    {
+      "fieldId": "name",
+      "name": "会場名（日本語）",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "nameEn",
+      "name": "会場名（英語）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "area",
+      "name": "エリア",
+      "kind": "text",
+      "required": true,
+      "description": "例: 中崎町・梅田、ミナミ・心斎橋、中之島・北浜、天王寺・新世界"
+    },
+    {
+      "fieldId": "areaEn",
+      "name": "エリア（英語）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "address",
+      "name": "住所",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "addressEn",
+      "name": "住所（英語）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "access",
+      "name": "アクセス案内",
+      "kind": "textArea",
+      "required": true
+    },
+    {
+      "fieldId": "accessEn",
+      "name": "アクセス案内（英語）",
+      "kind": "textArea",
+      "required": false
+    },
+    {
+      "fieldId": "description",
+      "name": "会場概要",
+      "kind": "textArea",
+      "required": false
+    },
+    {
+      "fieldId": "descriptionEn",
+      "name": "会場概要（英語）",
+      "kind": "textArea",
+      "required": false
+    },
+    {
+      "fieldId": "location",
+      "name": "緯度経度JSON",
+      "kind": "textArea",
+      "required": true,
+      "description": "JSON形式: {\"lat\": 34.7081, \"lng\": 135.5034}"
+    },
+    {
+      "fieldId": "image",
+      "name": "メイン会場写真",
+      "kind": "media",
+      "required": false
+    },
+    {
+      "fieldId": "image2",
+      "name": "会場写真2",
+      "kind": "media",
+      "required": false
+    },
+    {
+      "fieldId": "image3",
+      "name": "会場写真3",
+      "kind": "media",
+      "required": false
+    },
+    {
+      "fieldId": "websiteUrl",
+      "name": "公式WEBサイトURL",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "snsTwitter",
+      "name": "X (Twitter) URL",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "snsInstagram",
+      "name": "Instagram URL",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "snsFacebook",
+      "name": "Facebook URL",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "capacity",
+      "name": "収容人数",
+      "kind": "number",
+      "required": false
+    }
+  ]
+}

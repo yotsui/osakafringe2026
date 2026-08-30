@@ -1,0 +1,167 @@
+{
+  "apiType": "object",
+  "fields": [
+    {
+      "fieldId": "siteTitle",
+      "name": "サイトタイトル（日本語）",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "siteTitleEn",
+      "name": "サイトタイトル（英語）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "heroTagline",
+      "name": "トップメインキャッチコピー（日本語）",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "heroTaglineEn",
+      "name": "トップメインキャッチコピー（英語）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "heroSubtitle",
+      "name": "トップサブタイトル（日本語）",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "heroSubtitleEn",
+      "name": "トップサブタイトル（英語）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "festivalPeriod",
+      "name": "開催日程（日本語）",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "festivalPeriodEn",
+      "name": "開催日程（英語）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "locationSummary",
+      "name": "開催エリア概要（日本語）",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "locationSummaryEn",
+      "name": "開催エリア概要（英語）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "aboutTitle",
+      "name": "About タイトル（日本語）",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "aboutTitleEn",
+      "name": "About タイトル（英語）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "aboutText",
+      "name": "About 本文（日本語）",
+      "kind": "textArea",
+      "required": true
+    },
+    {
+      "fieldId": "aboutTextEn",
+      "name": "About 本文（英語）",
+      "kind": "textArea",
+      "required": false
+    },
+    {
+      "fieldId": "donationTitle",
+      "name": "寄付案内タイトル（日本語）",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "donationTitleEn",
+      "name": "寄付案内タイトル（英語）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "donationText",
+      "name": "寄付案内本文（日本語）",
+      "kind": "textArea",
+      "required": true
+    },
+    {
+      "fieldId": "donationTextEn",
+      "name": "寄付案内本文（英語）",
+      "kind": "textArea",
+      "required": false
+    },
+    {
+      "fieldId": "donationBankInfo",
+      "name": "銀行振込口座情報（日本語）",
+      "kind": "textArea",
+      "required": false
+    },
+    {
+      "fieldId": "donationBankInfoEn",
+      "name": "銀行振込口座情報（英語）",
+      "kind": "textArea",
+      "required": false
+    },
+    {
+      "fieldId": "donationCrowdfundingUrl",
+      "name": "クラウドファンディングURL",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "googleFormUrl",
+      "name": "お問い合わせ GoogleフォームURL",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "officialInstagramUrl",
+      "name": "公式Instagram URL",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "officialXUrl",
+      "name": "公式X (Twitter) URL",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "officialWebsiteUrl",
+      "name": "公式WEBサイトURL",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "contactEmail",
+      "name": "お問い合わせメールアドレス",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "awardsEnabled",
+      "name": "アワード表示フラグ（ON/OFF）",
+      "kind": "boolean",
+      "required": false
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "apiType": "list",
+  "fields": [
+    {
+      "fieldId": "title",
+      "name": "公演タイトル（日本語）",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "titleEn",
+      "name": "公演タイトル（英語）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "artistName",
+      "name": "アーティスト名（日本語）",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "artistNameEn",
+      "name": "アーティスト名（英語）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "genre",
+      "name": "ジャンル",
+      "kind": "select",
+      "required": true,
+      "selectItems": [
+        { "value": "street" },
+        { "value": "dance" },
+        { "value": "music" },
+        { "value": "theater" },
+        { "value": "traditional" },
+        { "value": "kamishibai" },
+        { "value": "exhibition" },
+        { "value": "other" }
+      ]
+    },
+    {
+      "fieldId": "genreCustom",
+      "name": "カスタムジャンル名（例: フィジカルシアター）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "genreCustomEn",
+      "name": "カスタムジャンル名（英語）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "description",
+      "name": "公演概要・紹介文（日本語）",
+      "kind": "textArea",
+      "required": true
+    },
+    {
+      "fieldId": "descriptionEn",
+      "name": "公演概要・紹介文（英語）",
+      "kind": "textArea",
+      "required": false
+    },
+    {
+      "fieldId": "venueId",
+      "name": "デフォルト会場ID (venuesのコンテンツID)",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "schedules",
+      "name": "公演スケジュールJSON（会場紐づけ）",
+      "kind": "textArea",
+      "required": true,
+      "description": "JSON形式: [{\"date\":\"2026-09-18\",\"startTime\":\"19:00\",\"endTime\":\"20:15\",\"venueId\":\"nakazaki-hall\",\"venueName\":\"中崎町アートスペース SPACE ONE\",\"venueNameEn\":\"Nakazakicho Art Space SPACE ONE\",\"note\":\"初日\"}]"
+    },
+    {
+      "fieldId": "ticketPrice",
+      "name": "チケット料金（日本語）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "ticketPriceEn",
+      "name": "チケット料金（英語）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "ticketUrl",
+      "name": "チケット予約・購入URL（※空欄の場合はボタン非表示）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "websiteUrl",
+      "name": "アーティスト公式WEBサイト",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "snsTwitter",
+      "name": "X (Twitter) URL",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "snsInstagram",
+      "name": "Instagram URL",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "snsYoutube",
+      "name": "YouTube URL",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "image",
+      "name": "メインビジュアル画像",
+      "kind": "media",
+      "required": true
+    },
+    {
+      "fieldId": "isFeatured",
+      "name": "注目公演フラグ（トップに掲載）",
+      "kind": "boolean",
+      "required": false
+    },
+    {
+      "fieldId": "durationMinutes",
+      "name": "上演時間（分）",
+      "kind": "number",
+      "required": false
+    }
+  ]
+}

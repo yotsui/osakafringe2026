@@ -1,0 +1,77 @@
+{
+  "apiType": "list",
+  "fields": [
+    {
+      "fieldId": "year",
+      "name": "受賞年",
+      "kind": "number",
+      "required": true
+    },
+    {
+      "fieldId": "title",
+      "name": "アワード名（日本語）",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "titleEn",
+      "name": "アワード名（英語）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "category",
+      "name": "部門名（日本語）",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "categoryEn",
+      "name": "部門名（英語）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "winner",
+      "name": "受賞アーティスト（日本語）",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "winnerEn",
+      "name": "受賞アーティスト（英語）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "workTitle",
+      "name": "受賞作品名（日本語）",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "workTitleEn",
+      "name": "受賞作品名（英語）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "comment",
+      "name": "講評（日本語）",
+      "kind": "textArea",
+      "required": false
+    },
+    {
+      "fieldId": "commentEn",
+      "name": "講評（英語）",
+      "kind": "textArea",
+      "required": false
+    },
+    {
+      "fieldId": "image",
+      "name": "写真",
+      "kind": "media",
+      "required": false
+    }
+  ]
+}
