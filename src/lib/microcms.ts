@@ -2,8 +2,15 @@ import { createClient } from 'microcms-js-sdk';
 import { Venue, Performance, Award, Banner, SiteInfo, PerformanceSchedule } from '@/types';
 import { mockVenues, mockPerformances, mockAwards, mockBanners, mockSiteInfo } from './mockData';
 
-const serviceDomain = process.env.MICROCMS_SERVICE_DOMAIN || process.env.NEXT_PUBLIC_MICROCMS_SERVICE_DOMAIN || '';
-const apiKey = process.env.MICROCMS_API_KEY || process.env.NEXT_PUBLIC_MICROCMS_API_KEY || '';
+const rawServiceDomain = process.env.MICROCMS_SERVICE_DOMAIN || process.env.NEXT_PUBLIC_MICROCMS_SERVICE_DOMAIN || '';
+// URL形式（https://xxx.microcms.io/）が渡された場合もサブドメイン部分（xxx）を安全に抽出
+export const serviceDomain = rawServiceDomain
+  .trim()
+  .replace(/^https?:\/\//i, '')
+  .replace(/\.microcms\.io\/?$/i, '')
+  .replace(/\/$/, '');
+
+const apiKey = (process.env.MICROCMS_API_KEY || process.env.NEXT_PUBLIC_MICROCMS_API_KEY || '').trim();
 
 export const isMicroCMSConfigured = Boolean(serviceDomain && apiKey);
 

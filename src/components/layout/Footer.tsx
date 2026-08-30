@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useLanguage } from '@/context/LanguageContext';
+import BrandLogo from '@/components/common/BrandLogo';
 import { Sparkles, Heart, Mail, Globe, MapPin, ExternalLink } from 'lucide-react';
 import { InstagramIcon } from '@/components/common/SnsIcons';
 
@@ -17,16 +18,9 @@ export default function Footer() {
           
           {/* Logo & About */}
           <div className="md:col-span-2 space-y-4">
-            <Link href="/" className="inline-block">
-              <div className="relative h-12 w-56">
-                <Image
-                  src="/images/logo_date_main_trans.png"
-                  alt="OCT8 - NOV8, 2026 大阪文化万博 | osaka fringe"
-                  fill
-                  className="object-contain object-left"
-                />
-              </div>
-            </Link>
+            <div className="w-56">
+              <BrandLogo variant="main-date" />
+            </div>
             <p className="text-xs text-slate-500 max-w-md leading-relaxed font-medium">
               {t('footerDesc')}
             </p>

@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import { Banner } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
+import SafeImage from '@/components/common/SafeImage';
 import { ExternalLink, Landmark } from 'lucide-react';
 import { InstagramIcon } from './SnsIcons';
 
@@ -31,14 +31,16 @@ export default function BannerSection({ banners }: BannerSectionProps) {
               href={banner.linkUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative overflow-hidden rounded-3xl bg-white border border-pink-100 hover:border-pink-300 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col sm:flex-row items-center p-5 gap-5"
+              className="group relative overflow-hidden rounded-3xl bg-white border border-pink-100 hover:border-pink-300 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col sm:flex-row items-center p-5 gap-5"
             >
               {/* Thumbnail */}
               <div className="relative w-full sm:w-36 h-28 flex-shrink-0 overflow-hidden rounded-2xl bg-slate-100">
-                <Image
+                <SafeImage
                   src={banner.imageUrl}
                   alt={banner.alt || title}
                   fill
+                  fallbackType="banner"
+                  fallbackText={banner.type === 'instagram' ? 'Instagram' : 'Official Portal'}
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
@@ -58,18 +60,18 @@ export default function BannerSection({ banners }: BannerSectionProps) {
                     </span>
                   )}
                 </div>
-                <h3 className="text-sm sm:text-base font-black text-slate-900 group-hover:text-pink-600 transition-colors line-clamp-1">
+
+                <h3 className="text-sm font-black text-slate-900 group-hover:text-pink-600 transition-colors leading-snug line-clamp-1">
                   {title}
                 </h3>
-                {desc && (
-                  <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed font-medium">
-                    {desc}
-                  </p>
-                )}
+
+                <p className="text-xs text-slate-500 font-medium leading-relaxed line-clamp-2">
+                  {desc}
+                </p>
               </div>
 
-              {/* External Arrow Icon */}
-              <div className="hidden sm:flex items-center justify-center w-9 h-9 rounded-full bg-pink-50 text-pink-600 group-hover:bg-pink-600 group-hover:text-white transition-all flex-shrink-0">
+              {/* Icon */}
+              <div className="self-end sm:self-center p-2 rounded-xl bg-pink-50 group-hover:bg-pink-600 group-hover:text-white text-pink-600 transition-colors flex-shrink-0">
                 <ExternalLink className="w-4 h-4" />
               </div>
             </a>

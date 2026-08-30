@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
-import Image from 'next/image';
+import React, { useEffect } from 'react';
 import { Performance } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
+import SafeImage from '@/components/common/SafeImage';
 import { 
   X, 
   Calendar, 
@@ -13,9 +13,10 @@ import {
   Globe, 
   Sparkles, 
   ExternalLink,
-  Share2,
-  Navigation
+  Navigation,
+  Heart
 } from 'lucide-react';
+import { TwitterIcon, InstagramIcon } from '@/components/common/SnsIcons';
 
 interface PerformanceModalProps {
   performance: Performance | null;
@@ -32,6 +33,26 @@ export default function PerformanceModal({
 }: PerformanceModalProps) {
   const { t, getText } = useLanguage();
 
+  // Handle ESC key press to close modal
+  useEffect(() => {
+    if (!performance) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    // Prevent body scrolling when modal is open
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [performance, onClose]);
+
   if (!performance) return null;
 
   const title = getText(performance.title, performance.titleEn);
@@ -46,163 +67,240 @@ export default function PerformanceModal({
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-10 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 md:p-10 bg-slate-900/70 backdrop-blur-md animate-fadeIn"
+      onClick={onClose}
+    >
       <div 
-        className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl border border-pink-100 shadow-2xl space-y-6"
+        className="relative w-full max-w-3xl max-h-[92vh] flex flex-col bg-white rounded-3xl border border-pink-100 shadow-2xl overflow-hidden animate-scaleUp"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header Hero Image */}
-        <div className="relative aspect-16/9 w-full bg-slate-100">
-          <Image
-            src={performance.image || 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1200&q=80'}
-            alt={title}
-            fill
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
-
-          {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 p-2.5 rounded-full bg-white/80 hover:bg-white text-slate-800 backdrop-blur-md shadow-md transition-colors"
-            aria-label="Close"
-          >
-            <X className="w-5 h-5" />
-          </button>
-
-          {/* Badges & Favorite */}
-          <div className="absolute top-4 left-4 flex flex-wrap gap-2">
-            <span className="px-3 py-1 rounded-full bg-pink-600 text-white text-xs font-black uppercase shadow-md">
+        {/* Sticky Header with Close Button that NEVER scrolls away */}
+        <div className="sticky top-0 z-40 flex items-center justify-between px-6 py-3.5 bg-white/90 backdrop-blur-md border-b border-pink-100/80 shadow-xs">
+          <div className="flex items-center gap-2 overflow-hidden mr-3">
+            <span className="px-2.5 py-0.5 rounded-full bg-pink-50 border border-pink-200 text-pink-600 text-[11px] font-black uppercase">
               {t(`genre_${performance.genre}`) || performance.genre}
             </span>
-            {genreCustom && (
-              <span className="px-3 py-1 rounded-full bg-slate-900/80 backdrop-blur-md text-pink-200 text-xs font-bold">
-                {genreCustom}
-              </span>
-            )}
+            <span className="text-xs font-bold text-slate-700 truncate">
+              {title}
+            </span>
           </div>
 
-          {/* Title on Hero */}
-          <div className="absolute bottom-6 left-6 right-6 space-y-1 text-white">
-            <p className="text-pink-300 text-xs font-black tracking-wider uppercase">
-              {artistName}
-            </p>
-            <h2 className="text-xl sm:text-3xl font-black leading-tight drop-shadow-md">
-              {title}
-            </h2>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {onToggleFavorite && (
+              <button
+                type="button"
+                onClick={() => onToggleFavorite(performance.id)}
+                className={`p-2 rounded-full border transition-all cursor-pointer ${
+                  isFavorite
+                    ? 'bg-pink-600 text-white border-pink-600 shadow-sm'
+                    : 'bg-white text-slate-600 border-slate-200 hover:text-pink-600 hover:border-pink-300'
+                }`}
+                aria-label="Favorite"
+              >
+                <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+              </button>
+            )}
+
+            <button
+              onClick={onClose}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-pink-600 hover:text-white text-slate-700 text-xs font-black transition-all cursor-pointer"
+              aria-label="Close modal"
+            >
+              <X className="w-4 h-4" />
+              <span className="hidden sm:inline">{t('closeModal')}</span>
+              <span className="text-[10px] opacity-60 font-mono hidden md:inline">(ESC)</span>
+            </button>
           </div>
         </div>
 
-        {/* Modal Body */}
-        <div className="px-6 sm:px-8 pb-8 space-y-8">
-          
-          {/* Action Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pb-6 border-b border-slate-100">
-            <div className="flex items-center gap-2">
-              {onToggleFavorite && (
-                <button
-                  onClick={() => onToggleFavorite(performance.id)}
-                  className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                    isFavorite
-                      ? 'bg-pink-600 text-white shadow-md shadow-pink-500/30'
-                      : 'bg-slate-100 hover:bg-pink-50 text-slate-700 hover:text-pink-600'
-                  }`}
-                >
-                  <Sparkles className="w-4 h-4" />
-                  <span>{isFavorite ? 'お気に入り登録中' : 'お気に入りに追加'}</span>
-                </button>
+        {/* Scrollable Modal Content */}
+        <div className="overflow-y-auto flex-1 space-y-6">
+          {/* Hero Image Container */}
+          <div className="relative aspect-16/9 w-full bg-slate-900 overflow-hidden">
+            <SafeImage
+              src={performance.image}
+              alt={title}
+              fill
+              fallbackGenre={performance.genre}
+              fallbackText={title}
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
+
+            {/* Title on Hero */}
+            <div className="absolute bottom-6 left-6 right-6 space-y-1.5 text-white">
+              <p className="text-pink-300 text-xs font-black tracking-wider uppercase drop-shadow-sm">
+                {artistName}
+              </p>
+              <h2 className="text-xl sm:text-3xl font-black leading-tight drop-shadow-md">
+                {title}
+              </h2>
+            </div>
+          </div>
+
+          {/* Modal Body */}
+          <div className="px-6 sm:px-8 pb-8 space-y-8">
+            {/* Action Bar */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-6 border-b border-slate-100">
+              <div className="flex flex-wrap items-center gap-2">
+                {performance.ticketUrl && (
+                  <a
+                    href={performance.ticketUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-black text-xs flex items-center gap-2 shadow-md shadow-pink-500/20 transition-all cursor-pointer"
+                  >
+                    <Ticket className="w-4 h-4" />
+                    <span>{t('bookTickets')}</span>
+                    <ExternalLink className="w-3.5 h-3.5 opacity-80" />
+                  </a>
+                )}
+
+                {performance.websiteUrl && (
+                  <a
+                    href={performance.websiteUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-2 transition-colors cursor-pointer"
+                  >
+                    <Globe className="w-4 h-4 text-slate-500" />
+                    <span>Web</span>
+                  </a>
+                )}
+
+                {performance.snsTwitter && (
+                  <a
+                    href={performance.snsTwitter}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
+                    aria-label="X / Twitter"
+                  >
+                    <TwitterIcon className="w-4 h-4" />
+                  </a>
+                )}
+
+                {performance.snsInstagram && (
+                  <a
+                    href={performance.snsInstagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-pink-600 transition-colors cursor-pointer"
+                    aria-label="Instagram"
+                  >
+                    <InstagramIcon className="w-4 h-4" />
+                  </a>
+                )}
+              </div>
+
+              {performance.durationMinutes && (
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold">
+                  <Clock className="w-3.5 h-3.5 text-pink-600" />
+                  <span>{t('durationLabel')}: {performance.durationMinutes} {t('minutes')}</span>
+                </div>
               )}
             </div>
 
-            <div className="flex items-center gap-2">
+            {/* Performance Description */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-pink-600" />
+                <span>{t('aboutTheShow')}</span>
+              </h3>
+              <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100 text-slate-700 text-xs sm:text-sm leading-relaxed font-medium whitespace-pre-line">
+                {description}
+              </div>
+            </div>
+
+            {/* Schedule & Venues List */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-pink-600" />
+                <span>{t('scheduleList')}</span>
+              </h3>
+
+              <div className="space-y-3">
+                {performance.schedules && performance.schedules.length > 0 ? (
+                  performance.schedules.map((schedule, idx) => {
+                    const sVenueName = getText(schedule.venueName, schedule.venueNameEn) || fallbackVenueName || 'Venue';
+                    return (
+                      <div
+                        key={idx}
+                        className="p-4 rounded-2xl border border-pink-100 bg-white hover:border-pink-300 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs"
+                      >
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2.5 py-0.5 rounded-md bg-pink-100 text-pink-700 text-xs font-black">
+                              {schedule.date}
+                            </span>
+                            <span className="text-xs font-bold text-slate-800">
+                              {schedule.startTime} - {schedule.endTime}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+                            <MapPin className="w-3.5 h-3.5 text-pink-600 flex-shrink-0" />
+                            <span>{sVenueName}</span>
+                          </div>
+                          {schedule.note && (
+                            <p className="text-[11px] text-slate-400">
+                              ※ {schedule.note}
+                            </p>
+                          )}
+                        </div>
+
+                        <a
+                          href={googleMapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="self-start sm:self-center px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-pink-50 hover:text-pink-600 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                        >
+                          <Navigation className="w-3.5 h-3.5 text-pink-600" />
+                          <span>{t('directions')}</span>
+                        </a>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="text-xs text-slate-400">No schedules listed</p>
+                )}
+              </div>
+            </div>
+
+            {/* Ticket Price Info */}
+            <div className="p-5 rounded-2xl bg-pink-50/70 border border-pink-100 flex items-center justify-between gap-4">
+              <div className="space-y-0.5">
+                <span className="text-[11px] font-black text-pink-600 uppercase">
+                  {t('priceLabel')}
+                </span>
+                <p className="text-sm font-black text-slate-900">
+                  {ticketPrice || t('inquirePrice')}
+                </p>
+              </div>
+
               {performance.ticketUrl && (
                 <a
                   href={performance.ticketUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-black text-xs shadow-md transition-all"
+                  className="px-4 py-2 rounded-xl bg-pink-600 hover:bg-pink-500 text-white font-black text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
                 >
-                  <Ticket className="w-4 h-4" />
-                  <span>{t('bookTickets')}</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
+                  <Ticket className="w-3.5 h-3.5" />
+                  <span>{t('tickets')}</span>
                 </a>
               )}
             </div>
-          </div>
 
-          {/* Description */}
-          <div className="space-y-3">
-            <h3 className="text-xs font-black text-pink-600 uppercase tracking-widest">
-              {t('aboutTheShow')}
-            </h3>
-            <p className="text-sm sm:text-base text-slate-700 leading-relaxed whitespace-pre-line font-medium">
-              {description}
-            </p>
-          </div>
-
-          {/* Schedules List with Specific Venues */}
-          <div className="space-y-4">
-            <h3 className="text-xs font-black text-pink-600 uppercase tracking-widest flex items-center gap-1.5">
-              <Calendar className="w-4 h-4" />
-              <span>{t('scheduleList')}</span>
-            </h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {performance.schedules && performance.schedules.map((schedule, idx) => {
-                const sVenueName = getText(schedule.venueName, schedule.venueNameEn) || fallbackVenueName;
-                const sAddress = fallbackAddress;
-                const specificMapUrl = sVenueName ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(sVenueName + ' 大阪')}` : googleMapsUrl;
-
-                return (
-                  <div key={idx} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
-                    <div className="flex items-center justify-between text-xs font-black text-pink-600">
-                      <span>{schedule.date}</span>
-                      <span>{schedule.startTime} 〜 {schedule.endTime || ''}</span>
-                    </div>
-
-                    {sVenueName && (
-                      <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
-                        <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 truncate">
-                          <MapPin className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-                          <span className="truncate">{sVenueName}</span>
-                        </div>
-                        <a
-                          href={specificMapUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[11px] font-bold text-pink-600 hover:text-pink-700 flex items-center gap-0.5 flex-shrink-0"
-                        >
-                          <span>Map</span>
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                      </div>
-                    )}
-
-                    {schedule.note && (
-                      <p className="text-[11px] text-pink-600 font-bold bg-pink-50 px-2 py-0.5 rounded inline-block">
-                        {schedule.note}
-                      </p>
-                    )}
-                  </div>
-                );
-              })}
+            {/* Bottom Close Button */}
+            <div className="pt-4 flex justify-center">
+              <button
+                onClick={onClose}
+                className="px-8 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs transition-all cursor-pointer"
+              >
+                {t('closeModal')}
+              </button>
             </div>
           </div>
-
-          {/* Ticket Price & Duration Info */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 rounded-2xl bg-pink-50/50 border border-pink-100">
-            <div className="space-y-1">
-              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{t('priceLabel')}</span>
-              <p className="text-sm font-black text-slate-900">{ticketPrice || t('inquirePrice')}</p>
-            </div>
-            {performance.durationMinutes && (
-              <div className="space-y-1">
-                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{t('durationLabel')}</span>
-                <p className="text-sm font-black text-slate-900">{performance.durationMinutes} {t('minutes')}</p>
-              </div>
-            )}
-          </div>
-
         </div>
       </div>
     </div>

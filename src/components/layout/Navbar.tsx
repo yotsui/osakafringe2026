@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
+import BrandLogo from '@/components/common/BrandLogo';
 import { 
   Sparkles, 
   Menu, 
@@ -38,17 +39,9 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Main Logo (Date-included: OCT8 - NOV8, 2026 大阪文化万博 | osaka fringe) */}
-          <Link href="/" className="flex items-center gap-3 group py-2">
-            <div className="relative h-12 w-48 sm:w-64">
-              <Image
-                src="/images/logo_date_main_trans.png"
-                alt="OCT8 - NOV8, 2026 大阪文化万博 | osaka fringe"
-                fill
-                priority
-                className="object-contain object-left group-hover:scale-[1.02] transition-transform duration-200"
-              />
-            </div>
-          </Link>
+          <div className="w-52 sm:w-64 py-2">
+            <BrandLogo variant="main-date" />
+          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-1.5">

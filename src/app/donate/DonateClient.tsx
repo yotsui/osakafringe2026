@@ -3,7 +3,7 @@
 import React from 'react';
 import { SiteInfo } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
-import { Heart, Landmark, ExternalLink, Sparkles, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { Heart, Landmark, ExternalLink, Sparkles, ShieldCheck } from 'lucide-react';
 
 interface DonateClientProps {
   siteInfo: SiteInfo;
@@ -39,7 +39,7 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
             MESSAGE
           </span>
           <h2 className="text-2xl sm:text-3xl font-black">
-            街とアーティストの未来を共に創るパートナーへ
+            {t('donateMessageHeader')}
           </h2>
           <p className="text-sm sm:text-base text-pink-100 leading-relaxed font-medium whitespace-pre-line">
             {text}
@@ -51,7 +51,7 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
       <div className="space-y-6">
         <div className="text-center space-y-1">
           <h2 className="text-xl sm:text-2xl font-black text-slate-900">{t('donatePurpose')}</h2>
-          <p className="text-xs text-slate-500 font-medium">いただいたご支援の使途</p>
+          <p className="text-xs text-slate-500 font-medium">{t('donatePurposeSub')}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -77,7 +77,7 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
       <div className="space-y-6">
         <div className="text-center space-y-1">
           <h2 className="text-xl sm:text-2xl font-black text-slate-900">{t('donateMethods')}</h2>
-          <p className="text-xs text-slate-500 font-medium">ご都合に合わせた支援方法をお選びいただけます</p>
+          <p className="text-xs text-slate-500 font-medium">{t('donateMethodsSub')}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -89,7 +89,7 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
               </div>
               <div>
                 <h3 className="text-base font-black text-slate-900">{t('bankTransferTitle')}</h3>
-                <p className="text-xs text-slate-500">直接口座へのご寄付</p>
+                <p className="text-xs text-slate-500">{t('bankTransferSub')}</p>
               </div>
             </div>
 
@@ -113,7 +113,7 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
                 </div>
                 <div>
                   <h3 className="text-base font-black text-slate-900">{t('crowdfundingTitle')}</h3>
-                  <p className="text-xs text-slate-500">リワード付き応援</p>
+                  <p className="text-xs text-slate-500">{t('crowdfundingSub')}</p>
                 </div>
               </div>
 
@@ -127,7 +127,7 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
                 href={(siteInfo.donationCrowdfundUrl || siteInfo.donationCrowdfundingUrl) || 'https://camp-fire.jp'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-black text-xs flex items-center justify-center gap-2 shadow-md transition-all"
+                className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-black text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
               >
                 <span>{t('viewProject')}</span>
                 <ExternalLink className="w-4 h-4" />

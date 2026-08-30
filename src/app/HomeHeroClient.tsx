@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { SiteInfo } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
+import BrandLogo from '@/components/common/BrandLogo';
 import { Sparkles, MapPin, Calendar, ArrowRight, ExternalLink } from 'lucide-react';
 
 interface HomeHeroClientProps {
@@ -27,15 +28,9 @@ export default function HomeHeroClient({ siteInfo }: HomeHeroClientProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center text-center space-y-8 max-w-4xl mx-auto">
           
-          {/* Main Logo Showcase (Date included) */}
-          <div className="relative w-full max-w-lg sm:max-w-xl h-24 sm:h-32 mb-2">
-            <Image
-              src="/images/logo_date_main_trans.png"
-              alt="OCT8 - NOV8, 2026 大阪文化万博 | osaka fringe"
-              fill
-              priority
-              className="object-contain drop-shadow-sm hover:scale-[1.02] transition-transform duration-300"
-            />
+          {/* Main Logo Showcase (Date included vector SVG) */}
+          <div className="w-full max-w-md sm:max-w-lg py-2 mb-2 flex justify-center">
+            <BrandLogo variant="main-date" linkToHome={false} className="w-full h-auto drop-shadow-sm" />
           </div>
 
           {/* Tagline & Slogan */}

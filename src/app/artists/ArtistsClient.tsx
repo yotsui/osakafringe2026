@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Performance, Venue } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import PerformanceModal from '@/components/audience/PerformanceModal';
+import SafeImage from '@/components/common/SafeImage';
 import { Users, Sparkles, Calendar, MapPin, Ticket, ExternalLink, ArrowRight } from 'lucide-react';
 
 interface ArtistsClientProps {
@@ -51,10 +52,12 @@ export default function ArtistsClient({ performances, venues }: ArtistsClientPro
                 className="relative aspect-16/10 w-full overflow-hidden bg-slate-100 cursor-pointer"
                 onClick={() => setSelectedPerformance(perf)}
               >
-                <Image
-                  src={perf.image || 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=800&q=80'}
+                <SafeImage
+                  src={perf.image}
                   alt={artistName}
                   fill
+                  fallbackGenre={perf.genre}
+                  fallbackText={artistName}
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />

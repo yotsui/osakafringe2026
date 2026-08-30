@@ -1,17 +1,17 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import { Performance } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
+import SafeImage from '@/components/common/SafeImage';
 import { 
   Calendar, 
   MapPin, 
   Clock, 
-  Sparkles, 
   ExternalLink, 
   Ticket,
-  ChevronRight
+  ChevronRight,
+  Heart
 } from 'lucide-react';
 
 interface PerformanceCardProps {
@@ -41,20 +41,25 @@ export default function PerformanceCard({
   const venueDisplayName = scheduleVenueName || fallbackVenueName;
 
   return (
-    <div className="group relative bg-white border border-pink-100/80 hover:border-pink-300 rounded-3xl overflow-hidden shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+    <div className="group relative bg-white border border-pink-100/90 hover:border-pink-300 rounded-3xl overflow-hidden shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
       {/* Thumbnail */}
-      <div className="relative aspect-16/10 w-full overflow-hidden bg-slate-100 cursor-pointer" onClick={() => onSelect?.(performance)}>
-        <Image
-          src={performance.image || 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=800&q=80'}
+      <div 
+        className="relative aspect-16/10 w-full overflow-hidden bg-slate-900 cursor-pointer select-none" 
+        onClick={() => onSelect?.(performance)}
+      >
+        <SafeImage
+          src={performance.image}
           alt={title}
           fill
+          fallbackGenre={performance.genre}
+          fallbackText={title}
           className="object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent pointer-events-none" />
 
         {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-          <span className="px-3 py-1 rounded-full bg-pink-600/90 backdrop-blur-md text-white text-[11px] font-extrabold uppercase shadow-sm">
+        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
+          <span className="px-3 py-1 rounded-full bg-pink-600 text-white text-[11px] font-extrabold uppercase shadow-xs">
             {t(`genre_${performance.genre}`) || performance.genre}
           </span>
           {genreCustom && (
@@ -67,72 +72,86 @@ export default function PerformanceCard({
         {/* Favorite Button */}
         {onToggleFavorite && (
           <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
               onToggleFavorite(performance.id);
             }}
-            className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-md transition-all shadow-sm ${
+            className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-md transition-all shadow-sm z-10 cursor-pointer ${
               isFavorite
-                ? 'bg-pink-600 text-white scale-110 shadow-pink-500/50'
+                ? 'bg-pink-600 text-white shadow-pink-500/30'
                 : 'bg-white/80 hover:bg-white text-slate-700 hover:text-pink-600'
             }`}
             aria-label="Toggle Favorite"
           >
-            <Sparkles className="w-4 h-4" />
+            <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
           </button>
         )}
 
-        {/* Artist Name on Image */}
-        <div className="absolute bottom-3 left-3 right-3">
-          <p className="text-white text-xs font-bold truncate drop-shadow-md">
+        {/* Artist Name overlay on image */}
+        <div className="absolute bottom-2.5 left-3 right-3 z-10 pointer-events-none">
+          <p className="text-[11px] font-black text-pink-200 truncate drop-shadow-sm">
             {artistName}
           </p>
         </div>
       </div>
 
-      {/* Content */}
+      {/* Card Content */}
       <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-        <div className="space-y-2 cursor-pointer" onClick={() => onSelect?.(performance)}>
-          <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-pink-600 transition-colors line-clamp-2">
+        <div className="space-y-2">
+          <h3 
+            onClick={() => onSelect?.(performance)}
+            className="text-base sm:text-lg font-black text-slate-900 group-hover:text-pink-600 transition-colors line-clamp-2 leading-snug cursor-pointer"
+          >
             {title}
           </h3>
+
           <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed font-medium">
             {description}
           </p>
         </div>
 
-        {/* Schedule & Venue Metadata */}
-        <div className="pt-2 border-t border-slate-100 space-y-2 text-xs font-bold text-slate-600">
+        {/* Meta Info */}
+        <div className="space-y-2 pt-2 border-t border-slate-100 text-xs">
           {primarySchedule && (
-            <div className="flex items-center gap-2 text-pink-600">
-              <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
+            <div className="flex items-center gap-1.5 text-slate-600 font-bold">
+              <Calendar className="w-3.5 h-3.5 text-pink-600 flex-shrink-0" />
               <span className="truncate">
-                {primarySchedule.date} {primarySchedule.startTime}〜
-                {performance.schedules.length > 1 && ` (他 ${performance.schedules.length - 1}公演)`}
+                {primarySchedule.date} {primarySchedule.startTime}
+                {performance.schedules && performance.schedules.length > 1 && (
+                  <span className="ml-1 text-[10px] text-pink-600 font-bold">
+                    (+{performance.schedules.length - 1}公演)
+                  </span>
+                )}
               </span>
             </div>
           )}
 
           {venueDisplayName && (
-            <div className="flex items-center gap-2 text-slate-600">
-              <MapPin className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+            <div className="flex items-center gap-1.5 text-slate-600 font-medium truncate">
+              <MapPin className="w-3.5 h-3.5 text-pink-600 flex-shrink-0" />
               <span className="truncate">{venueDisplayName}</span>
             </div>
           )}
 
-          {ticketPrice && (
-            <div className="flex items-center gap-2 text-slate-500">
-              <Ticket className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-              <span className="truncate">{ticketPrice}</span>
-            </div>
-          )}
+          <div className="flex items-center justify-between text-slate-500 pt-1">
+            <span className="text-[11px] text-slate-600 font-bold truncate">
+              {ticketPrice || t('inquirePrice')}
+            </span>
+            {performance.durationMinutes && (
+              <span className="inline-flex items-center gap-1 text-[11px] text-slate-400 font-medium">
+                <Clock className="w-3 h-3" />
+                {performance.durationMinutes}{t('minutes')}
+              </span>
+            )}
+          </div>
         </div>
 
-        {/* Actions */}
-        <div className="pt-2 flex items-center justify-between gap-2">
+        {/* Footer Actions */}
+        <div className="pt-2 flex items-center gap-2">
           <button
             onClick={() => onSelect?.(performance)}
-            className="flex-1 py-2.5 px-4 rounded-xl bg-pink-50 hover:bg-pink-100/80 text-pink-600 font-extrabold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+            className="flex-1 py-2 px-3 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-600 font-bold text-xs flex items-center justify-center gap-1 transition-colors cursor-pointer"
           >
             <span>{t('viewDetails')}</span>
             <ChevronRight className="w-3.5 h-3.5" />
@@ -143,11 +162,10 @@ export default function PerformanceCard({
               href={performance.ticketUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-extrabold text-xs flex items-center justify-center gap-1 shadow-sm transition-all flex-shrink-0"
-              title={t('bookTickets')}
+              className="py-2 px-3 rounded-xl bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs flex items-center justify-center gap-1 shadow-xs transition-colors cursor-pointer"
             >
               <Ticket className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{t('tickets')}</span>
+              <span>{t('tickets')}</span>
             </a>
           )}
         </div>

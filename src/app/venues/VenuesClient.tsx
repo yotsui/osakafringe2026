@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { Venue, Performance } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
+import SafeImage from '@/components/common/SafeImage';
 import FestivalMap from '@/components/audience/FestivalMap';
 import PerformanceModal from '@/components/audience/PerformanceModal';
 import { 
@@ -88,14 +89,16 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
               >
                 {/* Image Gallery */}
                 <div className="space-y-3">
-                  <div className="relative aspect-16/9 w-full rounded-2xl overflow-hidden bg-slate-100">
-                    <Image
+                  <div className="relative aspect-16/9 w-full rounded-2xl overflow-hidden bg-slate-900">
+                    <SafeImage
                       src={photoGallery[0]}
                       alt={venueName}
                       fill
+                      fallbackType="venue"
+                      fallbackText={venueName}
                       className="object-cover"
                     />
-                    <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-pink-600 text-white text-xs font-black shadow-sm">
+                    <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-pink-600 text-white text-xs font-black shadow-sm z-10">
                       {venueArea}
                     </div>
                   </div>
@@ -103,8 +106,8 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                   {photoGallery.length > 1 && (
                     <div className="grid grid-cols-3 gap-2">
                       {photoGallery.map((imgUrl, imgIdx) => (
-                        <div key={imgIdx} className="relative aspect-16/10 rounded-xl overflow-hidden bg-slate-100 border border-slate-100">
-                          <Image src={imgUrl} alt={`${venueName} ${imgIdx + 1}`} fill className="object-cover" />
+                        <div key={imgIdx} className="relative aspect-16/10 rounded-xl overflow-hidden bg-slate-900 border border-slate-100">
+                          <SafeImage src={imgUrl} alt={`${venueName} ${imgIdx + 1}`} fill fallbackType="venue" className="object-cover" />
                         </div>
                       ))}
                     </div>
