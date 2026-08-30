@@ -1,12 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Venue, Performance, Award, Banner, SiteInfo } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import HomeHeroClient from './HomeHeroClient';
 import PerformanceCard from '@/components/audience/PerformanceCard';
+import PerformanceModal from '@/components/audience/PerformanceModal';
 import BannerSection from '@/components/common/BannerSection';
 import { 
   Sparkles, 
@@ -40,6 +41,7 @@ export default function HomeClient({
   siteInfo,
 }: HomeClientProps) {
   const { t, getText } = useLanguage();
+  const [selectedPerformance, setSelectedPerformance] = useState<Performance | null>(null);
 
   // Smart selection for 3 featured shows (Filter past shows & fallback intelligently)
   const displayPerformances = selectFeaturedPerformances(performances, 3);
@@ -78,7 +80,11 @@ export default function HomeClient({
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayPerformances.map((perf) => (
-            <PerformanceCard key={perf.id} performance={perf} />
+            <PerformanceCard 
+              key={perf.id} 
+              performance={perf} 
+              onSelect={(p) => setSelectedPerformance(p)}
+            />
           ))}
         </div>
       </section>
@@ -170,6 +176,12 @@ export default function HomeClient({
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <BannerSection banners={banners} />
       </section>
+
+      {/* Performance Modal Window */}
+      <PerformanceModal
+        performance={selectedPerformance}
+        onClose={() => setSelectedPerformance(null)}
+      />
     </div>
   );
 }
