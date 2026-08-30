@@ -1,6 +1,5 @@
 {
-  "apiType": "list",
-  "fields": [
+  "apiFields": [
     {
       "fieldId": "title",
       "name": "公演タイトル（日本語）",
@@ -31,14 +30,14 @@
       "kind": "select",
       "required": true,
       "selectItems": [
-        { "value": "street" },
-        { "value": "dance" },
-        { "value": "music" },
-        { "value": "theater" },
-        { "value": "traditional" },
-        { "value": "kamishibai" },
-        { "value": "exhibition" },
-        { "value": "other" }
+        "street",
+        "dance",
+        "music",
+        "theater",
+        "traditional",
+        "kamishibai",
+        "exhibition",
+        "other"
       ]
     },
     {
@@ -67,16 +66,15 @@
     },
     {
       "fieldId": "venueId",
-      "name": "デフォルト会場ID (venuesのコンテンツID)",
+      "name": "主会場ID（例: nakazaki-hall）",
       "kind": "text",
       "required": false
     },
     {
       "fieldId": "schedules",
-      "name": "公演スケジュールJSON（会場紐づけ）",
+      "name": "公演スケジュール（JSON配列）",
       "kind": "textArea",
-      "required": true,
-      "description": "JSON形式: [{\"date\":\"2026-09-18\",\"startTime\":\"19:00\",\"endTime\":\"20:15\",\"venueId\":\"nakazaki-hall\",\"venueName\":\"中崎町アートスペース SPACE ONE\",\"venueNameEn\":\"Nakazakicho Art Space SPACE ONE\",\"note\":\"初日\"}]"
+      "required": false
     },
     {
       "fieldId": "ticketPrice",
@@ -92,31 +90,25 @@
     },
     {
       "fieldId": "ticketUrl",
-      "name": "チケット予約・購入URL（※空欄の場合はボタン非表示）",
+      "name": "チケット予約・購入URL",
       "kind": "text",
       "required": false
     },
     {
       "fieldId": "websiteUrl",
-      "name": "アーティスト公式WEBサイト",
+      "name": "アーティスト公式サイトURL",
       "kind": "text",
       "required": false
     },
     {
       "fieldId": "snsTwitter",
-      "name": "X (Twitter) URL",
+      "name": "アーティストX（Twitter）URL",
       "kind": "text",
       "required": false
     },
     {
       "fieldId": "snsInstagram",
-      "name": "Instagram URL",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "snsYoutube",
-      "name": "YouTube URL",
+      "name": "アーティストInstagram URL",
       "kind": "text",
       "required": false
     },
@@ -124,11 +116,11 @@
       "fieldId": "image",
       "name": "メインビジュアル画像",
       "kind": "media",
-      "required": true
+      "required": false
     },
     {
       "fieldId": "isFeatured",
-      "name": "注目公演フラグ（トップに掲載）",
+      "name": "おすすめ・注目フラグ",
       "kind": "boolean",
       "required": false
     },
@@ -138,5 +130,6 @@
       "kind": "number",
       "required": false
     }
-  ]
+  ],
+  "customFields": []
 }

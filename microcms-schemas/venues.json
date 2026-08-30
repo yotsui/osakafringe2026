@@ -1,6 +1,5 @@
 {
-  "apiType": "list",
-  "fields": [
+  "apiFields": [
     {
       "fieldId": "name",
       "name": "会場名（日本語）",
@@ -15,10 +14,9 @@
     },
     {
       "fieldId": "area",
-      "name": "エリア",
+      "name": "エリア（日本語）",
       "kind": "text",
-      "required": true,
-      "description": "例: 中崎町・梅田、ミナミ・心斎橋、中之島・北浜、天王寺・新世界"
+      "required": true
     },
     {
       "fieldId": "areaEn",
@@ -28,7 +26,7 @@
     },
     {
       "fieldId": "address",
-      "name": "住所",
+      "name": "住所（日本語）",
       "kind": "text",
       "required": true
     },
@@ -40,7 +38,7 @@
     },
     {
       "fieldId": "access",
-      "name": "アクセス案内",
+      "name": "アクセス案内（日本語）",
       "kind": "textArea",
       "required": true
     },
@@ -52,7 +50,7 @@
     },
     {
       "fieldId": "description",
-      "name": "会場概要",
+      "name": "会場概要（日本語）",
       "kind": "textArea",
       "required": false
     },
@@ -63,39 +61,14 @@
       "required": false
     },
     {
-      "fieldId": "location",
-      "name": "緯度経度JSON",
-      "kind": "textArea",
-      "required": true,
-      "description": "JSON形式: {\"lat\": 34.7081, \"lng\": 135.5034}"
-    },
-    {
-      "fieldId": "image",
-      "name": "メイン会場写真",
-      "kind": "media",
-      "required": false
-    },
-    {
-      "fieldId": "image2",
-      "name": "会場写真2",
-      "kind": "media",
-      "required": false
-    },
-    {
-      "fieldId": "image3",
-      "name": "会場写真3",
-      "kind": "media",
-      "required": false
-    },
-    {
       "fieldId": "websiteUrl",
-      "name": "公式WEBサイトURL",
+      "name": "公式WebサイトURL",
       "kind": "text",
       "required": false
     },
     {
       "fieldId": "snsTwitter",
-      "name": "X (Twitter) URL",
+      "name": "X（Twitter）URL",
       "kind": "text",
       "required": false
     },
@@ -106,16 +79,17 @@
       "required": false
     },
     {
-      "fieldId": "snsFacebook",
-      "name": "Facebook URL",
-      "kind": "text",
+      "fieldId": "image",
+      "name": "会場メイン写真",
+      "kind": "media",
       "required": false
     },
     {
       "fieldId": "capacity",
-      "name": "収容人数",
+      "name": "収容人数・キャパシティ",
       "kind": "number",
       "required": false
     }
-  ]
+  ],
+  "customFields": []
 }
