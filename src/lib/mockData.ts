@@ -308,12 +308,17 @@ Artists and audiences collide directly, igniting unpredictable creativity and sh
   donationTextEn: `The Osaka Fringe Festival is a non-profit initiative dedicated to empowering emerging creators and making performing arts accessible to everyone worldwide.
 
 Your generous contributions directly support artist subsidies, venue technical setups, and multilingual visitor infrastructure.`,
-  donationBankInfo: `【振込先口座】
-りそな銀行 大阪営業部（普）1234567
-口座名義：オオサカブンカフリンジキコウ セツリツジュンビシツ`,
-  donationBankInfoEn: `[Bank Details]
-Resona Bank, Osaka Main Branch (Ordinary) #1234567
-Account Name: OSAKA FRINGE EXECUTIVE COMMITTEE`,
+  donationBankInfo: `金融機関名：大阪シティ信用金庫
+支店名：阿倍野支店
+口座種別：普通預金
+口座番号：8173108
+口座名義：オオサカブンカフリンジキコウセツリツジュンビシツ
+（大阪文化フリンジ機構設立準備室）`,
+  donationBankInfoEn: `Bank: Osaka City Shinkin Bank
+Branch: Abeno Branch
+Account Type: Ordinary / Savings
+Account Number: 8173108
+Account Name: OSAKA BUNKA FRINGE KIKOU SETSURITSU JUNBISHITSU`,
   donationCrowdfundUrl: 'https://camp-fire.jp/example-osaka-fringe',
   donationCrowdfundingUrl: 'https://camp-fire.jp/example-osaka-fringe',
   googleFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLScX_ExampleFormId/viewform?embedded=true',

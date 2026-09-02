@@ -1,17 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --primary-pink: #e6007e;
-  --primary-pink-hover: #cc006f;
-  --pink-light: #fff0f6;
-  --pink-border: #fbcfe8;
+  --primary-pink: #E6007E;
+  --spill-yellow: #FFF100;
+  --accent-blue: #0078D7;
+  --accent-green: #00A960;
+  --bg-base: #fef9fc;
+  --text-dark: #1A1A1A;
 }
 
 body {
-  background-color: #ffffff;
-  color: #1e293b;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: var(--bg-base);
+  color: var(--text-dark);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans JP', sans-serif;
   overflow-x: hidden;
+}
+
+/* Refined Premium Shadows */
+.shadow-fringe {
+  box-shadow: 0 10px 30px -5px rgba(230, 0, 126, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-card {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-card-hover {
+  box-shadow: 0 20px 35px -5px rgba(230, 0, 126, 0.18), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -35,15 +50,4 @@ body {
 
 .animate-fadeIn {
   animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Accent gradients */
-.bg-fringe-gradient {
-  background: linear-gradient(135deg, #e6007e 0%, #ff2e93 50%, #7c3aed 100%);
-}
-
-.text-fringe-gradient {
-  background: linear-gradient(135deg, #e6007e 0%, #ff2e93 50%, #9333ea 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 }

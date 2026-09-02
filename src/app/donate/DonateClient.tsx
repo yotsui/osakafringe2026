@@ -93,13 +93,13 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
               </div>
             </div>
 
-            <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-3">
-              <pre className="text-xs font-bold text-slate-800 whitespace-pre-wrap font-mono leading-relaxed">
-                {bankInfo || 'りそな銀行 大阪営業部\n普通口座 1234567\nオオサカブンカフリンジキコウ'}
+            <div className="p-6 rounded-2xl bg-white border border-slate-200 space-y-3 shadow-xs">
+              <pre className="text-xs sm:text-sm font-bold text-slate-800 whitespace-pre-wrap font-mono leading-relaxed">
+                {bankInfo || `金融機関名：大阪シティ信用金庫\n支店名：阿倍野支店\n口座種別：普通預金\n口座番号：8173108\n口座名義：オオサカブンカフリンジキコウセツリツジュンビシツ\n（大阪文化フリンジ機構設立準備室）`}
               </pre>
             </div>
 
-            <p className="text-[11px] text-slate-500 font-medium">
+            <p className="text-[11px] text-slate-500 font-medium leading-normal">
               {t('bankTransferNotice')}
             </p>
           </div>
