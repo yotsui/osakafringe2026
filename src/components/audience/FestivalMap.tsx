@@ -16,35 +16,7 @@ interface FestivalMapProps {
 }
 
 const CARTO_API_KEY = 'cb1_2u9e_1_e673ff91216e39ecfb52f65d';
-
-// CARTO Positron（key パラメータ適用、Retina @2x、フォントグリフ定義追加）
-const CARTO_POSITRON_KEYED_STYLE: any = {
-  version: 8,
-  glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
-  sources: {
-    'carto-positron': {
-      type: 'raster',
-      tiles: [
-        `https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png?key=${CARTO_API_KEY}`,
-        `https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png?key=${CARTO_API_KEY}`,
-        `https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png?key=${CARTO_API_KEY}`,
-        `https://d.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png?key=${CARTO_API_KEY}`,
-      ],
-      tileSize: 256,
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a>',
-    },
-  },
-  layers: [
-    {
-      id: 'carto-positron-tiles',
-      type: 'raster',
-      source: 'carto-positron',
-      minzoom: 0,
-      maxzoom: 20,
-    },
-  ],
-};
+const CARTO_VECTOR_STYLE_URL = `https://basemaps.cartocdn.com/gl/positron-gl-style/style.json?key=${CARTO_API_KEY}`;
 
 export default function FestivalMap({
   venues,
@@ -237,7 +209,6 @@ export default function FestivalMap({
             'text-offset': [0, 1.2],
             'text-anchor': 'top',
             'text-allow-overlap': false,
-            'text-font': ['Noto Sans Regular'],
           },
           paint: {
             'text-color': '#0f172a',
@@ -269,15 +240,27 @@ export default function FestivalMap({
       }
 
       // 既存インスタンス破棄
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
+      if (mapInstanceRef.current?.map) {
+        mapInstanceRef.current.map.remove();
         mapInstanceRef.current = null;
       }
 
-      // 地図インスタンス生成
+      // CARTO のベクタータイル、フォント、スプライトリクエストに API キーを注入する transformRequest
+      const transformRequest = (url: string) => {
+        if (url.includes('cartocdn.com') || url.includes('carto.com')) {
+          const sep = url.includes('?') ? '&' : '?';
+          if (!url.includes('key=')) {
+            return { url: `${url}${sep}key=${CARTO_API_KEY}` };
+          }
+        }
+        return { url };
+      };
+
+      // ベクタータイル地図インスタンス生成 (CARTO Positron Vector)
       const map = new maplibregl.Map({
         container: mapContainerRef.current,
-        style: CARTO_POSITRON_KEYED_STYLE,
+        style: CARTO_VECTOR_STYLE_URL,
+        transformRequest: transformRequest,
         center: [135.5023, 34.6937],
         zoom: 12,
         attributionControl: false,
@@ -309,10 +292,10 @@ export default function FestivalMap({
           });
         }
 
-        // 2. 鉄道レイヤー追加
+        // 2. 鉄道ベクターレイヤー追加
         addTransitLayers(map);
 
-        // 3. マーカー配置
+        // 3. 会場マーカー配置
         updateMarkers(map, maplibregl);
       };
 
