@@ -356,12 +356,9 @@ export default function FestivalMap({
 
           {/* Map Legend: Osaka Metro 9 Lines (添付画像準拠デザイン) */}
           <div className="absolute bottom-4 left-4 z-10 bg-white/95 backdrop-blur-md p-3 rounded-2xl border border-slate-200/90 shadow-lg hidden sm:flex flex-col gap-2 max-w-sm">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">
-              <div className="flex items-center gap-1.5 text-[11px] font-black text-slate-900">
-                <Train className="w-3.5 h-3.5 text-[#E6007E]" />
-                <span>Osaka Metro 路線ネットワーク</span>
-              </div>
-              <span className="text-[10px] text-slate-400 font-bold">公式9路線</span>
+            <div className="flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
+              <Train className="w-3.5 h-3.5 text-[#E6007E]" />
+              <span className="text-[11px] font-black text-slate-900">Osaka Metro 路線ネットワーク</span>
             </div>
             
             {/* 添付画像アイコン準拠のライン＆シンボルバッジ一覧 */}
