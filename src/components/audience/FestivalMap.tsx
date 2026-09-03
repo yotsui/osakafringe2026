@@ -149,16 +149,26 @@ export default function FestivalMap({
           </div>
         `);
 
-        // ポップアップが開いたらピン色をイエローに変更＆会場選択
+        // ポップアップが開いたら他のポップアップをすべて閉じ、ピン色をイエローに変更＆会場選択
         popup.on('open', () => {
+          markersRef.current.forEach((item) => {
+            if (item.popup !== popup && item.popup.isOpen()) {
+              item.popup.remove();
+            }
+          });
           setActiveVenue(v);
           if (onSelectVenue) onSelectVenue(v.id);
           updateMarkerColors(v.id);
         });
 
-        // ポップアップが閉じられたらピン色をリセット
+        // ポップアップが閉じられた時、他に開いているPOPUPがなければピン色をリセット
         popup.on('close', () => {
-          updateMarkerColors(null);
+          setTimeout(() => {
+            const anyOpen = markersRef.current.some((item) => item.popup.isOpen());
+            if (!anyOpen) {
+              updateMarkerColors(null);
+            }
+          }, 10);
         });
 
         const marker = new maplibregl.Marker({ element: el })
