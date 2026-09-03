@@ -87,13 +87,13 @@ export default function Footer() {
             </h4>
             <div className="space-y-3">
               <a
-                href="https://www.instagram.com/osakafringe"
+                href="https://www.instagram.com/osaka_fringe/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2.5 p-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition-all group"
               >
                 <InstagramIcon className="w-4 h-4 text-[#FFF100]" />
-                <span>Instagram @osakafringe</span>
+                <span>Instagram @osaka_fringe</span>
                 <ExternalLink className="w-3.5 h-3.5 ml-auto text-white/60 group-hover:text-white" />
               </a>
 
