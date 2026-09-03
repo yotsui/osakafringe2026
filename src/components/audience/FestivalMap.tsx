@@ -20,6 +20,14 @@ interface FestivalMapProps {
   onSelectPerformance?: (performance: Performance) => void;
 }
 
+interface MarkerItem {
+  venue: Venue;
+  marker: any;
+  popup: any;
+  pinEl: HTMLDivElement;
+  dotEl: HTMLDivElement;
+}
+
 export default function FestivalMap({
   venues,
   performances = [],
@@ -30,7 +38,7 @@ export default function FestivalMap({
   const { getText, t } = useLanguage();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
-  const markersRef = useRef<any[]>([]);
+  const markersRef = useRef<MarkerItem[]>([]);
   const isMapReadyRef = useRef<boolean>(false);
 
   const [activeVenue, setActiveVenue] = useState<Venue | null>(null);
@@ -47,11 +55,23 @@ export default function FestivalMap({
     }
   }, [venues, selectedVenueId, activeVenue]);
 
+  // マーカーのハイライト色を一括更新する関数
+  const updateMarkerColors = useCallback((selectedId: string | null) => {
+    markersRef.current.forEach(({ venue, pinEl, dotEl }) => {
+      const isSelected = venue.id === selectedId;
+      pinEl.style.background = isSelected ? '#FFF100' : '#E6007E';
+      pinEl.style.boxShadow = isSelected
+        ? '0 4px 14px rgba(0,0,0,0.35)'
+        : '0 4px 12px rgba(230,0,126,0.45)';
+      dotEl.style.background = isSelected ? '#000000' : '#ffffff';
+    });
+  }, []);
+
   // 会場マーカーの配置・更新
   const renderMarkers = useCallback(
     (map: any, maplibregl: any) => {
       // 既存マーカークリア
-      markersRef.current.forEach((m) => m.remove());
+      markersRef.current.forEach(({ marker }) => marker.remove());
       markersRef.current = [];
 
       if (!map || !venues || venues.length === 0) return;
@@ -73,57 +93,55 @@ export default function FestivalMap({
         el.style.alignItems = 'center';
         el.style.justifyContent = 'center';
 
-        el.innerHTML = `
-          <div style="
-            position: relative;
-            width: 32px;
-            height: 32px;
-            background: ${isSelected ? '#FFF100' : '#E6007E'};
-            border-radius: 50% 50% 50% 0;
-            transform: rotate(-45deg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px ${isSelected ? 'rgba(0,0,0,0.35)' : 'rgba(230,0,126,0.5)'};
-            border: 2.5px solid #ffffff;
-            transition: transform 0.2s ease, background 0.2s ease;
-          ">
-            <div style="
-              width: 10px;
-              height: 10px;
-              background: ${isSelected ? '#000000' : '#ffffff'};
-              border-radius: 50%;
-              transform: rotate(45deg);
-            "></div>
-          </div>
-        `;
+        const pinEl = document.createElement('div');
+        pinEl.style.position = 'relative';
+        pinEl.style.width = '32px';
+        pinEl.style.height = '32px';
+        pinEl.style.background = isSelected ? '#FFF100' : '#E6007E';
+        pinEl.style.borderRadius = '50% 50% 50% 0';
+        pinEl.style.transform = 'rotate(-45deg)';
+        pinEl.style.display = 'flex';
+        pinEl.style.alignItems = 'center';
+        pinEl.style.justifyContent = 'center';
+        pinEl.style.boxShadow = isSelected
+          ? '0 4px 14px rgba(0,0,0,0.35)'
+          : '0 4px 12px rgba(230,0,126,0.45)';
+        pinEl.style.border = '2.5px solid #ffffff';
+        pinEl.style.transition = 'transform 0.2s ease, background 0.2s ease';
 
-        el.addEventListener('click', () => {
-          setActiveVenue(v);
-          if (onSelectVenue) onSelectVenue(v.id);
-          map.panTo([v.location.lng, v.location.lat], { essential: true });
-        });
+        const dotEl = document.createElement('div');
+        dotEl.style.width = '10px';
+        dotEl.style.height = '10px';
+        dotEl.style.background = isSelected ? '#000000' : '#ffffff';
+        dotEl.style.borderRadius = '50%';
+        dotEl.style.transform = 'rotate(45deg)';
 
+        pinEl.appendChild(dotEl);
+        el.appendChild(pinEl);
+
+        // POPUP 生成（closeOnClick: true で地図上クリック時に閉じる）
         const popup = new maplibregl.Popup({
-          offset: [0, -18],
+          offset: [0, -20],
           closeButton: true,
-          closeOnClick: false,
+          closeOnClick: true,
+          maxWidth: '280px',
         }).setHTML(`
-          <div style="min-width: 210px; font-family: sans-serif; color: #0f172a; padding: 4px;">
+          <div style="font-family: sans-serif; color: #0f172a; padding: 2px 2px 4px 2px;">
             <div style="font-size: 11px; font-weight: 800; color: #E6007E; text-transform: uppercase; letter-spacing: 0.05em;">${vArea}</div>
-            <div style="font-size: 13px; font-weight: 900; margin: 2px 0 4px 0; line-height: 1.3;">${vName}</div>
-            <div style="font-size: 11px; color: #64748b; margin-bottom: 8px; line-height: 1.4;">${vAccess}</div>
+            <div style="font-size: 14px; font-weight: 900; margin: 3px 0 6px 0; line-height: 1.35;">${vName}</div>
+            <div style="font-size: 11px; color: #64748b; margin-bottom: 12px; line-height: 1.45;">${vAccess}</div>
             <a href="${navUrl}" target="_blank" rel="noopener noreferrer" style="
               display: inline-flex;
               align-items: center;
-              gap: 4px;
+              gap: 5px;
               background: #E6007E;
               color: white;
-              padding: 5px 12px;
-              border-radius: 8px;
+              padding: 6px 14px;
+              border-radius: 10px;
               font-size: 11px;
               font-weight: 800;
               text-decoration: none;
+              box-shadow: 0 2px 6px rgba(230,0,126,0.3);
             ">
               <span>Google Maps でルート案内</span>
               ↗
@@ -131,15 +149,29 @@ export default function FestivalMap({
           </div>
         `);
 
+        // ポップアップが閉じられたらピン色をリセット
+        popup.on('close', () => {
+          updateMarkerColors(null);
+        });
+
+        // PINクリックイベント（ZOOMや移動は行わず、色変化＆POPUP表示のみ）
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          setActiveVenue(v);
+          if (onSelectVenue) onSelectVenue(v.id);
+          updateMarkerColors(v.id);
+          popup.addTo(map);
+        });
+
         const marker = new maplibregl.Marker({ element: el })
           .setLngLat([v.location.lng, v.location.lat])
           .setPopup(popup)
           .addTo(map);
 
-        markersRef.current.push(marker);
+        markersRef.current.push({ venue: v, marker, popup, pinEl, dotEl });
       });
     },
-    [venues, activeVenue, getText, onSelectVenue]
+    [venues, activeVenue, getText, onSelectVenue, updateMarkerColors]
   );
 
   // 鉄道レイヤー（路線ライン＆駅）を追加する関数
@@ -308,6 +340,11 @@ export default function FestivalMap({
         'bottom-right'
       );
 
+      // 地図上の空き領域をクリックしたらピン色リセット
+      map.on('click', () => {
+        updateMarkerColors(null);
+      });
+
       // マップ準備完了ハンドラー
       const onReady = () => {
         if (isMapReadyRef.current || isCancelled) return;
@@ -321,7 +358,7 @@ export default function FestivalMap({
         // 2. 会場ピンを追加
         renderMarkers(map, maplibregl);
 
-        // 3. 全会場が収まる広域ZOOMに自動調整 (fitBounds)
+        // 3. 全会場が収まる広域ZOOMに初期自動調整 (fitBounds)
         if (venues.length > 0) {
           const bounds = new maplibregl.LngLatBounds();
           venues.forEach((v) => {
@@ -354,24 +391,20 @@ export default function FestivalMap({
         mapInstanceRef.current = null;
       }
     };
-  }, [addTransitLayers, renderMarkers, venues]);
+  }, [addTransitLayers, renderMarkers, updateMarkerColors, venues]);
 
-  // 会場や選択変更時のマーカー更新
-  useEffect(() => {
-    if (mapInstanceRef.current?.map && mapInstanceRef.current?.maplibregl) {
-      renderMarkers(mapInstanceRef.current.map, mapInstanceRef.current.maplibregl);
-    }
-  }, [venues, activeVenue, renderMarkers]);
+  // 会場リスト選択時にピン色とPOPUPを連動（ZOOM・カメラ移動は行わない）
+  const handleSelectVenueCard = (v: Venue) => {
+    setActiveVenue(v);
+    if (onSelectVenue) onSelectVenue(v.id);
+    updateMarkerColors(v.id);
 
-  // 会場切り替え時のマップ移動（現在のZOOMレベルを維持して中心移動のみ）
-  useEffect(() => {
-    if (activeVenue && mapInstanceRef.current?.map) {
-      mapInstanceRef.current.map.panTo(
-        [activeVenue.location.lng, activeVenue.location.lat],
-        { essential: true }
-      );
+    // 対応するマーカーのPOPUPを開く
+    const item = markersRef.current.find((m) => m.venue.id === v.id);
+    if (item && mapInstanceRef.current?.map) {
+      item.popup.addTo(mapInstanceRef.current.map);
     }
-  }, [activeVenue]);
+  };
 
   // 選択された会場で上演される公演一覧
   const venuePerformances = activeVenue
@@ -383,6 +416,43 @@ export default function FestivalMap({
 
   return (
     <div className="space-y-6">
+      {/* POPUP & Close Button Custom Styles */}
+      <style>{`
+        .maplibregl-popup-close-button {
+          width: 28px !important;
+          height: 28px !important;
+          font-size: 18px !important;
+          font-weight: 700 !important;
+          line-height: 26px !important;
+          text-align: center !important;
+          color: #64748b !important;
+          background-color: #f1f5f9 !important;
+          border-radius: 9999px !important;
+          top: 8px !important;
+          right: 8px !important;
+          border: 1px solid #e2e8f0 !important;
+          cursor: pointer !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+          transition: all 0.15s ease !important;
+          padding: 0 !important;
+        }
+        .maplibregl-popup-close-button:hover {
+          background-color: #fee2e2 !important;
+          color: #ef4444 !important;
+          border-color: #fca5a5 !important;
+          transform: scale(1.08) !important;
+        }
+        .maplibregl-popup-content {
+          border-radius: 18px !important;
+          box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.18) !important;
+          padding: 16px 18px 14px 18px !important;
+          border: 1px solid #e2e8f0 !important;
+        }
+      `}</style>
+
       {/* Map + Detail Panel */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-white rounded-3xl border border-pink-100 p-4 sm:p-6 shadow-sm overflow-hidden">
         {/* Vector Map Container */}
@@ -510,10 +580,7 @@ export default function FestivalMap({
           return (
             <button
               key={v.id}
-              onClick={() => {
-                setActiveVenue(v);
-                if (onSelectVenue) onSelectVenue(v.id);
-              }}
+              onClick={() => handleSelectVenueCard(v)}
               className={`p-4 rounded-2xl text-left border transition-all cursor-pointer ${
                 isSelected
                   ? 'bg-white border-[#E6007E] shadow-md ring-2 ring-[#E6007E]/20'
