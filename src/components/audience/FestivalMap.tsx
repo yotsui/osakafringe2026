@@ -4,7 +4,12 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Venue, Performance } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import { Navigation, ExternalLink, Calendar, Train } from 'lucide-react';
-import { OSAKA_TRANSIT_LINES, OSAKA_TRANSIT_STATIONS } from '@/data/transitData';
+import {
+  OSAKA_TRANSIT_LINES,
+  OSAKA_TRANSIT_STATIONS,
+  METRO_LINES_INFO,
+} from '@/data/transitData';
+import { CARTO_POSITRON_VECTOR_STYLE } from '@/data/cartoPositronStyle';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 interface FestivalMapProps {
@@ -14,9 +19,6 @@ interface FestivalMapProps {
   onSelectVenue?: (venueId: string) => void;
   onSelectPerformance?: (performance: Performance) => void;
 }
-
-const CARTO_API_KEY = 'cb1_2u9e_1_e673ff91216e39ecfb52f65d';
-const CARTO_VECTOR_STYLE_URL = `https://basemaps.cartocdn.com/gl/positron-gl-style/style.json?key=${CARTO_API_KEY}`;
 
 export default function FestivalMap({
   venues,
@@ -29,6 +31,7 @@ export default function FestivalMap({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
+  const isMapReadyRef = useRef<boolean>(false);
 
   const [activeVenue, setActiveVenue] = useState<Venue | null>(null);
 
@@ -44,11 +47,14 @@ export default function FestivalMap({
     }
   }, [venues, selectedVenueId, activeVenue]);
 
-  // マーカーを更新・配置する関数
-  const updateMarkers = useCallback(
+  // 会場マーカーの配置・更新
+  const renderMarkers = useCallback(
     (map: any, maplibregl: any) => {
+      // 既存マーカークリア
       markersRef.current.forEach((m) => m.remove());
       markersRef.current = [];
+
+      if (!map || !venues || venues.length === 0) return;
 
       venues.forEach((v) => {
         const isSelected = activeVenue?.id === v.id;
@@ -140,7 +146,7 @@ export default function FestivalMap({
     [venues, activeVenue, getText, onSelectVenue]
   );
 
-  // 鉄道レイヤーを追加する関数
+  // 鉄道レイヤー（路線ライン＆駅）を追加する関数
   const addTransitLayers = useCallback((map: any) => {
     try {
       // 1. 鉄道路線（OSAKA_TRANSIT_LINES）
@@ -150,7 +156,7 @@ export default function FestivalMap({
           data: OSAKA_TRANSIT_LINES,
         });
 
-        // 線路の下地グロー（視認性を向上させる半透明ホワイト）
+        // 下地ホワイトグロー（視認性を向上させる半透明白ライン）
         map.addLayer({
           id: 'transit-lines-glow',
           type: 'line',
@@ -162,7 +168,7 @@ export default function FestivalMap({
           },
         });
 
-        // 路線カラーのライン
+        // 路線公式カラーライン
         map.addLayer({
           id: 'transit-lines-core',
           type: 'line',
@@ -197,12 +203,12 @@ export default function FestivalMap({
           },
         });
 
-        // 駅名テキストラベル（ズーム12.2以上で表示）
+        // 駅名テキストラベル（ズーム12以上で表示）
         map.addLayer({
           id: 'transit-station-labels',
           type: 'symbol',
           source: 'osaka-transit-stations',
-          minzoom: 12.2,
+          minzoom: 12,
           layout: {
             'text-field': ['get', 'name'],
             'text-size': 11.5,
@@ -219,7 +225,7 @@ export default function FestivalMap({
         });
       }
     } catch (err) {
-      console.warn('[FestivalMap] Failed to add transit layers:', err);
+      console.warn('[FestivalMap] transit layers error:', err);
     }
   }, []);
 
@@ -229,12 +235,12 @@ export default function FestivalMap({
 
     let isCancelled = false;
 
-    const initMapLibre = async () => {
+    const initMap = async () => {
       const maplibregl = (await import('maplibre-gl')) as any;
 
       if (isCancelled || !mapContainerRef.current) return;
 
-      // WebWorker URL の明示設定（Next.js Turbopack での MIME エラーを防止）
+      // WebWorker をローカルから配信設定
       if (typeof maplibregl.setWorkerUrl === 'function') {
         maplibregl.setWorkerUrl('/maplibre-gl-worker.mjs');
       }
@@ -245,22 +251,12 @@ export default function FestivalMap({
         mapInstanceRef.current = null;
       }
 
-      // CARTO のベクタータイル、フォント、スプライトリクエストに API キーを注入する transformRequest
-      const transformRequest = (url: string) => {
-        if (url.includes('cartocdn.com') || url.includes('carto.com')) {
-          const sep = url.includes('?') ? '&' : '?';
-          if (!url.includes('key=')) {
-            return { url: `${url}${sep}key=${CARTO_API_KEY}` };
-          }
-        }
-        return { url };
-      };
+      isMapReadyRef.current = false;
 
-      // ベクタータイル地図インスタンス生成 (CARTO Positron Vector)
+      // CARTO Positron MVT ベクタータイルスタイルを直接適用
       const map = new maplibregl.Map({
         container: mapContainerRef.current,
-        style: CARTO_VECTOR_STYLE_URL,
-        transformRequest: transformRequest,
+        style: CARTO_POSITRON_VECTOR_STYLE,
         center: [135.5023, 34.6937],
         zoom: 12,
         attributionControl: false,
@@ -276,10 +272,20 @@ export default function FestivalMap({
         'bottom-right'
       );
 
-      const handleMapReady = () => {
+      // マップ準備完了ハンドラー
+      const onReady = () => {
+        if (isMapReadyRef.current || isCancelled) return;
+        isMapReadyRef.current = true;
+
         map.resize();
 
-        // 1. 全会場ピンを画面内に収める自動ZOOM調整 (fitBounds)
+        // 1. 鉄道強調ベクターレイヤーを追加
+        addTransitLayers(map);
+
+        // 2. 会場ピンを追加
+        renderMarkers(map, maplibregl);
+
+        // 3. 全会場が収まる広域ZOOMに自動調整 (fitBounds)
         if (venues.length > 0) {
           const bounds = new maplibregl.LngLatBounds();
           venues.forEach((v) => {
@@ -291,20 +297,19 @@ export default function FestivalMap({
             duration: 0,
           });
         }
-
-        // 2. 鉄道ベクターレイヤー追加
-        addTransitLayers(map);
-
-        // 3. 会場マーカー配置
-        updateMarkers(map, maplibregl);
       };
 
-      map.on('load', handleMapReady);
+      map.on('load', onReady);
+      map.on('style.load', onReady);
+
+      map.on('error', (e: any) => {
+        console.warn('[MapLibre Warning]', e);
+      });
 
       mapInstanceRef.current = { map, maplibregl };
     };
 
-    initMapLibre();
+    initMap();
 
     return () => {
       isCancelled = true;
@@ -313,14 +318,14 @@ export default function FestivalMap({
         mapInstanceRef.current = null;
       }
     };
-  }, [addTransitLayers, updateMarkers, venues]);
+  }, [addTransitLayers, renderMarkers, venues]);
 
-  // venues または activeVenue 変更時のマーカー更新
+  // 会場や選択変更時のマーカー更新
   useEffect(() => {
     if (mapInstanceRef.current?.map && mapInstanceRef.current?.maplibregl) {
-      updateMarkers(mapInstanceRef.current.map, mapInstanceRef.current.maplibregl);
+      renderMarkers(mapInstanceRef.current.map, mapInstanceRef.current.maplibregl);
     }
-  }, [venues, activeVenue, updateMarkers]);
+  }, [venues, activeVenue, renderMarkers]);
 
   // 会場切り替え時のマップ移動
   useEffect(() => {
@@ -346,30 +351,40 @@ export default function FestivalMap({
       {/* Map + Detail Panel */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-white rounded-3xl border border-pink-100 p-4 sm:p-6 shadow-sm overflow-hidden">
         {/* Vector Map Container */}
-        <div className="lg:col-span-8 relative rounded-2xl overflow-hidden min-h-[440px] lg:min-h-[580px] bg-slate-100 border border-slate-200">
+        <div className="lg:col-span-8 relative rounded-2xl overflow-hidden min-h-[460px] lg:min-h-[600px] bg-slate-100 border border-slate-200">
           <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />
 
-          {/* Map Legend (Transit Lines) */}
-          <div className="absolute bottom-4 left-4 z-10 bg-white/95 backdrop-blur-md px-3.5 py-2.5 rounded-2xl border border-slate-200/80 shadow-md hidden sm:flex flex-col gap-1.5 max-w-xs">
-            <div className="flex items-center gap-1.5 text-[11px] font-black text-slate-800">
-              <Train className="w-3.5 h-3.5 text-[#E6007E]" />
-              <span>大阪 鉄道路線ネットワーク</span>
+          {/* Map Legend: Osaka Metro 9 Lines (添付画像準拠デザイン) */}
+          <div className="absolute bottom-4 left-4 z-10 bg-white/95 backdrop-blur-md p-3 rounded-2xl border border-slate-200/90 shadow-lg hidden sm:flex flex-col gap-2 max-w-sm">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">
+              <div className="flex items-center gap-1.5 text-[11px] font-black text-slate-900">
+                <Train className="w-3.5 h-3.5 text-[#E6007E]" />
+                <span>Osaka Metro 路線ネットワーク</span>
+              </div>
+              <span className="text-[10px] text-slate-400 font-bold">公式9路線</span>
             </div>
-            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[10px] font-bold text-slate-600">
-              <span className="inline-flex items-center gap-1">
-                <span className="w-2.5 h-1 rounded-full bg-[#E5171F]" /> 御堂筋線
+            
+            {/* 添付画像アイコン準拠のライン＆シンボルバッジ一覧 */}
+            <div className="grid grid-cols-3 gap-x-2.5 gap-y-1.5 text-[10px] font-bold text-slate-700">
+              {METRO_LINES_INFO.map((line) => (
+                <div key={line.symbol} className="flex items-center gap-1.5 truncate">
+                  <span
+                    className="w-4 h-4 rounded-full flex items-center justify-center text-white text-[9px] font-black shrink-0 shadow-xs"
+                    style={{ backgroundColor: line.color }}
+                  >
+                    {line.symbol}
+                  </span>
+                  <span className="truncate">{line.name}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="pt-1 border-t border-slate-100 flex items-center gap-2 text-[9.5px] font-bold text-slate-500">
+              <span className="flex items-center gap-1">
+                <span className="w-2.5 h-1 rounded-full bg-[#E85219]" /> JR線
               </span>
-              <span className="inline-flex items-center gap-1">
-                <span className="w-2.5 h-1 rounded-full bg-[#522886]" /> 谷町線
-              </span>
-              <span className="inline-flex items-center gap-1">
-                <span className="w-2.5 h-1 rounded-full bg-[#0078BA]" /> 四つ橋線
-              </span>
-              <span className="inline-flex items-center gap-1">
-                <span className="w-2.5 h-1 rounded-full bg-[#E85219]" /> JR環状線
-              </span>
-              <span className="inline-flex items-center gap-1">
-                <span className="w-2.5 h-1 rounded-full bg-[#1E50A2]" /> 京阪/私鉄
+              <span className="flex items-center gap-1">
+                <span className="w-2.5 h-1 rounded-full bg-[#1E50A2]" /> 私鉄各線
               </span>
             </div>
           </div>
