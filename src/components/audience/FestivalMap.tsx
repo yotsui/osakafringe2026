@@ -101,11 +101,7 @@ export default function FestivalMap({
         el.addEventListener('click', () => {
           setActiveVenue(v);
           if (onSelectVenue) onSelectVenue(v.id);
-          map.flyTo({
-            center: [v.location.lng, v.location.lat],
-            zoom: 14.5,
-            essential: true,
-          });
+          map.panTo([v.location.lng, v.location.lat], { essential: true });
         });
 
         const popup = new maplibregl.Popup({
@@ -163,19 +159,19 @@ export default function FestivalMap({
           source: 'osaka-transit-lines',
           paint: {
             'line-color': '#ffffff',
-            'line-width': 6,
+            'line-width': ['+', ['coalesce', ['get', 'width'], 3], 2],
             'line-opacity': 0.85,
           },
         });
 
-        // 路線公式カラーライン
+        // 路線カラーライン（Osaka Metroは公式色、JRは#333333、私鉄は#666666細線）
         map.addLayer({
           id: 'transit-lines-core',
           type: 'line',
           source: 'osaka-transit-lines',
           paint: {
             'line-color': ['get', 'color'],
-            'line-width': 3.5,
+            'line-width': ['coalesce', ['get', 'width'], 3],
             'line-opacity': 0.95,
           },
         });
@@ -367,14 +363,13 @@ export default function FestivalMap({
     }
   }, [venues, activeVenue, renderMarkers]);
 
-  // 会場切り替え時のマップ移動
+  // 会場切り替え時のマップ移動（現在のZOOMレベルを維持して中心移動のみ）
   useEffect(() => {
     if (activeVenue && mapInstanceRef.current?.map) {
-      mapInstanceRef.current.map.flyTo({
-        center: [activeVenue.location.lng, activeVenue.location.lat],
-        zoom: 14.5,
-        essential: true,
-      });
+      mapInstanceRef.current.map.panTo(
+        [activeVenue.location.lng, activeVenue.location.lat],
+        { essential: true }
+      );
     }
   }, [activeVenue]);
 
@@ -394,8 +389,8 @@ export default function FestivalMap({
         <div className="lg:col-span-8 relative rounded-2xl overflow-hidden min-h-[460px] lg:min-h-[600px] bg-slate-100 border border-slate-200">
           <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />
 
-          {/* Map Legend: Osaka Metro 9 Lines (添付画像準拠デザイン) */}
-          <div className="absolute bottom-4 left-4 z-10 bg-white/95 backdrop-blur-md p-3 rounded-2xl border border-slate-200/90 shadow-lg hidden sm:flex flex-col gap-2 max-w-sm">
+          {/* Map Legend: Osaka Metro 9 Lines (将来表示用として保持・現在は非表示) */}
+          <div className="hidden absolute bottom-4 left-4 z-10 bg-white/95 backdrop-blur-md p-3 rounded-2xl border border-slate-200/90 shadow-lg flex-col gap-2 max-w-sm">
             <div className="flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
               <Train className="w-3.5 h-3.5 text-[#E6007E]" />
               <span className="text-[11px] font-black text-slate-900">Osaka Metro 路線ネットワーク</span>
@@ -418,10 +413,10 @@ export default function FestivalMap({
 
             <div className="pt-1 border-t border-slate-100 flex items-center gap-2 text-[9.5px] font-bold text-slate-500">
               <span className="flex items-center gap-1">
-                <span className="w-2.5 h-1 rounded-full bg-[#E85219]" /> JR線
+                <span className="w-2.5 h-1 rounded-full bg-[#333333]" /> JR線
               </span>
               <span className="flex items-center gap-1">
-                <span className="w-2.5 h-1 rounded-full bg-[#1E50A2]" /> 私鉄各線
+                <span className="w-2.5 h-1 rounded-full bg-[#666666]" /> 私鉄各線
               </span>
             </div>
           </div>

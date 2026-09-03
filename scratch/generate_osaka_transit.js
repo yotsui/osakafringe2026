@@ -20,20 +20,20 @@ function roundCoord(c) {
   return [Math.round(c[0] * 100000) / 100000, Math.round(c[1] * 100000) / 100000];
 }
 
-// Line definitions & styles
+// Osaka Metro official 9 lines
 const METRO_MAP = {
-  '1号線(御堂筋線)': { name: '御堂筋線', symbol: 'M', color: '#E5171F', width: 4 },
+  '1号線(御堂筋線)': { name: '御堂筋線', symbol: 'M', color: '#E5171F', width: 4.0 },
   '2号線(谷町線)': { name: '谷町線', symbol: 'T', color: '#522886', width: 3.5 },
   '3号線(四つ橋線)': { name: '四つ橋線', symbol: 'Y', color: '#0078BA', width: 3.5 },
   '4号線(中央線)': { name: '中央線', symbol: 'C', color: '#019A66', width: 3.5 },
-  '5号線(千日前線)': { name: '千日前線', symbol: 'S', color: '#E44D93', width: 3 },
-  '6号線(堺筋線)': { name: '堺筋線', symbol: 'K', color: '#814721', width: 3 },
-  '7号線(長堀鶴見緑地線)': { name: '長堀鶴見緑地線', symbol: 'N', color: '#A9CC51', width: 3 },
-  '8号線(今里筋線)': { name: '今里筋線', symbol: 'I', color: '#EE7B1A', width: 3 },
-  '南港ポートタウン線': { name: 'ニュートラム', symbol: 'P', color: '#00A0DE', width: 3 },
+  '5号線(千日前線)': { name: '千日前線', symbol: 'S', color: '#E44D93', width: 3.0 },
+  '6号線(堺筋線)': { name: '堺筋線', symbol: 'K', color: '#814721', width: 3.0 },
+  '7号線(長堀鶴見緑地線)': { name: '長堀鶴見緑地線', symbol: 'N', color: '#A9CC51', width: 3.0 },
+  '8号線(今里筋線)': { name: '今里筋線', symbol: 'I', color: '#EE7B1A', width: 3.0 },
+  '南港ポートタウン線': { name: 'ニュートラム', symbol: 'P', color: '#00A0DE', width: 3.0 },
 };
 
-// Major stations to show at lower zoom
+// Major stations to show at lower zoom (terminals & festival hubs)
 const MAJOR_STATIONS = new Set([
   '大阪', '梅田', '東梅田', '西梅田', '大阪梅田',
   '中崎町', '天満', '扇町', '中之島', '福島', '新福島',
@@ -41,10 +41,11 @@ const MAJOR_STATIONS = new Set([
   '心斎橋', '四ツ橋', 'なんば', '難波', '大阪難波', '日本橋', '近鉄日本橋',
   '新今宮', '動物園前', '天王寺', '大阪阿部野橋',
   '京橋', '天満橋', '森ノ宮', '谷町四丁目', '谷町九丁目', '鶴橋',
-  '弁天町', '大正', '新大阪', '西中島南方', '十三', 'コスモスクエア', '野田', '野田阪神'
+  '弁天町', '大正', '新大阪', '西中島南方', '十三', 'コスモスクエア', '野田', '野田阪神',
+  'ユニバーサルシティ', '桜島'
 ]);
 
-// 1. Process Railroad Lines
+// 1. Process Lines
 const outLines = [];
 
 linesRaw.features.forEach(f => {
@@ -74,42 +75,38 @@ linesRaw.features.forEach(f => {
       isMetro: true,
     };
   } else if (op.includes('西日本旅客鉄道')) {
-    if (rawLine.includes('大阪環状線')) {
-      matchInfo = { name: 'JR大阪環状線', symbol: 'JR', operator: 'JR West', color: '#E85219', width: 3.5, isMetro: false };
-    } else if (rawLine.includes('JR東西線')) {
-      matchInfo = { name: 'JR東西線', symbol: 'JR', operator: 'JR West', color: '#DC6B9A', width: 2.5, isMetro: false };
-    } else if (rawLine.includes('桜島線')) {
-      matchInfo = { name: 'JRゆめ咲線', symbol: 'JR', operator: 'JR West', color: '#0072CE', width: 2.5, isMetro: false };
-    } else if (rawLine.includes('おおさか東線')) {
-      matchInfo = { name: 'JRおおさか東線', symbol: 'JR', operator: 'JR West', color: '#4169E1', width: 2.5, isMetro: false };
-    } else if (rawLine.includes('東海道線')) {
-      matchInfo = { name: 'JR京都・神戸線', symbol: 'JR', operator: 'JR West', color: '#0072CE', width: 2.5, isMetro: false };
-    } else if (rawLine.includes('関西線') || rawLine.includes('阪和線')) {
-      matchInfo = { name: rawLine, symbol: 'JR', operator: 'JR West', color: '#0072CE', width: 2.5, isMetro: false };
-    }
-  } else if (op.includes('阪急電鉄')) {
-    if (rawLine.includes('神戸') || rawLine.includes('宝塚') || rawLine.includes('京都') || rawLine.includes('千里')) {
-      matchInfo = { name: `阪急${rawLine}`, symbol: '阪急', operator: '阪急電鉄', color: '#6B1D2F', width: 2.8, isMetro: false };
-    }
-  } else if (op.includes('阪神電気鉄道')) {
-    matchInfo = { name: `阪神${rawLine}`, symbol: '阪神', operator: '阪神電気鉄道', color: '#0C3B7C', width: 2.5, isMetro: false };
-  } else if (op.includes('京阪電気鉄道')) {
-    if (rawLine.includes('京阪本線') || rawLine.includes('中之島線')) {
-      matchInfo = { name: `京阪${rawLine}`, symbol: '京阪', operator: '京阪電気鉄道', color: '#1E50A2', width: 2.5, isMetro: false };
-    }
-  } else if (op.includes('近畿日本鉄道')) {
-    if (rawLine.includes('難波') || rawLine.includes('奈良') || rawLine.includes('大阪線') || rawLine.includes('南大阪') || rawLine.includes('けいはんな')) {
-      matchInfo = { name: `近鉄${rawLine}`, symbol: '近鉄', operator: '近畿日本鉄道', color: '#004F9F', width: 2.5, isMetro: false };
-    }
-  } else if (op.includes('南海電気鉄道')) {
-    if (rawLine.includes('南海本線') || rawLine.includes('高野線') || rawLine.includes('空港線')) {
-      matchInfo = { name: `南海${rawLine}`, symbol: '南海', operator: '南海電気鉄道', color: '#1D428A', width: 2.5, isMetro: false };
-    }
+    // JR line: 濃いめのグレー #333333
+    // 大阪環状線, 桜島線(JRゆめ咲線), JR東西線, おおさか東線, 東海道線, 阪和線, 関西線など全て
+    matchInfo = {
+      name: rawLine,
+      symbol: 'JR',
+      operator: 'JR West',
+      color: '#333333',
+      width: 2.8,
+      isMetro: false,
+    };
+  } else if (
+    op.includes('阪急電鉄') ||
+    op.includes('阪神電気鉄道') ||
+    op.includes('京阪電気鉄道') ||
+    op.includes('近畿日本鉄道') ||
+    op.includes('南海電気鉄道') ||
+    op.includes('大阪モノレール') ||
+    op.includes('阪堺電気軌道')
+  ) {
+    // 私鉄各線: 薄めのグレー #666666, 細いライン width 1.8
+    matchInfo = {
+      name: `${op.slice(0, 2)}${rawLine}`,
+      symbol: op.slice(0, 2),
+      operator: op,
+      color: '#666666',
+      width: 1.8,
+      isMetro: false,
+    };
   }
 
   if (!matchInfo) return;
 
-  // Filter coordinates by bounding box
   const coords = f.geometry.coordinates;
   const filteredCoords = [];
 
@@ -134,17 +131,18 @@ linesRaw.features.forEach(f => {
 
 console.log('Extracted lines features count:', outLines.length);
 
-// 2. Process Stations
-const stationGroups = new Map(); // key: name + operator/symbol
+// 2. Process Stations - 全駅網羅
+const stationGroups = new Map();
 
 stationsRaw.features.forEach(f => {
   const op = f.properties.N02_004 || '';
   const rawLine = f.properties.N02_003 || '';
   const stationName = f.properties.N02_005 || '';
-  
-  let symbol = '';
-  let color = '#64748b';
-  let operator = '';
+  if (!stationName) return;
+
+  let symbol = '私鉄';
+  let color = '#666666';
+  let operator = op;
   let isTarget = false;
 
   if (op.includes('大阪市高速電気軌道')) {
@@ -154,47 +152,34 @@ stationsRaw.features.forEach(f => {
       operator = 'Osaka Metro';
       isTarget = true;
     }
+  } else if (op.includes('北大阪急行電鉄')) {
+    symbol = 'M';
+    color = '#E5171F';
+    operator = '北大阪急行';
+    isTarget = true;
   } else if (op.includes('西日本旅客鉄道')) {
-    if (rawLine.includes('大阪環状線') || rawLine.includes('東西線') || rawLine.includes('桜島線')) {
-      symbol = 'JR';
-      color = '#E85219';
-      operator = 'JR West';
-      isTarget = true;
-    }
-  } else if (op.includes('阪神電気鉄道')) {
-    symbol = '阪神';
-    color = '#0C3B7C';
-    operator = '阪神電車';
+    // 桜島線を含むすべてのJR
+    symbol = 'JR';
+    color = '#333333';
+    operator = 'JR West';
     isTarget = true;
-  } else if (op.includes('京阪電気鉄道')) {
-    if (rawLine.includes('京阪本線') || rawLine.includes('中之島線')) {
-      symbol = '京阪';
-      color = '#1E50A2';
-      operator = '京阪電車';
-      isTarget = true;
-    }
-  } else if (op.includes('阪急電鉄')) {
-    symbol = '阪急';
-    color = '#6B1D2F';
-    operator = '阪急電鉄';
-    isTarget = true;
-  } else if (op.includes('近畿日本鉄道')) {
-    if (rawLine.includes('難波') || rawLine.includes('奈良')) {
-      symbol = '近鉄';
-      color = '#004F9F';
-      operator = '近鉄電車';
-      isTarget = true;
-    }
-  } else if (op.includes('南海電気鉄道')) {
-    symbol = '南海';
-    color = '#1D428A';
-    operator = '南海電鉄';
+  } else if (
+    op.includes('阪急電鉄') ||
+    op.includes('阪神電気鉄道') ||
+    op.includes('京阪電気鉄道') ||
+    op.includes('近畿日本鉄道') ||
+    op.includes('南海電気鉄道') ||
+    op.includes('大阪モノレール') ||
+    op.includes('阪堺電気軌道')
+  ) {
+    symbol = op.slice(0, 2);
+    color = '#666666';
+    operator = op;
     isTarget = true;
   }
 
   if (!isTarget) return;
 
-  // Calculate midpoint of station LineString
   const coords = f.geometry.coordinates;
   if (!coords || coords.length < 2) return;
 
@@ -211,7 +196,7 @@ stationsRaw.features.forEach(f => {
   const centerLng = sumLng / validCount;
   const centerLat = sumLat / validCount;
 
-  // Deduplicate by Station Name & Line Symbol
+  // Deduplicate by Station Name & Symbol
   const key = `${stationName}_${symbol}`;
   if (!stationGroups.has(key)) {
     const isMajor = MAJOR_STATIONS.has(stationName);
@@ -241,10 +226,9 @@ const outStations = Array.from(stationGroups.values()).map(s => ({
   },
 }));
 
-console.log('Extracted unique stations count:', outStations.length);
+console.log('Extracted unique stations count (All stations):', outStations.length);
 console.log('Major stations count:', outStations.filter(s => s.properties.isMajor).length);
 
-// Generate final TypeScript file content
 const metroLinesInfo = [
   { symbol: 'M', name: '御堂筋線', nameEn: 'Midosuji Line', color: '#E5171F' },
   { symbol: 'T', name: '谷町線', nameEn: 'Tanimachi Line', color: '#522886' },
@@ -258,8 +242,10 @@ const metroLinesInfo = [
 ];
 
 const tsContent = `/**
- * 国土交通省「国土数値情報 鉄道データ（N02）」に基づく高精度鉄道路線＆駅 GeoJSON
- * 大阪メトロ公式9路線（M, T, Y, C, S, K, N, I, P）＋JR環状線・主要私鉄
+ * 国土交通省「国土数値情報 鉄道データ（N02）」に基づく高精度鉄道路線＆全駅 GeoJSON
+ * - Osaka Metro 9路線（公式カラー・太線）
+ * - JR西日本（桜島線等含む全線：#333333 濃いグレー）
+ * - 私鉄各社（阪急・阪神・京阪・近鉄・南海・モノレール等：#666666 薄いグレー・細線）
  * 出典：国土交通省 国土数値情報（鉄道時系列データ N02-23）
  */
 
