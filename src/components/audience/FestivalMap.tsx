@@ -188,12 +188,13 @@ export default function FestivalMap({
           data: OSAKA_TRANSIT_STATIONS,
         });
 
-        // 駅の丸印（ズーム11以上）
+        // 1. 主要駅（ターミナル・乗換・会場最寄り）の丸印（ズーム11.5以上）
         map.addLayer({
-          id: 'transit-station-points',
+          id: 'transit-station-points-major',
           type: 'circle',
           source: 'osaka-transit-stations',
-          minzoom: 11,
+          minzoom: 11.5,
+          filter: ['==', ['get', 'isMajor'], true],
           paint: {
             'circle-radius': 4.5,
             'circle-color': '#ffffff',
@@ -203,21 +204,60 @@ export default function FestivalMap({
           },
         });
 
-        // 駅名テキストラベル（ズーム12以上で表示）
+        // 2. 主要駅の駅名テキストラベル（ズーム12以上）
         map.addLayer({
-          id: 'transit-station-labels',
+          id: 'transit-station-labels-major',
           type: 'symbol',
           source: 'osaka-transit-stations',
           minzoom: 12,
+          filter: ['==', ['get', 'isMajor'], true],
           layout: {
             'text-field': ['get', 'name'],
-            'text-size': 11.5,
+            'text-size': 12,
             'text-offset': [0, 1.2],
             'text-anchor': 'top',
             'text-allow-overlap': false,
           },
           paint: {
             'text-color': '#0f172a',
+            'text-halo-color': '#ffffff',
+            'text-halo-width': 2.5,
+            'text-halo-blur': 0.5,
+          },
+        });
+
+        // 3. 一般駅の丸印（ズーム13.5以上で全駅表示）
+        map.addLayer({
+          id: 'transit-station-points-minor',
+          type: 'circle',
+          source: 'osaka-transit-stations',
+          minzoom: 13.5,
+          filter: ['!=', ['get', 'isMajor'], true],
+          paint: {
+            'circle-radius': 3.5,
+            'circle-color': '#ffffff',
+            'circle-stroke-color': ['get', 'color'],
+            'circle-stroke-width': 2,
+            'circle-opacity': 0.9,
+          },
+        });
+
+        // 4. 一般駅の駅名テキストラベル（ズーム14以上で全駅表示）
+        map.addLayer({
+          id: 'transit-station-labels-minor',
+          type: 'symbol',
+          source: 'osaka-transit-stations',
+          minzoom: 14,
+          filter: ['!=', ['get', 'isMajor'], true],
+          layout: {
+            'text-field': ['get', 'name'],
+            'text-size': 11,
+            'text-offset': [0, 1.2],
+            'text-anchor': 'top',
+            'text-allow-overlap': false,
+          },
+          paint: {
+            'text-color': '#334155',
             'text-halo-color': '#ffffff',
             'text-halo-width': 2,
             'text-halo-blur': 0.5,
