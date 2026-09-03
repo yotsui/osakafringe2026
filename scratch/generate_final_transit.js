@@ -1,13 +1,33 @@
 const fs = require('fs');
+const https = require('https');
+const { execSync } = require('child_process');
 
 async function updateTransitData() {
+  if (!fs.existsSync('scratch/N02-23_GML.zip')) {
+    console.log('Downloading...');
+    await new Promise((res, rej) => {
+      const f = fs.createWriteStream('scratch/N02-23_GML.zip');
+      https.get('https://nlftp.mlit.go.jp/ksj/gml/data/N02/N02-23/N02-23_GML.zip', r => {
+        r.pipe(f);
+        f.on('finish', () => f.close(res));
+      }).on('error', rej);
+    });
+  }
+  if (!fs.existsSync('scratch/n02/UTF-8/N02-23_Station.geojson')) {
+    console.log('Unzipping...');
+    execSync('powershell -Command "Expand-Archive -Path \'scratch/N02-23_GML.zip\' -DestinationPath \'scratch/n02\' -Force"');
+  }
+
   const linesRaw = JSON.parse(fs.readFileSync('scratch/n02/UTF-8/N02-23_RailroadSection.geojson', 'utf8'));
   const stationsRaw = JSON.parse(fs.readFileSync('scratch/n02/UTF-8/N02-23_Station.geojson', 'utf8'));
 
+  // Extended bounding box:
+  // - South: 34.37 (Hineno 34.38997, Nagataki 34.38156 fully included)
+  // - East: 135.73 (Ikoma Line East stations 135.709, Oji 135.703 fully included)
   const BBOX = {
     minLng: 135.20,
-    maxLng: 135.70,
-    minLat: 34.40,
+    maxLng: 135.73,
+    minLat: 34.37,
     maxLat: 34.86,
   };
 
@@ -41,7 +61,8 @@ async function updateTransitData() {
     '弁天町', '大正', '新大阪', '西中島南方', '十三', 'コスモスクエア', '野田', '野田阪神',
     'ユニバーサルシティ', '桜島',
     'なかもず', '中百舌鳥', '堺東', '堺', '三国ヶ丘',
-    '箕面萱野', '河内長野', '関西空港', 'りんくうタウン', '宝塚', '伊丹', '川西池田'
+    '箕面萱野', '河内長野', '関西空港', 'りんくうタウン', '宝塚', '伊丹', '川西池田',
+    '日根野', '熊取', '生駒', '王寺', '平群'
   ]);
 
   const outLines = [];
@@ -275,6 +296,18 @@ async function updateTransitData() {
   console.log('Total Line features:', outLines.length);
   console.log('Total Unique stations:', outStations.length);
 
+  // Verification checks
+  ['日根野', '熊取', '生駒', '平群', '王寺'].forEach(name => {
+    const found = outStations.filter(s => s.properties.name === name);
+    console.log(`Station "${name}":`, found.map(s => `${s.properties.operator} (${s.properties.symbol}) ${s.geometry.coordinates}`));
+  });
+
+  const ikomaLines = outLines.filter(l => l.properties.name.includes('生駒'));
+  console.log('Ikoma line features count:', ikomaLines.length);
+
+  const hanwaLines = outLines.filter(l => l.properties.name.includes('阪和'));
+  console.log('Hanwa line features count:', hanwaLines.length);
+
   const metroLinesInfo = [
     { symbol: 'M', name: '御堂筋線', nameEn: 'Midosuji Line', color: '#E5171F' },
     { symbol: 'T', name: '谷町線', nameEn: 'Tanimachi Line', color: '#522886' },
@@ -291,8 +324,8 @@ async function updateTransitData() {
  * 国土交通省「国土数値情報 鉄道データ（N02）」に基づく高精度鉄道路線＆全駅 GeoJSON
  * - Osaka Metro 9路線（御堂筋線：箕面萱野〜なかもず 完全直通）
  * - 南海電鉄（難波〜中百舌鳥〜河内長野、南海本線・空港線 関西空港まで完全延伸）
- * - 近畿日本鉄道（南大阪線、長野線：古市〜富田林〜河内長野まで完全延伸）
- * - JR西日本（福知山線 宝塚まで接続、関西空港線 関西空港まで延伸、#333333 濃いグレー）
+ * - 近畿日本鉄道（南大阪線、長野線：古市〜富田林〜河内長野、生駒線：王寺〜平群〜生駒まで完全延伸）
+ * - JR西日本（熊取〜日根野〜関西空港線完全接続、福知山線 宝塚まで接続、#333333 濃いグレー）
  * - 新幹線（山陽新幹線・東海道新幹線）は除外
  * - 私鉄各社（#666666 薄いグレー・細線）
  * 出典：国土交通省 国土数値情報（鉄道時系列データ N02-23）＋ 2024北急延伸データ
@@ -313,6 +346,11 @@ export const OSAKA_TRANSIT_STATIONS: any = {
 
   fs.writeFileSync('src/data/transitData.ts', tsContent);
   console.log('Successfully wrote src/data/transitData.ts, size:', tsContent.length);
+
+  // Clean temp files
+  console.log('Cleaning up scratch files...');
+  execSync('powershell -Command "Remove-Item -Recurse -Force \'scratch/n02\', \'scratch/N02-23_GML.zip\' -ErrorAction SilentlyContinue"');
+  console.log('Finished successfully.');
 }
 
 updateTransitData().catch(console.error);
