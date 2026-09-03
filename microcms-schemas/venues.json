@@ -89,6 +89,18 @@
       "name": "収容人数・キャパシティ",
       "kind": "number",
       "required": false
+    },
+    {
+      "fieldId": "lat",
+      "name": "緯度（Latitude 例: 34.7065）",
+      "kind": "number",
+      "required": false
+    },
+    {
+      "fieldId": "lng",
+      "name": "経度（Longitude 例: 135.5032）",
+      "kind": "number",
+      "required": false
     }
   ],
   "customFields": []

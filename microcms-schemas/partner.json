@@ -1,0 +1,53 @@
+{
+  "apiFields": [
+    {
+      "fieldId": "name",
+      "name": "団体名・パートナー名（日本語）",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "nameEn",
+      "name": "団体名・パートナー名（英語）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "image",
+      "name": "バナー画像",
+      "kind": "media",
+      "required": true
+    },
+    {
+      "fieldId": "url",
+      "name": "リンク先URL",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "description",
+      "name": "説明文（日本語）",
+      "kind": "textArea",
+      "required": false
+    },
+    {
+      "fieldId": "descriptionEn",
+      "name": "説明文（英語）",
+      "kind": "textArea",
+      "required": false
+    },
+    {
+      "fieldId": "category",
+      "name": "パートナー区分（観光局/連携フェス/会場協力/スポンサー等）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "order",
+      "name": "表示順（数値）",
+      "kind": "number",
+      "required": false
+    }
+  ],
+  "customFields": []
+}

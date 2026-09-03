@@ -26,19 +26,29 @@
     },
     {
       "fieldId": "genre",
-      "name": "ジャンル（street/dance/music/theater/traditional/kamishibai/exhibition/other）",
-      "kind": "text",
+      "name": "ジャンル区分（検索・絞り込み用セレクト）",
+      "kind": "select",
+      "selectItems": [
+        "street",
+        "dance",
+        "music",
+        "theater",
+        "traditional",
+        "kamishibai",
+        "exhibition",
+        "other"
+      ],
       "required": true
     },
     {
       "fieldId": "genreCustom",
-      "name": "カスタムジャンル名（例: フィジカルシアター）",
+      "name": "カスタムジャンル詳細名（自由記述 例: フィジカルシアター、現代三味線）",
       "kind": "text",
       "required": false
     },
     {
       "fieldId": "genreCustomEn",
-      "name": "カスタムジャンル名（英語）",
+      "name": "カスタムジャンル詳細名（英語）",
       "kind": "text",
       "required": false
     },
@@ -56,8 +66,9 @@
     },
     {
       "fieldId": "venueId",
-      "name": "主会場ID（例: nakazaki-hall）",
-      "kind": "text",
+      "name": "主会場（会場API参照またはID）",
+      "kind": "relation",
+      "reference": "venues",
       "required": false
     },
     {

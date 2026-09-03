@@ -43,9 +43,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/audience" className="text-[#FFF100] hover:text-white flex items-center gap-1.5 font-black">
-                  <SparkleIcon className="w-3.5 h-3.5" fill="#FFF100" />
-                  <span>{t('navAudience')}</span>
+                <Link href="/audience" className="text-[#FFF100] hover:text-white font-black">
+                  {t('navAudience')}
                 </Link>
               </li>
               <li>

@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Venue, Performance } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
-import { MapPin, Navigation, Compass, ExternalLink, Calendar, Sparkles } from 'lucide-react';
+import { Navigation, ExternalLink, Calendar } from 'lucide-react';
+import 'maplibre-gl/dist/maplibre-gl.css';
 
 interface FestivalMapProps {
   venues: Venue[];
@@ -13,6 +14,33 @@ interface FestivalMapProps {
   onSelectPerformance?: (performance: Performance) => void;
 }
 
+// APIキー不要・透かしなし・POIのない国土地理院 淡色地図スタイル
+const GSI_PALE_STYLE: any = {
+  version: 8,
+  sources: {
+    'gsi-pale': {
+      type: 'raster',
+      tiles: ['https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png'],
+      tileSize: 256,
+      attribution:
+        '&copy; <a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener noreferrer">国土地理院</a>',
+    },
+  },
+  layers: [
+    {
+      id: 'gsi-pale-tiles',
+      type: 'raster',
+      source: 'gsi-pale',
+      minzoom: 5,
+      maxzoom: 18,
+      paint: {
+        'raster-opacity': 0.95,
+        'raster-saturation': -0.15,
+      },
+    },
+  ],
+};
+
 export default function FestivalMap({
   venues,
   performances = [],
@@ -21,11 +49,14 @@ export default function FestivalMap({
   onSelectPerformance,
 }: FestivalMapProps) {
   const { getText, t } = useLanguage();
-  const [mounted, setMounted] = useState(false);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<any>(null);
+  const markersRef = useRef<any[]>([]);
+
   const [activeVenue, setActiveVenue] = useState<Venue | null>(null);
 
+  // 初期アクティブ会場
   useEffect(() => {
-    setMounted(true);
     if (venues.length > 0 && !activeVenue) {
       if (selectedVenueId) {
         const found = venues.find((v) => v.id === selectedVenueId);
@@ -36,128 +67,267 @@ export default function FestivalMap({
     }
   }, [venues, selectedVenueId, activeVenue]);
 
-  // Initialize Leaflet
+  // MapLibre GL JS の初期化
   useEffect(() => {
-    if (!mounted || typeof window === 'undefined') return;
+    if (!mapContainerRef.current || typeof window === 'undefined') return;
 
-    let mapInstance: any = null;
+    let isCancelled = false;
 
-    const initMap = async () => {
-      const L = (await import('leaflet')).default;
-      const mapContainer = document.getElementById('festival-leaflet-map');
-      if (!mapContainer || (mapContainer as any)._leaflet_id) return;
+    const initMapLibre = async () => {
+      const maplibregl = (await import('maplibre-gl')) as any;
 
-      const center = activeVenue
-        ? [activeVenue.location.lat, activeVenue.location.lng]
-        : [34.6937, 135.5023];
+      if (isCancelled || !mapContainerRef.current) return;
 
-      const map = L.map('festival-leaflet-map', {
-        center: center as [number, number],
+      // 既存インスタンス破棄
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+
+      const initialCenter: [number, number] = activeVenue
+        ? [activeVenue.location.lng, activeVenue.location.lat]
+        : [135.5023, 34.6937];
+
+      // 地図インスタンス生成
+      const map = new maplibregl.Map({
+        container: mapContainerRef.current,
+        style: GSI_PALE_STYLE,
+        center: initialCenter,
         zoom: 13,
-        scrollWheelZoom: true,
+        attributionControl: false,
       });
 
-      mapInstance = map;
+      map.addControl(
+        new maplibregl.NavigationControl({ showCompass: false }),
+        'top-right'
+      );
 
-      // OpenStreetMap Light tiles
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        maxZoom: 19,
-      }).addTo(map);
+      map.addControl(
+        new maplibregl.AttributionControl({ compact: true }),
+        'bottom-right'
+      );
 
-      // Custom Pink Pin
-      const customIcon = L.divIcon({
-        className: 'custom-venue-pin',
-        html: `
-          <div style="
-            background: linear-gradient(135deg, #e6007e, #7c3aed);
-            width: 32px;
-            height: 32px;
-            border-radius: 50% 50% 50% 0;
-            transform: rotate(-45deg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(230, 0, 126, 0.4);
-            border: 2px solid white;
-          ">
-            <div style="
-              width: 10px;
-              height: 10px;
-              background: white;
-              border-radius: 50%;
-              transform: rotate(45deg);
-            "></div>
-          </div>
-        `,
-        iconSize: [32, 32],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -32],
+      // マウント後のリサイズ補正
+      map.on('load', () => {
+        map.resize();
       });
 
-      // Markers
+      mapInstanceRef.current = map;
+
+      // ピンの配置
+      markersRef.current.forEach((m) => m.remove());
+      markersRef.current = [];
+
       venues.forEach((v) => {
-        const marker = L.marker([v.location.lat, v.location.lng], { icon: customIcon }).addTo(map);
-
+        const isSelected = activeVenue?.id === v.id;
         const vName = getText(v.name, v.nameEn);
         const vArea = getText(v.area, v.areaEn);
         const vAccess = getText(v.access, v.accessEn);
         const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${v.location.lat},${v.location.lng}`;
 
-        const popupContent = `
-          <div style="min-width: 200px; font-family: sans-serif; color: #1e293b; padding: 2px;">
-            <div style="font-size: 11px; font-weight: bold; color: #e6007e; text-transform: uppercase;">${vArea}</div>
-            <div style="font-size: 13px; font-weight: 800; margin: 2px 0 4px 0;">${vName}</div>
-            <div style="font-size: 11px; color: #64748b; margin-bottom: 8px;">${vAccess}</div>
+        // DOMマーカーエレメントの生成
+        const el = document.createElement('div');
+        el.className = 'custom-maplibre-marker';
+        el.style.cursor = 'pointer';
+        el.style.width = '36px';
+        el.style.height = '36px';
+        el.style.display = 'flex';
+        el.style.alignItems = 'center';
+        el.style.justifyContent = 'center';
+
+        el.innerHTML = `
+          <div style="
+            position: relative;
+            width: 32px;
+            height: 32px;
+            background: ${isSelected ? '#FFF100' : '#E6007E'};
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px ${isSelected ? 'rgba(0,0,0,0.3)' : 'rgba(230,0,126,0.45)'};
+            border: 2.5px solid #ffffff;
+            transition: transform 0.2s ease, background 0.2s ease;
+          ">
+            <div style="
+              width: 10px;
+              height: 10px;
+              background: ${isSelected ? '#000000' : '#ffffff'};
+              border-radius: 50%;
+              transform: rotate(45deg);
+            "></div>
+          </div>
+        `;
+
+        el.addEventListener('click', () => {
+          setActiveVenue(v);
+          if (onSelectVenue) onSelectVenue(v.id);
+          map.flyTo({
+            center: [v.location.lng, v.location.lat],
+            zoom: 14.5,
+            essential: true,
+          });
+        });
+
+        const popup = new maplibregl.Popup({
+          offset: [0, -18],
+          closeButton: true,
+          closeOnClick: false,
+        }).setHTML(`
+          <div style="min-width: 200px; font-family: sans-serif; color: #0f172a; padding: 4px;">
+            <div style="font-size: 11px; font-weight: 800; color: #E6007E; text-transform: uppercase; letter-spacing: 0.05em;">${vArea}</div>
+            <div style="font-size: 13px; font-weight: 900; margin: 2px 0 4px 0; line-height: 1.3;">${vName}</div>
+            <div style="font-size: 11px; color: #64748b; margin-bottom: 8px; line-height: 1.4;">${vAccess}</div>
             <a href="${navUrl}" target="_blank" rel="noopener noreferrer" style="
               display: inline-flex;
               align-items: center;
               gap: 4px;
-              background: #e6007e;
+              background: #E6007E;
               color: white;
               padding: 5px 12px;
               border-radius: 8px;
               font-size: 11px;
-              font-weight: bold;
+              font-weight: 800;
               text-decoration: none;
             ">
-              Google Maps 経路案内 ↗
+              <span>Google Maps でルート案内</span>
+              ↗
             </a>
           </div>
-        `;
+        `);
 
-        marker.bindPopup(popupContent);
+        const marker = new maplibregl.Marker({ element: el })
+          .setLngLat([v.location.lng, v.location.lat])
+          .setPopup(popup)
+          .addTo(map);
 
-        marker.on('click', () => {
-          setActiveVenue(v);
-          if (onSelectVenue) onSelectVenue(v.id);
-        });
+        markersRef.current.push(marker);
       });
     };
 
-    initMap();
+    initMapLibre();
 
     return () => {
-      if (mapInstance) {
-        mapInstance.remove();
+      isCancelled = true;
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
       }
     };
-  }, [mounted, venues, onSelectVenue, getText]);
+  }, [venues, getText, onSelectVenue]);
 
-  const activeVenuePerformances = activeVenue
-    ? performances.filter(
-        (p) => p.venueId === activeVenue.id || p.schedules.some((s) => s.venueId === activeVenue.id)
-      )
+  // 会場切り替え時のマップ移動
+  useEffect(() => {
+    if (activeVenue && mapInstanceRef.current) {
+      mapInstanceRef.current.flyTo({
+        center: [activeVenue.location.lng, activeVenue.location.lat],
+        zoom: 14,
+        essential: true,
+      });
+    }
+  }, [activeVenue]);
+
+  // 選択された会場で上演される公演一覧
+  const venuePerformances = activeVenue
+    ? performances.filter((p) => {
+        if (p.venueId === activeVenue.id) return true;
+        return p.schedules.some((s) => s.venueId === activeVenue.id);
+      })
     : [];
 
   return (
-    <div className="bg-white border border-pink-100 rounded-3xl overflow-hidden shadow-sm">
-      {/* Venue selector tabs */}
-      <div className="bg-slate-50 p-3.5 border-b border-pink-100 flex items-center gap-2 overflow-x-auto no-scrollbar">
-        <span className="text-xs font-black text-slate-700 flex items-center gap-1 flex-shrink-0 mr-2">
-          <MapPin className="w-3.5 h-3.5 text-pink-600" />
-          <span>{t('selectVenue')}</span>
-        </span>
+    <div className="space-y-6">
+      {/* Map + Detail Panel */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-white rounded-3xl border border-pink-100 p-4 sm:p-6 shadow-sm overflow-hidden">
+        {/* Vector Map Container */}
+        <div className="lg:col-span-8 relative rounded-2xl overflow-hidden min-h-[420px] lg:min-h-[560px] bg-slate-100 border border-slate-200">
+          <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />
+        </div>
+
+        {/* Venue Info Side Panel */}
+        <div className="lg:col-span-4 flex flex-col justify-between space-y-6 p-2 sm:p-4">
+          {activeVenue ? (
+            <div className="space-y-5">
+              <div className="space-y-2 border-b border-pink-100 pb-4">
+                <span className="inline-block px-3 py-1 rounded-full bg-pink-50 text-[#E6007E] font-black text-xs uppercase tracking-wide">
+                  {getText(activeVenue.area, activeVenue.areaEn)}
+                </span>
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
+                  {getText(activeVenue.name, activeVenue.nameEn)}
+                </h3>
+                <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                  {getText(activeVenue.address, activeVenue.addressEn)}
+                </p>
+              </div>
+
+              {/* Access */}
+              <div className="space-y-1 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80">
+                <div className="text-[11px] font-black text-slate-500 uppercase tracking-wider">
+                  {t('venueAccess')}
+                </div>
+                <div className="text-xs font-bold text-slate-800 leading-relaxed">
+                  {getText(activeVenue.access, activeVenue.accessEn)}
+                </div>
+              </div>
+
+              {/* Description */}
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+                {getText(activeVenue.description, activeVenue.descriptionEn)}
+              </p>
+
+              {/* Navigation Action */}
+              <div className="pt-2">
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${activeVenue.location.lat},${activeVenue.location.lng}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#E6007E] hover:bg-[#c4006b] text-white font-black text-xs shadow-md transition-colors"
+                >
+                  <Navigation className="w-4 h-4" />
+                  <span>Google Maps でルート案内</span>
+                </a>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-12 text-slate-400 font-bold text-sm">
+              会場を選択してください
+            </div>
+          )}
+
+          {/* Performances at this Venue */}
+          {venuePerformances.length > 0 && (
+            <div className="space-y-3 pt-4 border-t border-slate-100">
+              <div className="flex items-center gap-1.5 text-xs font-black text-slate-900">
+                <Calendar className="w-4 h-4 text-[#E6007E]" />
+                <span>この会場で上演される公演 ({venuePerformances.length})</span>
+              </div>
+              <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                {venuePerformances.map((perf) => (
+                  <button
+                    key={perf.id}
+                    onClick={() => onSelectPerformance && onSelectPerformance(perf)}
+                    className="w-full text-left p-2.5 rounded-xl bg-pink-50/50 hover:bg-pink-100/70 border border-pink-100 text-slate-900 transition-colors flex items-center justify-between gap-2 group cursor-pointer"
+                  >
+                    <div className="truncate">
+                      <div className="text-xs font-black truncate group-hover:text-[#E6007E]">
+                        {getText(perf.title, perf.titleEn)}
+                      </div>
+                      <div className="text-[11px] text-slate-500 font-medium truncate">
+                        {getText(perf.artistName, perf.artistNameEn)}
+                      </div>
+                    </div>
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#E6007E] flex-shrink-0" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Venue List Selector Tabs */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {venues.map((v) => {
           const isSelected = activeVenue?.id === v.id;
           return (
@@ -167,104 +337,21 @@ export default function FestivalMap({
                 setActiveVenue(v);
                 if (onSelectVenue) onSelectVenue(v.id);
               }}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-extrabold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`p-4 rounded-2xl text-left border transition-all cursor-pointer ${
                 isSelected
-                  ? 'bg-pink-600 text-white shadow-sm'
-                  : 'bg-white text-slate-700 hover:bg-pink-50/60 border border-slate-200'
+                  ? 'bg-white border-[#E6007E] shadow-md ring-2 ring-[#E6007E]/20'
+                  : 'bg-white/80 hover:bg-white border-slate-200 hover:border-pink-200'
               }`}
             >
-              <span>{getText(v.name, v.nameEn)}</span>
+              <div className="text-[11px] font-black text-[#E6007E] uppercase tracking-wider mb-1">
+                {getText(v.area, v.areaEn)}
+              </div>
+              <div className="text-xs font-black text-slate-900 line-clamp-1">
+                {getText(v.name, v.nameEn)}
+              </div>
             </button>
           );
         })}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 min-h-[420px]">
-        {/* Leaflet Map Canvas */}
-        <div className="lg:col-span-2 relative min-h-[350px] lg:min-h-[450px]">
-          <div id="festival-leaflet-map" className="w-full h-full min-h-[350px] lg:min-h-[450px] z-10" />
-          <div className="absolute top-3 right-3 z-20 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full border border-pink-200 text-[11px] text-pink-700 font-bold flex items-center gap-1 shadow-sm">
-            <Compass className="w-3.5 h-3.5 text-pink-600" />
-            <span>{t('tapPinHint')}</span>
-          </div>
-        </div>
-
-        {/* Selected Venue Details Panel */}
-        <div className="p-6 bg-slate-50 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-pink-100">
-          {activeVenue ? (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <span className="inline-block px-2.5 py-0.5 rounded-full bg-pink-100 text-pink-700 text-[11px] font-black uppercase tracking-wider">
-                  {getText(activeVenue.area, activeVenue.areaEn)}
-                </span>
-                <h3 className="text-base sm:text-lg font-black text-slate-900 leading-tight">
-                  {getText(activeVenue.name, activeVenue.nameEn)}
-                </h3>
-                <p className="text-xs text-slate-600 flex items-start gap-1 font-medium">
-                  <MapPin className="w-3.5 h-3.5 text-pink-600 flex-shrink-0 mt-0.5" />
-                  <span>{getText(activeVenue.address, activeVenue.addressEn)}</span>
-                </p>
-                {activeVenue.access && (
-                  <p className="text-xs text-slate-700 bg-white p-3 rounded-2xl border border-slate-200 leading-relaxed font-bold">
-                    {getText(activeVenue.access, activeVenue.accessEn)}
-                  </p>
-                )}
-              </div>
-
-              {/* Performances in this venue */}
-              <div className="space-y-2">
-                <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5 text-pink-600" />
-                  <span>この会場での公演 ({activeVenuePerformances.length}件)</span>
-                </h4>
-                <div className="space-y-2 max-h-44 overflow-y-auto pr-1">
-                  {activeVenuePerformances.map((perf) => (
-                    <div
-                      key={perf.id}
-                      onClick={() => onSelectPerformance?.(perf)}
-                      className="p-3 rounded-2xl bg-white border border-pink-100 text-xs flex items-center justify-between gap-2 hover:border-pink-300 hover:bg-pink-50/50 transition-colors cursor-pointer shadow-2xs"
-                    >
-                      <div className="truncate">
-                        <div className="font-black text-slate-900 truncate">
-                          {getText(perf.title, perf.titleEn)}
-                        </div>
-                        <div className="text-[11px] text-pink-600 font-bold">
-                          {getText(perf.artistName, perf.artistNameEn)}
-                        </div>
-                      </div>
-                      <span className="text-[10px] bg-pink-50 px-2 py-0.5 rounded text-pink-600 whitespace-nowrap font-black border border-pink-200">
-                        {perf.schedules.length}公演
-                      </span>
-                    </div>
-                  ))}
-                  {activeVenuePerformances.length === 0 && (
-                    <p className="text-xs text-slate-400 italic py-2">
-                      {t('noShowsScheduled')}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Navigation button */}
-              <div className="pt-2">
-                <a
-                  href={`https://www.google.com/maps/dir/?api=1&destination=${activeVenue.location.lat},${activeVenue.location.lng}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-black text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
-                >
-                  <Navigation className="w-4 h-4" />
-                  <span>{t('directions')}</span>
-                </a>
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full text-center text-slate-400 py-8">
-              <MapPin className="w-8 h-8 text-pink-300 mb-2" />
-              <p className="text-xs font-bold">会場を選択してください</p>
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );

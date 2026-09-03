@@ -1,4 +1,4 @@
-import { Venue, Performance, Award, Banner, SiteInfo } from '@/types';
+import { Venue, Performance, Award, Banner, SiteInfo, Partner } from '@/types';
 
 export const mockVenues: Venue[] = [
   {
@@ -13,9 +13,11 @@ export const mockVenues: Venue[] = [
     accessEn: '3 min walk from Nakazakicho Station (Tanimachi Line) / 10 min from Umeda',
     description: '【HISTORICAL】昭和初期の登録有形文化財・レトロ古民家をリノベーションした濃密な小劇場。歴史的空間と現代舞台表現が交差するプレミアムベニュー。',
     descriptionEn: '[HISTORICAL] An intimate renovated heritage building in retro Nakazakicho, blending historic architectural atmosphere with avant-garde performance.',
+    lat: 34.7065,
+    lng: 135.5032,
     location: {
-      lat: 34.7081,
-      lng: 135.5034,
+      lat: 34.7065,
+      lng: 135.5032,
     },
     websiteUrl: 'https://osakafringe.com',
     snsTwitter: 'https://twitter.com/osakafringe',
@@ -40,8 +42,10 @@ export const mockVenues: Venue[] = [
     accessEn: 'Directly outside Exit 7 of Shinsaibashi Station',
     description: '【LOCAL】アメリカ村の中心にある地下ライブスペース。街の隙間をハックし、アーティストと観客が密に交わる熱気あふれる空間。',
     descriptionEn: '[LOCAL] An energetic underground venue in America-mura, where artists and audience collide in an intimate atmosphere.',
+    lat: 34.6722,
+    lng: 135.4983,
     location: {
-      lat: 34.6725,
+      lat: 34.6722,
       lng: 135.4983,
     },
     websiteUrl: 'https://osakafringe.com',
@@ -64,18 +68,19 @@ export const mockVenues: Venue[] = [
     access: '京阪本線・Osaka Metro 堺筋線「北浜駅」徒歩2分',
     accessEn: '2 min walk from Kitahama Station',
     description: '【CORE】堂島川に面した開放的な公共ショーケース拠点。水都大阪の風を感じながら、大道芸・紙芝居・パブリックアートを展開。',
-    descriptionEn: '[CORE] A prime open-air showcase venue along the river, projecting festival energy into the cityscape with street circus, kamishibai & art installations.',
+    descriptionEn: '[CORE] A prime open-air showcase venue along the river, projecting festival energy into the cityscape with street circus and kamishibai.',
+    lat: 34.6937,
+    lng: 135.5042,
     location: {
       lat: 34.6937,
-      lng: 135.5039,
+      lng: 135.5042,
     },
     websiteUrl: 'https://osakafringe.com',
     snsTwitter: 'https://twitter.com/osakafringe',
-    image: 'https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=800&q=80',
     images: [
-      'https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=800&q=80'
+      'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=80'
     ],
     capacity: 200,
   },
@@ -91,9 +96,11 @@ export const mockVenues: Venue[] = [
     accessEn: '6 min walk from Tennoji Station North Exit',
     description: '【LOCAL】通天閣を遠くに望む元倉庫の秘密基地ルーフトップ。夕暮れから夜にかけての古典芸能や作品展示を実施。',
     descriptionEn: '[LOCAL] A converted rooftop space overlooking Tsutenkaku Tower, offering magical dusk atmosphere for traditional arts and site-specific performance.',
+    lat: 34.6515,
+    lng: 135.5135,
     location: {
-      lat: 34.6531,
-      lng: 135.5132,
+      lat: 34.6515,
+      lng: 135.5135,
     },
     websiteUrl: 'https://osakafringe.com',
     image: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80',
@@ -328,3 +335,39 @@ Account Name: OSAKA BUNKA FRINGE KIKOU SETSURITSU JUNBISHITSU`,
   contactEmail: 'info@osakafringe.com',
   awardsEnabled: false,
 };
+
+export const mockPartners: Partner[] = [
+  {
+    id: 'partner-octb',
+    name: '公益財団法人 大阪観光局',
+    nameEn: 'Osaka Convention & Tourism Bureau',
+    image: 'https://images.unsplash.com/photo-1590559899731-a382839e5549?auto=format&fit=crop&w=800&q=80',
+    url: 'https://osaka-info.jp',
+    description: '水都大阪の魅力を世界へ発信する大阪観光局。大阪フリンジの観光・インバウンド連携パートナー。',
+    descriptionEn: 'Official tourism board promoting Osaka worldwide as an international cultural hub.',
+    category: 'tourism',
+    order: 1,
+  },
+  {
+    id: 'partner-tomofes',
+    name: 'トモフェス (TOMO FESTIVAL)',
+    nameEn: 'TOMO FESTIVAL',
+    image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80',
+    url: 'https://osakafringe.com',
+    description: '大阪を舞台に人と街がつながる都市型カルチャーフェスティバル。連携企画を実施。',
+    descriptionEn: 'Urban cultural festival connecting people and community in Osaka.',
+    category: 'partner_event',
+    order: 2,
+  },
+  {
+    id: 'partner-minami',
+    name: 'ミナミフェス (MINAMI FESTIVAL)',
+    nameEn: 'MINAMI ART FESTIVAL',
+    image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=800&q=80',
+    url: 'https://osakafringe.com',
+    description: '心斎橋・道頓堀・アメリカ村を舞台にしたミナミエリア連携アートフェス。',
+    descriptionEn: 'Minami area collaborative art and performance festival.',
+    category: 'partner_event',
+    order: 3,
+  },
+];

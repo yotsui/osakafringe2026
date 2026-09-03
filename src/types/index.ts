@@ -18,6 +18,8 @@ export interface Venue {
   description?: string;
   descriptionEn?: string;
   location: Location;
+  lat?: number;
+  lng?: number;
   websiteUrl?: string;
   snsTwitter?: string;
   snsInstagram?: string;
@@ -78,17 +80,35 @@ export interface Performance {
 export interface Award {
   id: string;
   year: number;
-  title: string;
+  awardName?: string;
+  awardNameEn?: string;
+  title?: string;
   titleEn?: string;
   category: string;
   categoryEn?: string;
-  winner: string;
+  winnerName?: string;
+  winnerNameEn?: string;
+  winner?: string;
   winnerEn?: string;
-  workTitle: string;
+  performanceTitle?: string;
+  performanceTitleEn?: string;
+  workTitle?: string;
   workTitleEn?: string;
   comment: string;
   commentEn?: string;
   image?: string;
+}
+
+export interface Partner {
+  id: string;
+  name: string;
+  nameEn?: string;
+  image: string;
+  url: string;
+  description?: string;
+  descriptionEn?: string;
+  category?: string;
+  order?: number;
 }
 
 export interface Banner {
@@ -127,6 +147,9 @@ export interface SiteInfo {
   donationCrowdfundUrl?: string;
   donationCrowdfundingUrl?: string;
   googleFormUrl?: string;
+  newsNotice?: string;
+  newsNoticeEn?: string;
+  newsNoticeUrl?: string;
   officialInstagramUrl?: string;
   officialXUrl?: string;
   officialWebsiteUrl?: string;

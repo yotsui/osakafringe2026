@@ -45,9 +45,8 @@ export default function Navbar() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white text-[#E6007E] hover:bg-[#FFF100] hover:text-black font-black text-xs transition-all duration-200 ml-2 mr-1 cursor-pointer shadow-md"
+                    className="px-4 py-2 rounded-xl bg-white text-[#E6007E] hover:bg-[#FFF100] hover:text-black font-black text-xs transition-all duration-200 ml-2 mr-1 cursor-pointer shadow-md"
                   >
-                    <SparkleIcon className="w-4 h-4" fill="#E6007E" />
                     <span>{item.label}</span>
                   </Link>
                 );

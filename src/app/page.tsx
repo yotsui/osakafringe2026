@@ -1,15 +1,15 @@
 import React from 'react';
-import { getPerformances, getVenues, getAwards, getBanners, getSiteInfo } from '@/lib/microcms';
+import { getPerformances, getVenues, getAwards, getPartners, getSiteInfo } from '@/lib/microcms';
 import HomeClient from './HomeClient';
 
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const [performances, venues, awards, banners, siteInfo] = await Promise.all([
+  const [performances, venues, awards, partners, siteInfo] = await Promise.all([
     getPerformances(),
     getVenues(),
     getAwards(),
-    getBanners(),
+    getPartners(),
     getSiteInfo(),
   ]);
 
@@ -18,7 +18,7 @@ export default async function HomePage() {
       performances={performances}
       venues={venues}
       awards={awards}
-      banners={banners}
+      partners={partners}
       siteInfo={siteInfo}
     />
   );

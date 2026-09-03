@@ -1,6 +1,6 @@
 import { createClient } from 'microcms-js-sdk';
-import { Venue, Performance, Award, Banner, SiteInfo, PerformanceSchedule } from '@/types';
-import { mockVenues, mockPerformances, mockAwards, mockBanners, mockSiteInfo } from './mockData';
+import { Venue, Performance, Award, Banner, SiteInfo, PerformanceSchedule, Partner } from '@/types';
+import { mockVenues, mockPerformances, mockAwards, mockBanners, mockSiteInfo, mockPartners } from './mockData';
 
 const rawServiceDomain = process.env.MICROCMS_SERVICE_DOMAIN || process.env.NEXT_PUBLIC_MICROCMS_SERVICE_DOMAIN || '';
 // URL形式（https://xxx.microcms.io/）が渡された場合もサブドメイン部分（xxx）を安全に抽出
@@ -49,12 +49,14 @@ const DEFAULT_COORDINATES: Record<string, { lat: number; lng: number }> = {
 export async function getVenues(): Promise<Venue[]> {
   const normalizeVenue = (v: any): Venue => {
     const imgUrl = extractImageUrl(v.image);
-    const coords = v.location && v.location.lat
-      ? v.location
-      : (DEFAULT_COORDINATES[v.id] || { lat: 34.6937, lng: 135.5023 });
+    const lat = typeof v.lat === 'number' ? v.lat : (v.location?.lat ?? DEFAULT_COORDINATES[v.id]?.lat ?? 34.6937);
+    const lng = typeof v.lng === 'number' ? v.lng : (v.location?.lng ?? DEFAULT_COORDINATES[v.id]?.lng ?? 135.5023);
+    const coords = { lat, lng };
 
     return {
       ...v,
+      lat,
+      lng,
       image: imgUrl,
       location: coords,
       images: Array.isArray(v.images) ? v.images.map(extractImageUrl).filter(Boolean) : (imgUrl ? [imgUrl] : []),
@@ -108,12 +110,13 @@ export async function getPerformances(): Promise<Performance[]> {
       }
     }
 
-    // 3. 主会場の解決
-    const mainVenue = perf.venueId ? venueMap.get(perf.venueId) : undefined;
+    // 3. 主会場の解決（文字列またはリレーションオブジェクト { id: string }）
+    const resolvedVenueId = typeof perf.venueId === 'object' && perf.venueId !== null ? perf.venueId.id : perf.venueId;
+    const mainVenue = resolvedVenueId ? venueMap.get(resolvedVenueId) : undefined;
 
     // 4. 各公演日時に会場情報を紐付け
-    const enrichedSchedules = rawSchedules.map((s) => {
-      const sVenueId = s.venueId || perf.venueId;
+    const enrichedSchedules = rawSchedules.map((s: any) => {
+      const sVenueId = typeof s.venueId === 'object' && s.venueId !== null ? s.venueId.id : (s.venueId || resolvedVenueId);
       const sVenue = sVenueId ? venueMap.get(sVenueId) : mainVenue;
       return {
         ...s,
@@ -160,23 +163,60 @@ export async function getPerformanceById(id: string): Promise<Performance | unde
  * Award一覧を取得
  */
 export async function getAwards(): Promise<Award[]> {
+  const normalizeAward = (a: any): Award => ({
+    ...a,
+    awardName: a.awardName || a.title,
+    title: a.awardName || a.title,
+    winnerName: a.winnerName || a.winner,
+    winner: a.winnerName || a.winner,
+    performanceTitle: a.performanceTitle || a.workTitle,
+    workTitle: a.performanceTitle || a.workTitle,
+  });
+
   if (!client) {
-    return mockAwards;
+    return mockAwards.map(normalizeAward);
   }
   try {
-    const data = await client.getList<Award>({
+    const data = await client.getList<any>({
       endpoint: 'awards',
       queries: { limit: 50 },
     });
-    return data.contents.length > 0 ? data.contents : mockAwards;
+    const contents = data.contents.length > 0 ? data.contents : mockAwards;
+    return contents.map(normalizeAward);
   } catch (error) {
     console.warn('[MicroCMS] Failed to fetch awards, using mock data:', error);
-    return mockAwards;
+    return mockAwards.map(normalizeAward);
   }
 }
 
 /**
- * バナー一覧を取得
+ * パートナー/連携団体一覧を取得 (partner スキーマ)
+ */
+export async function getPartners(): Promise<Partner[]> {
+  const normalizePartner = (p: any): Partner => ({
+    ...p,
+    image: extractImageUrl(p.image) || p.image || '',
+    url: p.url || p.linkUrl || '#',
+  });
+
+  if (!client) {
+    return mockPartners.map(normalizePartner);
+  }
+  try {
+    const data = await client.getList<any>({
+      endpoint: 'partner',
+      queries: { limit: 50, orders: 'order' },
+    });
+    const contents = data.contents.length > 0 ? data.contents : mockPartners;
+    return contents.map(normalizePartner);
+  } catch (error) {
+    console.warn('[MicroCMS] Failed to fetch partners, using mock data:', error);
+    return mockPartners.map(normalizePartner);
+  }
+}
+
+/**
+ * バナー一覧を取得 (互換用)
  */
 export async function getBanners(): Promise<Banner[]> {
   if (!client) {

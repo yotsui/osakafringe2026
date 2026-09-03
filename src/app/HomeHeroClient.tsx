@@ -69,10 +69,10 @@ export default function HomeHeroClient({ siteInfo }: HomeHeroClientProps) {
             </div>
 
             {/* Official Osaka Fringe Logo (White) */}
-            <div className="w-44 sm:w-52">
-              <div className="relative w-full aspect-[215/110] filter brightness-0 invert">
+            <div className="w-full max-w-md">
+              <div className="relative w-full aspect-[321.73/49.5] filter brightness-0 invert">
                 <Image
-                  src="/images/osakafringe.svg"
+                  src="/images/osakafringe04.svg"
                   alt="Osaka Fringe"
                   fill
                   priority
@@ -100,7 +100,6 @@ export default function HomeHeroClient({ siteInfo }: HomeHeroClientProps) {
                 href="/audience"
                 className="flex-1 px-8 py-4.5 rounded-2xl bg-white hover:bg-[#FFF100] text-[#E6007E] hover:text-black font-black text-base shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2.5 cursor-pointer group"
               >
-                <SparkleIcon className="w-5 h-5" fill="#E6007E" />
                 <span>{t('heroOpenAudience')}</span>
                 <ArrowRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
@@ -109,7 +108,6 @@ export default function HomeHeroClient({ siteInfo }: HomeHeroClientProps) {
                 href="/venues"
                 className="px-7 py-4.5 rounded-2xl bg-black/40 hover:bg-black/60 text-white font-bold text-base border border-white/30 backdrop-blur-md shadow-md hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2.5 cursor-pointer"
               >
-                <MapPinIcon className="w-5 h-5" color="#FFF100" />
                 <span>{t('heroVenuesMap')}</span>
               </Link>
             </div>

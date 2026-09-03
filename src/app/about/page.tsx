@@ -1,5 +1,5 @@
 import React from 'react';
-import { getSiteInfo, getBanners } from '@/lib/microcms';
+import { getSiteInfo, getPartners } from '@/lib/microcms';
 import AboutClient from './AboutClient';
 
 export const metadata = {
@@ -8,10 +8,10 @@ export const metadata = {
 };
 
 export default async function AboutPage() {
-  const [siteInfo, banners] = await Promise.all([
+  const [siteInfo, partners] = await Promise.all([
     getSiteInfo(),
-    getBanners(),
+    getPartners(),
   ]);
 
-  return <AboutClient siteInfo={siteInfo} banners={banners} />;
+  return <AboutClient siteInfo={siteInfo} partners={partners} />;
 }
