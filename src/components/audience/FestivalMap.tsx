@@ -3,7 +3,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Venue, Performance } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
-import { Navigation, ExternalLink, Calendar } from 'lucide-react';
+import { Navigation, ExternalLink, Calendar, Train } from 'lucide-react';
+import { OSAKA_TRANSIT_LINES, OSAKA_TRANSIT_STATIONS } from '@/data/transitData';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 interface FestivalMapProps {
@@ -14,29 +15,32 @@ interface FestivalMapProps {
   onSelectPerformance?: (performance: Performance) => void;
 }
 
-// APIキー不要・透かしなし・POIのない国土地理院 淡色地図スタイル
-const GSI_PALE_STYLE: any = {
+const CARTO_API_KEY = 'cb1_2u9e_1_e673ff91216e39ecfb52f65d';
+
+// CARTO Positron（APIキー適用、Retina @2x、POIのない淡色地図）
+const CARTO_POSITRON_KEYED_STYLE: any = {
   version: 8,
   sources: {
-    'gsi-pale': {
+    'carto-positron': {
       type: 'raster',
-      tiles: ['https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png'],
+      tiles: [
+        `https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png?api_key=${CARTO_API_KEY}`,
+        `https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png?api_key=${CARTO_API_KEY}`,
+        `https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png?api_key=${CARTO_API_KEY}`,
+        `https://d.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png?api_key=${CARTO_API_KEY}`,
+      ],
       tileSize: 256,
       attribution:
-        '&copy; <a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener noreferrer">国土地理院</a>',
+        '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a>',
     },
   },
   layers: [
     {
-      id: 'gsi-pale-tiles',
+      id: 'carto-positron-tiles',
       type: 'raster',
-      source: 'gsi-pale',
-      minzoom: 5,
-      maxzoom: 18,
-      paint: {
-        'raster-opacity': 0.95,
-        'raster-saturation': -0.15,
-      },
+      source: 'carto-positron',
+      minzoom: 0,
+      maxzoom: 20,
     },
   ],
 };
@@ -67,7 +71,7 @@ export default function FestivalMap({
     }
   }, [venues, selectedVenueId, activeVenue]);
 
-  // MapLibre GL JS の初期化
+  // MapLibre GL JS の初期化 & 鉄道オーバーレイレイヤーの構築
   useEffect(() => {
     if (!mapContainerRef.current || typeof window === 'undefined') return;
 
@@ -84,16 +88,12 @@ export default function FestivalMap({
         mapInstanceRef.current = null;
       }
 
-      const initialCenter: [number, number] = activeVenue
-        ? [activeVenue.location.lng, activeVenue.location.lat]
-        : [135.5023, 34.6937];
-
       // 地図インスタンス生成
       const map = new maplibregl.Map({
         container: mapContainerRef.current,
-        style: GSI_PALE_STYLE,
-        center: initialCenter,
-        zoom: 13,
+        style: CARTO_POSITRON_KEYED_STYLE,
+        center: [135.5023, 34.6937],
+        zoom: 12,
         attributionControl: false,
       });
 
@@ -107,14 +107,102 @@ export default function FestivalMap({
         'bottom-right'
       );
 
-      // マウント後のリサイズ補正
       map.on('load', () => {
         map.resize();
+
+        // 1. 全会場ピンを画面内に収める自動ZOOM調整 (fitBounds)
+        if (venues.length > 0) {
+          const bounds = new maplibregl.LngLatBounds();
+          venues.forEach((v) => {
+            bounds.extend([v.location.lng, v.location.lat]);
+          });
+          map.fitBounds(bounds, {
+            padding: { top: 70, bottom: 70, left: 70, right: 70 },
+            maxZoom: 14,
+            duration: 0,
+          });
+        }
+
+        // 2. 鉄道路線（OSAKA_TRANSIT_LINES）の追加
+        if (!map.getSource('osaka-transit-lines')) {
+          map.addSource('osaka-transit-lines', {
+            type: 'geojson',
+            data: OSAKA_TRANSIT_LINES,
+          });
+
+          // 線路の下地グロー（視認性を向上させる半透明ホワイト）
+          map.addLayer({
+            id: 'transit-lines-glow',
+            type: 'line',
+            source: 'osaka-transit-lines',
+            paint: {
+              'line-color': '#ffffff',
+              'line-width': ['+', ['get', 'width'], 2.5],
+              'line-opacity': 0.75,
+            },
+          });
+
+          // 路線カラーのライン
+          map.addLayer({
+            id: 'transit-lines-core',
+            type: 'line',
+            source: 'osaka-transit-lines',
+            paint: {
+              'line-color': ['get', 'color'],
+              'line-width': ['get', 'width'],
+              'line-opacity': 0.85,
+            },
+          });
+        }
+
+        // 3. 主要駅（OSAKA_TRANSIT_STATIONS）の追加
+        if (!map.getSource('osaka-transit-stations')) {
+          map.addSource('osaka-transit-stations', {
+            type: 'geojson',
+            data: OSAKA_TRANSIT_STATIONS,
+          });
+
+          // 駅の丸印（ズーム11以上）
+          map.addLayer({
+            id: 'transit-station-points',
+            type: 'circle',
+            source: 'osaka-transit-stations',
+            minzoom: 11.5,
+            paint: {
+              'circle-radius': 4.5,
+              'circle-color': '#ffffff',
+              'circle-stroke-color': ['get', 'color'],
+              'circle-stroke-width': 2.5,
+              'circle-opacity': 0.95,
+            },
+          });
+
+          // 駅名テキストラベル（ズーム12.8以上で表示）
+          map.addLayer({
+            id: 'transit-station-labels',
+            type: 'symbol',
+            source: 'osaka-transit-stations',
+            minzoom: 12.8,
+            layout: {
+              'text-field': ['get', 'name'],
+              'text-size': 11,
+              'text-offset': [0, 1.1],
+              'text-anchor': 'top',
+              'text-allow-overlap': false,
+            },
+            paint: {
+              'text-color': '#1e293b',
+              'text-halo-color': '#ffffff',
+              'text-halo-width': 2,
+              'text-halo-blur': 0.5,
+            },
+          });
+        }
       });
 
       mapInstanceRef.current = map;
 
-      // ピンの配置
+      // 会場ピンの配置
       markersRef.current.forEach((m) => m.remove());
       markersRef.current = [];
 
@@ -146,7 +234,7 @@ export default function FestivalMap({
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 12px ${isSelected ? 'rgba(0,0,0,0.3)' : 'rgba(230,0,126,0.45)'};
+            box-shadow: 0 4px 12px ${isSelected ? 'rgba(0,0,0,0.35)' : 'rgba(230,0,126,0.5)'};
             border: 2.5px solid #ffffff;
             transition: transform 0.2s ease, background 0.2s ease;
           ">
@@ -175,7 +263,7 @@ export default function FestivalMap({
           closeButton: true,
           closeOnClick: false,
         }).setHTML(`
-          <div style="min-width: 200px; font-family: sans-serif; color: #0f172a; padding: 4px;">
+          <div style="min-width: 210px; font-family: sans-serif; color: #0f172a; padding: 4px;">
             <div style="font-size: 11px; font-weight: 800; color: #E6007E; text-transform: uppercase; letter-spacing: 0.05em;">${vArea}</div>
             <div style="font-size: 13px; font-weight: 900; margin: 2px 0 4px 0; line-height: 1.3;">${vName}</div>
             <div style="font-size: 11px; color: #64748b; margin-bottom: 8px; line-height: 1.4;">${vAccess}</div>
@@ -222,7 +310,7 @@ export default function FestivalMap({
     if (activeVenue && mapInstanceRef.current) {
       mapInstanceRef.current.flyTo({
         center: [activeVenue.location.lng, activeVenue.location.lat],
-        zoom: 14,
+        zoom: 14.5,
         essential: true,
       });
     }
@@ -241,8 +329,33 @@ export default function FestivalMap({
       {/* Map + Detail Panel */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-white rounded-3xl border border-pink-100 p-4 sm:p-6 shadow-sm overflow-hidden">
         {/* Vector Map Container */}
-        <div className="lg:col-span-8 relative rounded-2xl overflow-hidden min-h-[420px] lg:min-h-[560px] bg-slate-100 border border-slate-200">
+        <div className="lg:col-span-8 relative rounded-2xl overflow-hidden min-h-[440px] lg:min-h-[580px] bg-slate-100 border border-slate-200">
           <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />
+
+          {/* Map Legend (Transit Lines) */}
+          <div className="absolute bottom-4 left-4 z-10 bg-white/95 backdrop-blur-md px-3.5 py-2.5 rounded-2xl border border-slate-200/80 shadow-md hidden sm:flex flex-col gap-1.5 max-w-xs">
+            <div className="flex items-center gap-1.5 text-[11px] font-black text-slate-800">
+              <Train className="w-3.5 h-3.5 text-[#E6007E]" />
+              <span>大阪 鉄道路線ネットワーク</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[10px] font-bold text-slate-600">
+              <span className="inline-flex items-center gap-1">
+                <span className="w-2.5 h-1 rounded-full bg-[#E5171F]" /> 御堂筋線
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <span className="w-2.5 h-1 rounded-full bg-[#522886]" /> 谷町線
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <span className="w-2.5 h-1 rounded-full bg-[#0078BA]" /> 四つ橋線
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <span className="w-2.5 h-1 rounded-full bg-[#E85219]" /> JR環状線
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <span className="w-2.5 h-1 rounded-full bg-[#1E50A2]" /> 京阪/私鉄
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Venue Info Side Panel */}
