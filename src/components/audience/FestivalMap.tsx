@@ -26,6 +26,7 @@ interface MarkerItem {
   popup: any;
   pinEl: HTMLDivElement;
   dotEl: HTMLDivElement;
+  el: HTMLDivElement;
 }
 
 export default function FestivalMap({
@@ -55,15 +56,19 @@ export default function FestivalMap({
     }
   }, [venues, selectedVenueId, activeVenue]);
 
-  // マーカーのハイライト色を一括更新する関数
+  // マーカーのハイライト色・前面表示を一括更新する関数
   const updateMarkerColors = useCallback((selectedId: string | null) => {
-    markersRef.current.forEach(({ venue, pinEl, dotEl }) => {
+    markersRef.current.forEach(({ venue, pinEl, dotEl, el }) => {
       const isSelected = venue.id === selectedId;
       pinEl.style.background = isSelected ? '#FFF100' : '#E6007E';
       pinEl.style.boxShadow = isSelected
         ? '0 4px 14px rgba(0,0,0,0.35)'
         : '0 4px 12px rgba(230,0,126,0.45)';
+      pinEl.style.transform = isSelected ? 'scale(1.1) rotate(-45deg)' : 'scale(1) rotate(-45deg)';
       dotEl.style.background = isSelected ? '#000000' : '#ffffff';
+      if (el) {
+        el.style.zIndex = isSelected ? '50' : '10';
+      }
     });
   }, []);
 
@@ -119,9 +124,21 @@ export default function FestivalMap({
         pinEl.appendChild(dotEl);
         el.appendChild(pinEl);
 
+        // ポップアップが上下左右どの方向に出てもPIN本体を覆い隠さない方向別オフセット (28px確保)
+        const popupOffsets: Record<string, [number, number]> = {
+          'top': [0, 28],          // ポップアップがピンの下に出る時：ピン下端先端よりさらに下に配置
+          'top-left': [18, 28],
+          'top-right': [-18, 28],
+          'bottom': [0, -28],      // ポップアップがピンの上に出る時：ピン上端よりさらに上に配置
+          'bottom-left': [18, -28],
+          'bottom-right': [-18, -28],
+          'left': [28, 0],
+          'right': [-28, 0],
+        };
+
         // POPUP 生成（closeOnClick: true で地図上クリック時に閉じる）
         const popup = new maplibregl.Popup({
-          offset: [0, -20],
+          offset: popupOffsets,
           closeButton: true,
           closeOnClick: true,
           maxWidth: '280px',
@@ -182,7 +199,7 @@ export default function FestivalMap({
           marker.togglePopup();
         });
 
-        markersRef.current.push({ venue: v, marker, popup, pinEl, dotEl });
+        markersRef.current.push({ venue: v, marker, popup, pinEl, dotEl, el });
       });
     },
     [venues, getText, onSelectVenue, updateMarkerColors]
