@@ -17,17 +17,18 @@ interface FestivalMapProps {
 
 const CARTO_API_KEY = 'cb1_2u9e_1_e673ff91216e39ecfb52f65d';
 
-// CARTO Positron（APIキー適用、Retina @2x、POIのない淡色地図）
+// CARTO Positron（正しい key パラメータ適用、Retina @2x、フォントグリフ定義追加）
 const CARTO_POSITRON_KEYED_STYLE: any = {
   version: 8,
+  glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
   sources: {
     'carto-positron': {
       type: 'raster',
       tiles: [
-        `https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png?api_key=${CARTO_API_KEY}`,
-        `https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png?api_key=${CARTO_API_KEY}`,
-        `https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png?api_key=${CARTO_API_KEY}`,
-        `https://d.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png?api_key=${CARTO_API_KEY}`,
+        `https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png?key=${CARTO_API_KEY}`,
+        `https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png?key=${CARTO_API_KEY}`,
+        `https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png?key=${CARTO_API_KEY}`,
+        `https://d.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png?key=${CARTO_API_KEY}`,
       ],
       tileSize: 256,
       attribution:
@@ -107,23 +108,9 @@ export default function FestivalMap({
         'bottom-right'
       );
 
-      map.on('load', () => {
-        map.resize();
-
-        // 1. 全会場ピンを画面内に収める自動ZOOM調整 (fitBounds)
-        if (venues.length > 0) {
-          const bounds = new maplibregl.LngLatBounds();
-          venues.forEach((v) => {
-            bounds.extend([v.location.lng, v.location.lat]);
-          });
-          map.fitBounds(bounds, {
-            padding: { top: 70, bottom: 70, left: 70, right: 70 },
-            maxZoom: 14,
-            duration: 0,
-          });
-        }
-
-        // 2. 鉄道路線（OSAKA_TRANSIT_LINES）の追加
+      // 鉄道レイヤーを追加する関数
+      const addTransitLayers = () => {
+        // 1. 鉄道路線（OSAKA_TRANSIT_LINES）
         if (!map.getSource('osaka-transit-lines')) {
           map.addSource('osaka-transit-lines', {
             type: 'geojson',
@@ -137,8 +124,8 @@ export default function FestivalMap({
             source: 'osaka-transit-lines',
             paint: {
               'line-color': '#ffffff',
-              'line-width': ['+', ['get', 'width'], 2.5],
-              'line-opacity': 0.75,
+              'line-width': 6,
+              'line-opacity': 0.8,
             },
           });
 
@@ -149,13 +136,13 @@ export default function FestivalMap({
             source: 'osaka-transit-lines',
             paint: {
               'line-color': ['get', 'color'],
-              'line-width': ['get', 'width'],
-              'line-opacity': 0.85,
+              'line-width': 3.5,
+              'line-opacity': 0.9,
             },
           });
         }
 
-        // 3. 主要駅（OSAKA_TRANSIT_STATIONS）の追加
+        // 2. 主要駅（OSAKA_TRANSIT_STATIONS）
         if (!map.getSource('osaka-transit-stations')) {
           map.addSource('osaka-transit-stations', {
             type: 'geojson',
@@ -167,37 +154,58 @@ export default function FestivalMap({
             id: 'transit-station-points',
             type: 'circle',
             source: 'osaka-transit-stations',
-            minzoom: 11.5,
+            minzoom: 11,
             paint: {
               'circle-radius': 4.5,
               'circle-color': '#ffffff',
               'circle-stroke-color': ['get', 'color'],
               'circle-stroke-width': 2.5,
-              'circle-opacity': 0.95,
+              'circle-opacity': 1,
             },
           });
 
-          // 駅名テキストラベル（ズーム12.8以上で表示）
+          // 駅名テキストラベル（ズーム12.5以上で表示）
           map.addLayer({
             id: 'transit-station-labels',
             type: 'symbol',
             source: 'osaka-transit-stations',
-            minzoom: 12.8,
+            minzoom: 12.5,
             layout: {
               'text-field': ['get', 'name'],
-              'text-size': 11,
-              'text-offset': [0, 1.1],
+              'text-size': 11.5,
+              'text-offset': [0, 1.2],
               'text-anchor': 'top',
               'text-allow-overlap': false,
+              'text-font': ['Noto Sans Regular'],
             },
             paint: {
-              'text-color': '#1e293b',
+              'text-color': '#0f172a',
               'text-halo-color': '#ffffff',
               'text-halo-width': 2,
               'text-halo-blur': 0.5,
             },
           });
         }
+      };
+
+      map.on('load', () => {
+        map.resize();
+
+        // 1. 全会場ピンを画面内に収める自動ZOOM調整 (fitBounds)
+        if (venues.length > 0) {
+          const bounds = new maplibregl.LngLatBounds();
+          venues.forEach((v) => {
+            bounds.extend([v.location.lng, v.location.lat]);
+          });
+          map.fitBounds(bounds, {
+            padding: { top: 60, bottom: 60, left: 60, right: 60 },
+            maxZoom: 14,
+            duration: 0,
+          });
+        }
+
+        // 2. 鉄道レイヤー追加
+        addTransitLayers();
       });
 
       mapInstanceRef.current = map;
