@@ -149,18 +149,16 @@ export default function FestivalMap({
           </div>
         `);
 
-        // ポップアップが閉じられたらピン色をリセット
-        popup.on('close', () => {
-          updateMarkerColors(null);
-        });
-
-        // PINクリックイベント（ZOOMや移動は行わず、色変化＆POPUP表示のみ）
-        el.addEventListener('click', (e) => {
-          e.stopPropagation();
+        // ポップアップが開いたらピン色をイエローに変更＆会場選択
+        popup.on('open', () => {
           setActiveVenue(v);
           if (onSelectVenue) onSelectVenue(v.id);
           updateMarkerColors(v.id);
-          popup.addTo(map);
+        });
+
+        // ポップアップが閉じられたらピン色をリセット
+        popup.on('close', () => {
+          updateMarkerColors(null);
         });
 
         const marker = new maplibregl.Marker({ element: el })
@@ -168,10 +166,16 @@ export default function FestivalMap({
           .setPopup(popup)
           .addTo(map);
 
+        // クリック時に確実にポップアップを開閉
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          marker.togglePopup();
+        });
+
         markersRef.current.push({ venue: v, marker, popup, pinEl, dotEl });
       });
     },
-    [venues, activeVenue, getText, onSelectVenue, updateMarkerColors]
+    [venues, getText, onSelectVenue, updateMarkerColors]
   );
 
   // 鉄道レイヤー（路線ライン＆駅）を追加する関数
@@ -340,11 +344,6 @@ export default function FestivalMap({
         'bottom-right'
       );
 
-      // 地図上の空き領域をクリックしたらピン色リセット
-      map.on('click', () => {
-        updateMarkerColors(null);
-      });
-
       // マップ準備完了ハンドラー
       const onReady = () => {
         if (isMapReadyRef.current || isCancelled) return;
@@ -391,7 +390,7 @@ export default function FestivalMap({
         mapInstanceRef.current = null;
       }
     };
-  }, [addTransitLayers, renderMarkers, updateMarkerColors, venues]);
+  }, [venues]);
 
   // 会場リスト選択時にピン色とPOPUPを連動（ZOOM・カメラ移動は行わない）
   const handleSelectVenueCard = (v: Venue) => {
@@ -401,8 +400,10 @@ export default function FestivalMap({
 
     // 対応するマーカーのPOPUPを開く
     const item = markersRef.current.find((m) => m.venue.id === v.id);
-    if (item && mapInstanceRef.current?.map) {
-      item.popup.addTo(mapInstanceRef.current.map);
+    if (item?.marker) {
+      if (!item.marker.getPopup().isOpen()) {
+        item.marker.togglePopup();
+      }
     }
   };
 
