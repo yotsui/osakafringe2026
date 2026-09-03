@@ -67,7 +67,7 @@ export default function FestivalMap({
       pinEl.style.transform = isSelected ? 'scale(1.1) rotate(-45deg)' : 'scale(1) rotate(-45deg)';
       dotEl.style.background = isSelected ? '#000000' : '#ffffff';
       if (el) {
-        el.style.zIndex = isSelected ? '50' : '10';
+        el.style.zIndex = isSelected ? '10' : '1';
       }
     });
   }, []);
@@ -446,6 +446,9 @@ export default function FestivalMap({
     <div className="space-y-6">
       {/* POPUP & Close Button Custom Styles */}
       <style>{`
+        .maplibregl-popup {
+          z-index: 100 !important;
+        }
         .maplibregl-popup-close-button {
           width: 28px !important;
           height: 28px !important;
