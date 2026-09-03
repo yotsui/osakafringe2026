@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Venue, Performance } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import { Navigation, ExternalLink, Calendar, Train } from 'lucide-react';
@@ -17,7 +17,7 @@ interface FestivalMapProps {
 
 const CARTO_API_KEY = 'cb1_2u9e_1_e673ff91216e39ecfb52f65d';
 
-// CARTO Positron（正しい key パラメータ適用、Retina @2x、フォントグリフ定義追加）
+// CARTO Positron（key パラメータ適用、Retina @2x、フォントグリフ定義追加）
 const CARTO_POSITRON_KEYED_STYLE: any = {
   version: 8,
   glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
@@ -72,145 +72,9 @@ export default function FestivalMap({
     }
   }, [venues, selectedVenueId, activeVenue]);
 
-  // MapLibre GL JS の初期化 & 鉄道オーバーレイレイヤーの構築
-  useEffect(() => {
-    if (!mapContainerRef.current || typeof window === 'undefined') return;
-
-    let isCancelled = false;
-
-    const initMapLibre = async () => {
-      const maplibregl = (await import('maplibre-gl')) as any;
-
-      if (isCancelled || !mapContainerRef.current) return;
-
-      // 既存インスタンス破棄
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-      }
-
-      // 地図インスタンス生成
-      const map = new maplibregl.Map({
-        container: mapContainerRef.current,
-        style: CARTO_POSITRON_KEYED_STYLE,
-        center: [135.5023, 34.6937],
-        zoom: 12,
-        attributionControl: false,
-      });
-
-      map.addControl(
-        new maplibregl.NavigationControl({ showCompass: false }),
-        'top-right'
-      );
-
-      map.addControl(
-        new maplibregl.AttributionControl({ compact: true }),
-        'bottom-right'
-      );
-
-      // 鉄道レイヤーを追加する関数
-      const addTransitLayers = () => {
-        // 1. 鉄道路線（OSAKA_TRANSIT_LINES）
-        if (!map.getSource('osaka-transit-lines')) {
-          map.addSource('osaka-transit-lines', {
-            type: 'geojson',
-            data: OSAKA_TRANSIT_LINES,
-          });
-
-          // 線路の下地グロー（視認性を向上させる半透明ホワイト）
-          map.addLayer({
-            id: 'transit-lines-glow',
-            type: 'line',
-            source: 'osaka-transit-lines',
-            paint: {
-              'line-color': '#ffffff',
-              'line-width': 6,
-              'line-opacity': 0.8,
-            },
-          });
-
-          // 路線カラーのライン
-          map.addLayer({
-            id: 'transit-lines-core',
-            type: 'line',
-            source: 'osaka-transit-lines',
-            paint: {
-              'line-color': ['get', 'color'],
-              'line-width': 3.5,
-              'line-opacity': 0.9,
-            },
-          });
-        }
-
-        // 2. 主要駅（OSAKA_TRANSIT_STATIONS）
-        if (!map.getSource('osaka-transit-stations')) {
-          map.addSource('osaka-transit-stations', {
-            type: 'geojson',
-            data: OSAKA_TRANSIT_STATIONS,
-          });
-
-          // 駅の丸印（ズーム11以上）
-          map.addLayer({
-            id: 'transit-station-points',
-            type: 'circle',
-            source: 'osaka-transit-stations',
-            minzoom: 11,
-            paint: {
-              'circle-radius': 4.5,
-              'circle-color': '#ffffff',
-              'circle-stroke-color': ['get', 'color'],
-              'circle-stroke-width': 2.5,
-              'circle-opacity': 1,
-            },
-          });
-
-          // 駅名テキストラベル（ズーム12.5以上で表示）
-          map.addLayer({
-            id: 'transit-station-labels',
-            type: 'symbol',
-            source: 'osaka-transit-stations',
-            minzoom: 12.5,
-            layout: {
-              'text-field': ['get', 'name'],
-              'text-size': 11.5,
-              'text-offset': [0, 1.2],
-              'text-anchor': 'top',
-              'text-allow-overlap': false,
-              'text-font': ['Noto Sans Regular'],
-            },
-            paint: {
-              'text-color': '#0f172a',
-              'text-halo-color': '#ffffff',
-              'text-halo-width': 2,
-              'text-halo-blur': 0.5,
-            },
-          });
-        }
-      };
-
-      map.on('load', () => {
-        map.resize();
-
-        // 1. 全会場ピンを画面内に収める自動ZOOM調整 (fitBounds)
-        if (venues.length > 0) {
-          const bounds = new maplibregl.LngLatBounds();
-          venues.forEach((v) => {
-            bounds.extend([v.location.lng, v.location.lat]);
-          });
-          map.fitBounds(bounds, {
-            padding: { top: 60, bottom: 60, left: 60, right: 60 },
-            maxZoom: 14,
-            duration: 0,
-          });
-        }
-
-        // 2. 鉄道レイヤー追加
-        addTransitLayers();
-      });
-
-      mapInstanceRef.current = map;
-
-      // 会場ピンの配置
+  // マーカーを更新・配置する関数
+  const updateMarkers = useCallback(
+    (map: any, maplibregl: any) => {
       markersRef.current.forEach((m) => m.remove());
       markersRef.current = [];
 
@@ -300,23 +164,185 @@ export default function FestivalMap({
 
         markersRef.current.push(marker);
       });
+    },
+    [venues, activeVenue, getText, onSelectVenue]
+  );
+
+  // 鉄道レイヤーを追加する関数
+  const addTransitLayers = useCallback((map: any) => {
+    try {
+      // 1. 鉄道路線（OSAKA_TRANSIT_LINES）
+      if (!map.getSource('osaka-transit-lines')) {
+        map.addSource('osaka-transit-lines', {
+          type: 'geojson',
+          data: OSAKA_TRANSIT_LINES,
+        });
+
+        // 線路の下地グロー（視認性を向上させる半透明ホワイト）
+        map.addLayer({
+          id: 'transit-lines-glow',
+          type: 'line',
+          source: 'osaka-transit-lines',
+          paint: {
+            'line-color': '#ffffff',
+            'line-width': 6,
+            'line-opacity': 0.85,
+          },
+        });
+
+        // 路線カラーのライン
+        map.addLayer({
+          id: 'transit-lines-core',
+          type: 'line',
+          source: 'osaka-transit-lines',
+          paint: {
+            'line-color': ['get', 'color'],
+            'line-width': 3.5,
+            'line-opacity': 0.95,
+          },
+        });
+      }
+
+      // 2. 主要駅（OSAKA_TRANSIT_STATIONS）
+      if (!map.getSource('osaka-transit-stations')) {
+        map.addSource('osaka-transit-stations', {
+          type: 'geojson',
+          data: OSAKA_TRANSIT_STATIONS,
+        });
+
+        // 駅の丸印（ズーム11以上）
+        map.addLayer({
+          id: 'transit-station-points',
+          type: 'circle',
+          source: 'osaka-transit-stations',
+          minzoom: 11,
+          paint: {
+            'circle-radius': 4.5,
+            'circle-color': '#ffffff',
+            'circle-stroke-color': ['get', 'color'],
+            'circle-stroke-width': 2.5,
+            'circle-opacity': 1,
+          },
+        });
+
+        // 駅名テキストラベル（ズーム12.2以上で表示）
+        map.addLayer({
+          id: 'transit-station-labels',
+          type: 'symbol',
+          source: 'osaka-transit-stations',
+          minzoom: 12.2,
+          layout: {
+            'text-field': ['get', 'name'],
+            'text-size': 11.5,
+            'text-offset': [0, 1.2],
+            'text-anchor': 'top',
+            'text-allow-overlap': false,
+            'text-font': ['Noto Sans Regular'],
+          },
+          paint: {
+            'text-color': '#0f172a',
+            'text-halo-color': '#ffffff',
+            'text-halo-width': 2,
+            'text-halo-blur': 0.5,
+          },
+        });
+      }
+    } catch (err) {
+      console.warn('[FestivalMap] Failed to add transit layers:', err);
+    }
+  }, []);
+
+  // MapLibre GL JS の初期化
+  useEffect(() => {
+    if (!mapContainerRef.current || typeof window === 'undefined') return;
+
+    let isCancelled = false;
+
+    const initMapLibre = async () => {
+      const maplibregl = (await import('maplibre-gl')) as any;
+
+      if (isCancelled || !mapContainerRef.current) return;
+
+      // WebWorker URL の明示設定（Next.js Turbopack での MIME エラーを防止）
+      if (typeof maplibregl.setWorkerUrl === 'function') {
+        maplibregl.setWorkerUrl('/maplibre-gl-worker.mjs');
+      }
+
+      // 既存インスタンス破棄
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+
+      // 地図インスタンス生成
+      const map = new maplibregl.Map({
+        container: mapContainerRef.current,
+        style: CARTO_POSITRON_KEYED_STYLE,
+        center: [135.5023, 34.6937],
+        zoom: 12,
+        attributionControl: false,
+      });
+
+      map.addControl(
+        new maplibregl.NavigationControl({ showCompass: false }),
+        'top-right'
+      );
+
+      map.addControl(
+        new maplibregl.AttributionControl({ compact: true }),
+        'bottom-right'
+      );
+
+      const handleMapReady = () => {
+        map.resize();
+
+        // 1. 全会場ピンを画面内に収める自動ZOOM調整 (fitBounds)
+        if (venues.length > 0) {
+          const bounds = new maplibregl.LngLatBounds();
+          venues.forEach((v) => {
+            bounds.extend([v.location.lng, v.location.lat]);
+          });
+          map.fitBounds(bounds, {
+            padding: { top: 60, bottom: 60, left: 60, right: 60 },
+            maxZoom: 14,
+            duration: 0,
+          });
+        }
+
+        // 2. 鉄道レイヤー追加
+        addTransitLayers(map);
+
+        // 3. マーカー配置
+        updateMarkers(map, maplibregl);
+      };
+
+      map.on('load', handleMapReady);
+
+      mapInstanceRef.current = { map, maplibregl };
     };
 
     initMapLibre();
 
     return () => {
       isCancelled = true;
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
+      if (mapInstanceRef.current?.map) {
+        mapInstanceRef.current.map.remove();
         mapInstanceRef.current = null;
       }
     };
-  }, [venues, getText, onSelectVenue]);
+  }, [addTransitLayers, updateMarkers, venues]);
+
+  // venues または activeVenue 変更時のマーカー更新
+  useEffect(() => {
+    if (mapInstanceRef.current?.map && mapInstanceRef.current?.maplibregl) {
+      updateMarkers(mapInstanceRef.current.map, mapInstanceRef.current.maplibregl);
+    }
+  }, [venues, activeVenue, updateMarkers]);
 
   // 会場切り替え時のマップ移動
   useEffect(() => {
-    if (activeVenue && mapInstanceRef.current) {
-      mapInstanceRef.current.flyTo({
+    if (activeVenue && mapInstanceRef.current?.map) {
+      mapInstanceRef.current.map.flyTo({
         center: [activeVenue.location.lng, activeVenue.location.lat],
         zoom: 14.5,
         essential: true,
