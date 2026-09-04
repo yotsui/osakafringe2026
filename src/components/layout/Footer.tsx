@@ -77,6 +77,11 @@ export default function Footer() {
                   {t('navContact')}
                 </Link>
               </li>
+              <li className="pt-2 border-t border-white/20">
+                <Link href="/svgmapgenerator" className="text-white/80 hover:text-[#FFF100] transition-colors text-[11px] flex items-center gap-1 font-bold">
+                  <span>🗺️ SVG Map Generator (印刷用)</span>
+                </Link>
+              </li>
             </ul>
           </div>
 
