@@ -43,6 +43,31 @@ export default function FestivalMap({
   const isMapReadyRef = useRef<boolean>(false);
 
   const [activeVenue, setActiveVenue] = useState<Venue | null>(null);
+  const [visibleVenues, setVisibleVenues] = useState<Venue[]>(venues);
+
+  // 地図の表示範囲（bounds）に含まれる会場を抽出する関数
+  const updateVisibleVenues = useCallback(
+    (map: any) => {
+      if (!map || !venues || venues.length === 0) {
+        setVisibleVenues([]);
+        return;
+      }
+      try {
+        const bounds = map.getBounds();
+        if (!bounds) return;
+        const inBounds = venues.filter((v) => {
+          const lng = Number(v.location.lng);
+          const lat = Number(v.location.lat);
+          if (isNaN(lng) || isNaN(lat)) return false;
+          return bounds.contains([lng, lat]);
+        });
+        setVisibleVenues(inBounds);
+      } catch (err) {
+        console.warn('[FestivalMap] error getting map bounds:', err);
+      }
+    },
+    [venues]
+  );
 
   // 初期アクティブ会場
   useEffect(() => {
@@ -55,6 +80,15 @@ export default function FestivalMap({
       }
     }
   }, [venues, selectedVenueId, activeVenue]);
+
+  // venues プロパティ変更時の visibleVenues 初期化
+  useEffect(() => {
+    if (mapInstanceRef.current?.map && isMapReadyRef.current) {
+      updateVisibleVenues(mapInstanceRef.current.map);
+    } else {
+      setVisibleVenues(venues);
+    }
+  }, [venues, updateVisibleVenues]);
 
   // マーカーのハイライト色・前面表示を一括更新する関数
   const updateMarkerColors = useCallback((selectedId: string | null) => {
@@ -396,10 +430,15 @@ export default function FestivalMap({
             duration: 0,
           });
         }
+
+        // 初期表示範囲内の会場リストを更新
+        updateVisibleVenues(map);
       };
 
       map.on('load', onReady);
       map.on('style.load', onReady);
+      map.on('moveend', () => updateVisibleVenues(map));
+      map.on('zoomend', () => updateVisibleVenues(map));
 
       map.on('error', (e: any) => {
         console.warn('[MapLibre Warning]', e);
@@ -417,7 +456,7 @@ export default function FestivalMap({
         mapInstanceRef.current = null;
       }
     };
-  }, [venues]);
+  }, [venues, updateVisibleVenues, addTransitLayers, renderMarkers]);
 
   // 会場リスト選択時にピン色とPOPUPを連動（ZOOM・カメラ移動は行わない）
   const handleSelectVenueCard = (v: Venue) => {
@@ -443,11 +482,11 @@ export default function FestivalMap({
     : [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative isolate z-0">
       {/* POPUP & Close Button Custom Styles */}
       <style>{`
         .maplibregl-popup {
-          z-index: 100 !important;
+          z-index: 10 !important;
         }
         .maplibregl-popup-close-button {
           width: 28px !important;
@@ -487,7 +526,7 @@ export default function FestivalMap({
       {/* Map + Detail Panel */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-white rounded-3xl border border-pink-100 p-4 sm:p-6 shadow-sm overflow-hidden">
         {/* Vector Map Container */}
-        <div className="lg:col-span-8 relative rounded-2xl overflow-hidden min-h-[460px] lg:min-h-[600px] bg-slate-100 border border-slate-200">
+        <div className="lg:col-span-8 relative rounded-2xl overflow-hidden min-h-[460px] lg:min-h-[600px] bg-slate-100 border border-slate-200 isolate">
           <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />
 
           {/* Map Legend: Osaka Metro 9 Lines (将来表示用として保持・現在は非表示) */}
@@ -604,29 +643,48 @@ export default function FestivalMap({
         </div>
       </div>
 
-      {/* Venue List Selector Tabs */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        {venues.map((v) => {
-          const isSelected = activeVenue?.id === v.id;
-          return (
-            <button
-              key={v.id}
-              onClick={() => handleSelectVenueCard(v)}
-              className={`p-4 rounded-2xl text-left border transition-all cursor-pointer ${
-                isSelected
-                  ? 'bg-white border-[#E6007E] shadow-md ring-2 ring-[#E6007E]/20'
-                  : 'bg-white/80 hover:bg-white border-slate-200 hover:border-pink-200'
-              }`}
-            >
-              <div className="text-[11px] font-black text-[#E6007E] uppercase tracking-wider mb-1">
-                {getText(v.area, v.areaEn)}
-              </div>
-              <div className="text-xs font-black text-slate-900 line-clamp-1">
-                {getText(v.name, v.nameEn)}
-              </div>
-            </button>
-          );
-        })}
+      {/* Venue List Selector Tabs (Filtered by Visible Viewport Bounds) */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between px-1">
+          <span className="text-xs font-bold text-slate-600">
+            📍 地図の表示範囲内の会場: <strong className="text-[#E6007E]">{visibleVenues.length}</strong> {t('venuesCountUnit')}
+          </span>
+          {visibleVenues.length < venues.length && (
+            <span className="text-[11px] text-slate-400 font-medium">
+              （全 {venues.length} 会場中）
+            </span>
+          )}
+        </div>
+
+        {visibleVenues.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {visibleVenues.map((v) => {
+              const isSelected = activeVenue?.id === v.id;
+              return (
+                <button
+                  key={v.id}
+                  onClick={() => handleSelectVenueCard(v)}
+                  className={`p-4 rounded-2xl text-left border transition-all cursor-pointer ${
+                    isSelected
+                      ? 'bg-white border-[#E6007E] shadow-md ring-2 ring-[#E6007E]/20'
+                      : 'bg-white/80 hover:bg-white border-slate-200 hover:border-pink-200'
+                  }`}
+                >
+                  <div className="text-[11px] font-black text-[#E6007E] uppercase tracking-wider mb-1">
+                    {getText(v.area, v.areaEn)}
+                  </div>
+                  <div className="text-xs font-black text-slate-900 line-clamp-1">
+                    {getText(v.name, v.nameEn)}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="p-8 text-center bg-slate-50 border border-dashed border-slate-200 rounded-2xl text-slate-400 text-xs font-bold">
+            現在の地図表示範囲に会場はありません。地図をドラッグして移動するか、ズームアウトしてください。
+          </div>
+        )}
       </div>
     </div>
   );

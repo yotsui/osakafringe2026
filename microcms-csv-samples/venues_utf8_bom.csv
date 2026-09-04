@@ -1,5 +1,88 @@
 ﻿id,name,nameEn,area,areaEn,address,addressEn,access,accessEn,description,descriptionEn,websiteUrl,snsTwitter,snsInstagram,image,capacity,lat,lng
-nakazaki-hall,中崎町レトロビル・アートスペース SPACE ONE,Nakazakicho Heritage Art Space SPACE ONE,中崎町・梅田,Nakazakicho / Umeda,大阪市北区中崎西2-4-12,2-4-12 Nakazaki-nishi Kita-ku Osaka,Osaka Metro 谷町線「中崎町駅」徒歩3分 / 各線「梅田駅」徒歩10分,3 min walk from Nakazakicho Station / 10 min from Umeda,【HISTORICAL】昭和初期の登録有形文化財・レトロ古民家をリノベーションした濃密な小劇場。歴史的空間と現代舞台表現が交差するプレミアムベニュー。,[HISTORICAL] An intimate renovated heritage building in retro Nakazakicho blending historic architectural atmosphere with avant-garde performance.,https://osakafringe.com,https://twitter.com/osakafringe,https://instagram.com/osakafringe,,60,34.7065,135.5032
-shinsaibashi-under,心斎橋 CLUB UNDERGROUND,Shinsaibashi CLUB UNDERGROUND,ミナミ・心斎橋,Minami / Shinsaibashi,大阪市中央区西心斎橋1-10-8 B1F,B1F 1-10-8 Nishi-Shinsaibashi Chuo-ku Osaka,Osaka Metro 御堂筋線・長堀鶴見緑地線「心斎橋駅」7番出口すぐ,Directly outside Exit 7 of Shinsaibashi Station,【LOCAL】アメリカ村の中心にある地下ライブスペース。街の隙間をハックし、アーティストと観客が密に交わる熱気あふれる空間。,[LOCAL] An energetic underground venue in America-mura where artists and audience collide in an intimate atmosphere.,https://osakafringe.com,,https://instagram.com/osakafringe,,120,34.6722,135.4983
-nakanoshima-bank,中之島 ウォーターフロント・オープンデッキ,Nakanoshima Waterfront Open Deck,中之島・北浜,Nakanoshima / Kitahama,大阪市北区中之島1-1-28,1-1-28 Nakanoshima Kita-ku Osaka,京阪本線・Osaka Metro 堺筋線「北浜駅」徒歩2分,2 min walk from Kitahama Station,【CORE】堂島川に面した開放的な公共ショーケース拠点。水都大阪の風を感じながら、大道芸・紙芝居・パブリックアートを展開。,[CORE] A prime open-air showcase venue along the river projecting festival energy into the cityscape with street circus and kamishibai.,https://osakafringe.com,https://twitter.com/osakafringe,,,200,34.6937,135.5042
-tennoji-warehouse,天王寺 アートファクトリー・ルーフトップ,Tennoji Art Factory Rooftop,天王寺・新世界,Tennoji / Shinsekai,大阪市天王寺区逢阪2-3-15 屋上,Rooftop 2-3-15 Osaka Tennoji-ku Osaka,JR・Osaka Metro「天王寺駅」北口より徒歩6分,6 min walk from Tennoji Station North Exit,【LOCAL】通天閣を遠くに望む元倉庫の秘密基地ルーフトップ。夕暮れから夜にかけての古典芸能や作品展示を実施。,[LOCAL] A converted rooftop space overlooking Tsutenkaku Tower offering magical dusk atmosphere for traditional arts and site-specific performance.,https://osakafringe.com,,,,80,34.6515,135.5135
+kotanijo-kyodokan,小谷城郷土館,,堺・泉北,Sakai / Senboku,大阪府堺市南区豊田1602,"1602 Toyoda, Minami-ku, Sakai-shi, Osaka",泉北高速鉄道「栂・美木多駅」徒歩20分 / 南海バス「豊田南」下車すぐ,,古民家の広間、座敷,,http：//www.kotanijo.jp/,,,,60,34.4932363,135.4984478
+den-umeda-toyosaki,(確認中）DEN梅田豊崎,,中崎町・豊崎,Nakazakicho / Toyosaki,北区豊崎1丁目1-3,"1-1-3 Toyosaki, Kita-ku, Osaka",Osaka Metro 谷町線「中崎町駅」徒歩7分 / 御堂筋線「中津駅」徒歩10分 / 各線「梅田駅」徒歩12分,,大正築の古民家宿,,https://www.airbnb.jp/rooms/1654129544051282148?guests=1&adults=1&s=67&unique_share_id=dd53d88a-a83e-46c6-ac9c-8313c9e39b31,,,,120,34.7104113,135.503502
+absinthe-underground,The Absinthe Underground,,堀江・四ツ橋,Horie / Yotsubashi,大阪市西区北堀江1-2-27 AXIS SOUTH四ツ橋ビルB1F,"B1F AXIS SOUTH Yotsubashi Bldg., 1-2-27 Kitahorie, Nishi-ku, Osaka",Osaka Metro 四つ橋線「四ツ橋駅」徒歩1分 / 御堂筋線・長堀鶴見緑地線「心斎橋駅」徒歩5分,,"Located between Shinsaibashi and Horie, a 2-minute walk from Ame-mura’s Triangle Park, Absinthe Underground carries on the legacy of the former Absinthe Wormwood and Cafe Absinthe. A cozy, creative gathering spot where locals and travellers connect through music, art, and conversation, offering the perfect mix of energy and comfort for nights out, private parties, or simply unwinding by yourself.",,https://www.absintheunderground.com/,,https://www.instagram.com/theabsintheunderground/,,200,34.6733284,135.4971439
+kawaguchi-church,川口基督教会,,本田・阿波座,Honda / Awaza,大阪市西区川口1丁目3−8,"1-3-8 Kawaguchi, Nishi-ku, Osaka",Osaka Metro 中央線・千日前線「阿波座駅」徒歩10分,,建立106年目を迎えた歴史的な建物で、荘厳な外観と内部空間、ステンドグラスなどの装飾により非日常的な空間を演出している。,,www.nskk.org/osaka/church/kawaguchi,,https://www.instagram.com/kawaguchi.cc.official,,80,34.6821017,135.4822034
+grandfront-knowledge-plaza,グランフロント大阪 北館1F ナレッジプラザ,,梅田・大阪駅,Umeda / Osaka Station,大阪市北区大深町3-1,"3-1 Ofukacho, Kita-ku, Osaka",JR「大阪駅」徒歩5分 / Osaka Metro 御堂筋線「梅田駅」徒歩6分 / 阪急「大阪梅田駅」徒歩7分,,グランフロント大阪の中核施設「ナレッジキャピタル」の中心に位置するダイナミックな吹き抜け空間。,,https://www.gfo-ad.jp/index.html,,,,,34.70592,135.4944
+falafel-time,Falafel Time,,塚本・西淀川,Tsukamoto / Nishiyodogawa,大阪市西淀川区柏里,"Kashiwazato, Nishiyodogawa-ku, Osaka",JR神戸線「塚本駅」徒歩3分,,細長く、両側に扉がある,,,,https://www.instagram.com/falafel_time_osaka/,,,34.71003,135.4692
+momogaike-street,ももがいけすとりーと,,昭和町・西田辺,Showacho / Nishitanabe,大阪市阿倍野区桃ヶ池町1丁目（桃ヶ池公園北側）,"1 Momogaikecho (North side of Momogaike Park), Abeno-ku, Osaka",Osaka Metro 御堂筋線「昭和町駅」徒歩7分 / JR阪和線「南田辺駅」徒歩8分,,毎月5のつく日の午後、公園で紙芝居やパフォーマンスなどを行っています,,https://showacho.jp/2023/11/14/%E3%82%82%E3%82%82%E3%81%8C%E3%81%84%E3%81%91%E3%81%99%E3%81%A8%E3%82%8A%E3%83%BC%E3%81%A8%E5%AE%9F%E6%96%BD%E4%B8%AD/,,,,,34.63047,135.5211
+abeno-qs-mall,あべのキューズモール,,天王寺・阿倍野,Tennoji / Abeno,大阪市阿倍野区桃ヶ池町1丁目（桃ヶ池公園北側）,"1-6-1 Abenosuji, Abeno-ku, Osaka",各線「天王寺駅」徒歩3分 / Osaka Metro 谷町線「阿倍野駅」徒歩1分 / 近鉄「大阪阿部野橋駅」徒歩3分,,,,https://qs-mall.jp/abeno/,,,,,34.64533,135.5117
+tenshiba,てんしば,,天王寺・阿倍野,Tennoji / Abeno,大阪市阿倍野区桃ヶ池町1丁目（桃ヶ池公園北側）,"5-55 Chausuyamacho, Tennoji-ku, Osaka",各線「天王寺駅」徒歩2分 / 近鉄「大阪阿部野橋駅」徒歩4分,,,,https://www.tennoji-park.jp/,,https://www.instagram.com/tenshiba_official/,,,34.64854,135.511
+namba-hiroba,（調整中）なんば広場,,昭和町・西田辺,Showacho / Nishitanabe,大阪市阿倍野区桃ヶ池町1丁目（桃ヶ池公園北側）,"1 Momogaikecho (North side of Momogaike Park), Abeno-ku, Osaka",Osaka Metro 御堂筋線「昭和町駅」徒歩7分 / JR阪和線「南田辺駅」徒歩8分,,,,https://www.namba-hiroba.jp/,,https://www.instagram.com/nambahiroba/,,,34.66555,135.501
+miracle-world,MIRACLE WORLD（ミラクルワールド）,,難波・千日前,Namba / Sennichimae,大阪市中央区千日前2丁目8-17なんばオリエンタルホテル地下1階,"B1F Namba Oriental Hotel, 2-8-17 Sennichimae, Chuo-ku, Osaka",各線「なんば駅」徒歩3分 / 近鉄・阪神「日本橋駅」徒歩3分,,2025年冬にオープンした難波にある施設、光・映像・音・香りを組み合わせた没入型デジタルアートミュージアム。観光客で賑わう戎橋にあり、「四感に響く超現実空間」をコンセプトにしています。,,https://miracle-world.co.jp/,,https://www.instagram.com/miracleworld.osaka/,,,34.66577,135.5037
+mio-garden-terrace,ミオガーデンテラス,,天王寺・阿倍野,Tennoji / Abeno,大阪府大阪市天王寺区悲田院町１０番３９号,"10-39 Hidenincho, Tennoji-ku, Osaka",JR・Osaka Metro「天王寺駅」直結（徒歩1分） / 近鉄「大阪阿部野橋駅」徒歩2分,,"あべのハルカスに面した天王寺ミオ本館１階テラス。
+
+屋根あり。",,https://www.tennoji-mio.co.jp/miogardenterrace,,,,,34.64704,135.5139
+hoop-1f-stage,Hoop １階円形ステージ,,天王寺・阿倍野,Tennoji / Abeno,大阪市阿倍野区阿倍野筋1-1-43 あべのハルカス近鉄本店ウイング館10階,"10F Abeno Harukas Kintetsu Honten Wing Bldg., 1-1-43 Abenosuji, Abeno-ku, Osaka",近鉄「大阪阿部野橋駅」直結 / 各線「天王寺駅」徒歩2分,,ウイング館１０階にあるミニステージです。自前で集客できる方にはお勧めです。Hoop１階の円形ステージ,,https://www.d-kintetsu.co.jp/hoop/,,https://www.instagram.com/hoop_abeno/,,,34.64619,135.5135
+abenoba,あべのば,,天王寺・阿倍野,Tennoji / Abeno,阿倍野区阿倍野筋1丁目3番15号,"1-3-15 Abenosuji, Abeno-ku, Osaka",近鉄「大阪阿部野橋駅」徒歩1分 / 各線「天王寺駅」徒歩3分,,「学びの場」「交流の場」「憩いの場」「くつろぎの場」など、さまざまな形で利用できる場所,,https://www.kansaimiraibank.co.jp/abenoba/,,,,,34.64486,135.5129
+abechika-hanadokei,あべちか花時計広場,,天王寺・阿倍野,Tennoji / Abeno,大阪市天王寺区堀越町アベノ地下街8号,"Abeno Chikagai No. 8, Horikoshicho, Tennoji-ku, Osaka",各線「天王寺駅」直結（地下街） / 近鉄「大阪阿部野橋駅」徒歩3分,,あべちかB１に位置するメインの広場,,https://avetica.osaka-chikagai.jp/,https://x.com/avetica_osaka,,,,34.65044,135.5143
+abeno-a-stage,あべのルシアスビル１F あべのAステージ,,天王寺・阿倍野,Tennoji / Abeno,大阪市阿倍野区阿倍野筋1-5-1 あべのルシアス1階,"1F Abeno Lucias, 1-5-1 Abenosuji, Abeno-ku, Osaka",各線「天王寺駅」徒歩3分 / Osaka Metro 谷町線「阿倍野駅」徒歩4分,,アポロビル・ルシアスビルを挟んだ屋外広場内にあるステージです。,,https://www.apollo-lucias.jp/,,,,,34.64652,135.5109
+zeniya-honpo,錢屋本舗本館,,上本町・天王寺,Uehommachi / Tennoji,大阪市天王寺区石ケ辻町１４−６,"14-6 Ishigatsujicho, Tennoji-ku, Osaka",近鉄「大阪上本町駅」徒歩5分 / Osaka Metro 谷町線・千日前線「谷町九丁目駅」徒歩10分,,錢屋本舗が運営するレンタルスペースは、2人～24人用の個室や、床暖房を完備したスタジオ、200席以上収容のイベントスペースなど、利用目的にあわせた部屋をご用意しております。,,https://zeniyahompo.com/,,https://www.instagram.com/zeniya_hompo/,,,34.66446,135.522
+subaru-hall-planetarium,すばるホール3階プラネタリウム前,,富田林,Tondabayashi,大阪府富田林市桜ケ丘町２番８号,"2-8 Sakuragaokacho, Tondabayashi-shi, Osaka",近鉄長野線「川西駅」徒歩8分,,プラネタリウム観覧前の待合スペース,,http://subaruhall.org/,,,,,34.49527,135.5861
+saber-farm,富田林農業公園サバーファーム,,富田林,Tondabayashi,大阪府富田林市甘南備2300,"2300 Kannabi, Tondabayashi-shi, Osaka",近鉄長野線「富田林駅」から路線バス約20分「サバーファーム」下車,,BBQ広場前、 芝滑り広場前、 大型休憩所など多人数が収容可能なスペース活用が可能となっております。,,https://savorfarm.jp/,,https://www.instagram.com/savor_farm,,,34.45784,135.6087
+kirameki-factory,観光交流施設きらめきファクトリー,,富田林,Tondabayashi,富田林市本町19-8,"19-8 Honmachi, Tondabayashi-shi, Osaka",近鉄長野線「富田林駅」徒歩1分,,"1階は観光案内と特産品の販売
+
+2階はレンタルスペース",,http://tonkira.jp/,,https://www.instagram.com/kirameki_factory,,,34.50388,135.6011
+little-m,リトル＋エム,,昭和町・西田辺,Showacho / Nishitanabe,大阪市阿倍野区昭和町5-4-20,"5-4-20 Showacho, Abeno-ku, Osaka",Osaka Metro 御堂筋線「西田辺駅」徒歩2分,,,,,,,,,34.62379,135.5163
+routemaster-t15,Routemaster T15 by W.T.L.,,北加賀屋・住之江,Kitakagaya / Suminoe,住之江区 北加賀屋,"Kitakagaya, Suminoe-ku, Osaka",Osaka Metro 四つ橋線「北加賀屋駅」徒歩5分（周辺エリア）,,,,,,https://www.instagram.com/routemaster_t15.jp,,,34.6241,135.4745
+abeno-nagaya,レンタルスペース阿倍野長屋,,昭和町・西田辺,Showacho / Nishitanabe,大阪市阿倍野区昭和町４－６－８,"4-6-8 Showacho, Abeno-ku, Osaka",Osaka Metro 御堂筋線「西田辺駅」徒歩6分 / 「昭和町駅」徒歩8分,,,,,,,,,34.62563,135.5179
+aoyama-building,青山ビル,,北浜・淀屋橋,Kitahama / Yodoyabashi,大阪市中央区伏見町2-2-6,"2-2-6 Fushimicho, Chuo-ku, Osaka",Osaka Metro 堺筋線・京阪「北浜駅」徒歩2分 / 御堂筋線「淀屋橋駅」徒歩6分,,青山ビルは国登録有形文化財の元個人邸宅です。現在地下はレンタルスペース北浜ロンドとして使用しております。,,,,,,,34.68897,135.5059
+kawakyo-fugetsu,町屋河京富月,,富田林寺内町,Tondabayashi Jinaimachi,富田林市富田林町11-11,"11-11 Tondabayashicho, Tondabayashi-shi, Osaka",近鉄長野線「富田林駅」徒歩5分 / 「富田林西口駅」徒歩6分,,"歴史ある町並みに寄り添う町家で、特別な一日を。
+
+大阪市内から約30分。
+
+日常とは少し違う時間が流れる、富田林寺内町。
+
+写真撮影や動画撮影、展示会、ワークショップなど、さまざまな用途にご利用いただけます。
+
+やわらかな自然光と和モダンな空間、そして寺内町ならではの空気感が、ここで過ごすひとときをより特別なものにします。",,https://kakyofugetsu.com/,,,,,34.50096,135.6019
+ebisui-museum,登録有形文化財 戎井家住宅 綿とくらし博物館,,平野,Hirano,大阪市平野区平野東2-6-14,"2-6-14 Hiranohigashi, Hirano-ku, Osaka",JR大和路線「平野駅」徒歩15分 / Osaka Metro 谷町線「平野駅」徒歩18分,,"大阪市平野区平野東の住宅街にある
+
+地域の歴史を残し後世に伝えるために、主屋・蔵をレンタルスペースとして提供しています。
+
+平野区はかつて綿のまちとして、繁栄した歴史があることなどを蔵２階で、道具などを展示しています。
+
+見学された、綿くり・綿つむぎを実際に体験していただいたりもできます。
+
+また、カフェや手作り雑貨店が主屋に併設されています。
+
+毎月第二日曜日は、綿くらの日として、ワークショップなどのイベントを開催しています。レンタルスペースとして、定期的な利用、個人的に利用したい方にもご案内しています。",,,,https://www.instagram.com/wata.kura.hiranogo/,,,34.62251,135.5574
+wonderlab-miyakojima,わんだ〜らぼ都島,,都島,Miyakojima,大阪市都島区高倉町2-8-13,"2-8-13 Takakuracho, Miyakojima-ku, Osaka",Osaka Metro 谷町線「都島駅」徒歩12分,,大阪市都島区高倉町に有ります私設のコミュニティプレイスです。ビルの1階で自然光が射し込む明るい室内と中庭が有ります。アクセス最寄りはJR大阪東線「城北公園通駅」から南方向へ徒歩7/8分です。,,https://wonderlab-miyakojima3.localinfo.jp/,,https://www.instagram.com/wonderlab.miyakojima/,,,34.71755,135.5311
+ikutoku-cc,育徳コミュニティセンター,,昭和町・西田辺,Showacho / Nishitanabe,大阪市阿倍野区阪南町5-15-28,"5-15-28 Hannancho, Abeno-ku, Osaka",Osaka Metro 御堂筋線「西田辺駅」徒歩3分,,ホール・１Fイベントスペースがあります,,https://ikutokuen.or.jp/,,https://www.instagram.com/mazeruba_by_ikutokuen/,,,34.62267,135.5137
+congres-square-nakanoshima,コングレスクエア大阪中之島,,中之島・肥後橋,Nakanoshima / Higobashi,大阪市北区中之島4丁目3-5-1 Nakanoshima Qross R&Dセンター1F,"1F Nakanoshima Qross R&D Center, 4-3-5-1 Nakanoshima, Kita-ku, Osaka",京阪中之島線「中之島駅」徒歩5分 / 各線「福島駅」徒歩10分,,"2024年7月1日、中之島の未来医療国際拠点「Nakanoshima Qross」1階に開業しました。
+
+323㎡・150㎡・100㎡のカンファレンスルームをはじめ、ミーティングルーム5室、ゲストルーム3室を備え、全体で最大500名規模の利用が可能な施設です。
+
+会議・セミナー・講演会・展示会など、幅広い用途でご使用いただいています。
+
+また、文化・芸術が息づく中之島の地において、アートと社会をつなぐ場の創出を目指し、館内にはアート作品を常設展示しています。",,https://osaka.congres-square.jp/nakanoshima/,,https://www.instagram.com/congres_square_on,,,34.69204,135.4905
+axcross,AxCROSS,,梅田・大阪駅,Umeda / Osaka Station,〒530-0001 大阪府大阪市北区梅田3丁目2-2 ＫＩＴＴＥ大阪4階,"4F KITTE Osaka, 3-2-2 Umeda, Kita-ku, Osaka",JR「大阪駅」西口直結 / 各線「梅田駅」徒歩3〜5分,,JR大阪駅直結の商業施設・KＩＴＴＥ大阪4階に位置する大型の屋内広告スクリーン。デジタルアートの発信と映像広告の放映を行っています。,,https://osaka.congres-square.jp/nakanoshima/,,https://www.instagram.com/congres_square_on,,,34.70075,135.495
+tomofes-tomoyasu,トモフェス2026(友安製作所Cafe＆Bar前),,天王寺・阿倍野,Tennoji / Abeno,友安製作所Cafe＆Bar 阿部野前（阿倍野筋２丁目第２駐車場）,"Abenosuji 2-chome (No.2 Parking), Abeno-ku, Osaka",Osaka Metro 谷町線「阿倍野駅」徒歩2分 / 各線「天王寺駅」徒歩5分,,当社店舗と、店舗前のコインパーキング（阿倍野筋２丁目第２駐車場）をお借りして2日間開催するイベントです。,,https://tomoyasu.co.jp/event/tomofes/2025/,,,,,34.64317,135.5132
+gochiso-bldg-plaza,新宿ごちそうビル1階店頭広場,,天王寺・阿倍野,Tennoji / Abeno,新宿ごちそうビル・大阪市阿倍野区阿倍野筋1-1-61,"Shinjuku Gochiso Bldg., 1-1-61 Abenosuji, Abeno-ku, Osaka",近鉄「大阪阿部野橋駅」直結 / 各線「天王寺駅」徒歩1分,,,,,,,,,34.64589,135.5151
+gardeners-tenshiba,ガーデナーズてんしばイーナ店,,天王寺・阿倍野,Tennoji / Abeno,大阪市天王寺区茶臼山町5-55 テンシバイーナ,"5-55 Chausuyamacho, Tennoji-ku, Osaka",各線「天王寺駅」徒歩3分 / 近鉄「大阪阿部野橋駅」徒歩5分,,"Gardeners は、天王寺公園「てんしばイーナ」内にある大型の都市型ガーデンセンター＆カフェです。
+
+
+
+カフェの一部、25㎡程度のスペースございますので小規模のライブが行えます。",,https://www.gardeners-japan.com/,,https://www.instagram.com/gardeners.tenshiba/,,,34.64854,135.511
+loxodonta-black,LOXODONTA BLACK,,天王寺・阿倍野,Tennoji / Abeno,〒545-0052 大阪府大阪市阿倍野区阿倍野筋２丁目４−４５,"2-4-45 Abenosuji, Abeno-ku, Osaka",Osaka Metro 谷町線「阿倍野駅」徒歩2分 / 各線「天王寺駅」徒歩6分,,キャパ40〜50名のちいさなブラックボックスです。レイアウト自由な設営も可能。常設舞台もあり。音響照明設備もそろっています。,,,,https://www.facebook.com/loxodontablack/,,,34.64333,135.5126
+dotonbori-namikiza,道頓堀ミュージアム並木座,,難波・道頓堀,Namba / Dotonbori,〒542-0071 大阪府大阪市中央区道頓堀１丁目１−６,"1-1-6 Dotonbori, Chuo-ku, Osaka",各線「日本橋駅」徒歩3分 / 各線「なんば駅」徒歩8分,,"実は道頓堀は、400年の歴史を誇る""劇場都市""です。
+
+文楽や歌舞伎の名作もここで育まれ、世界の劇場演出にも影響を与えてきました。
+
+「道頓堀ミュージアム並木座」は、2019年に誕生し、大阪はもちろん、国内外からの多くのお客さまに""劇場都市 道頓堀""を演劇的に伝えるミュージアムです。
+
+江戸時代の芝居小屋にタイムトリップ！文七さんとタダノキツネブのかけあいやクイズ、 歌舞伎の変身体験や回り舞台体験などの楽しい体験とともに、歴史を知ることができます。
+
+
+
+さらに、「並木座」は演者と近いライブ会場です。
+
+演劇的に歴史を伝えるミュージアムとは別に、演者と近いライブ会場としてエンタメ街の再生を実践しています。
+
+落語、講談、JAZZ、浄瑠璃、津軽三味線、和楽器ロック、お座敷ライブ、ギターの弾き語り、ミニ歌舞伎、講演会、お化け屋敷など開催してきました。
+
+会場定員は36名。ZOOM配信にも対応しています。
+
+まわり舞台や花道、地下から登場など仕掛けも豊富です。
+
+江戸時代の芝居小屋を模した小屋で、心に残る体験を。",,http://www.yamane-e.com/DotonboriNamikiza/,,https://www.instagram.com/namikiza/,,,34.66883,135.5055

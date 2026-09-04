@@ -49,8 +49,8 @@ const DEFAULT_COORDINATES: Record<string, { lat: number; lng: number }> = {
 export async function getVenues(): Promise<Venue[]> {
   const normalizeVenue = (v: any): Venue => {
     const imgUrl = extractImageUrl(v.image);
-    const lat = typeof v.lat === 'number' ? v.lat : (v.location?.lat ?? DEFAULT_COORDINATES[v.id]?.lat ?? 34.6937);
-    const lng = typeof v.lng === 'number' ? v.lng : (v.location?.lng ?? DEFAULT_COORDINATES[v.id]?.lng ?? 135.5023);
+    const lat = v.lat != null && v.lat !== '' ? Number(v.lat) : (v.location?.lat ?? DEFAULT_COORDINATES[v.id]?.lat ?? 34.6937);
+    const lng = v.lng != null && v.lng !== '' ? Number(v.lng) : (v.location?.lng ?? DEFAULT_COORDINATES[v.id]?.lng ?? 135.5023);
     const coords = { lat, lng };
 
     return {
@@ -70,6 +70,7 @@ export async function getVenues(): Promise<Venue[]> {
     const data = await client.getList<any>({
       endpoint: 'venues',
       queries: { limit: 100 },
+      customRequestInit: { cache: 'no-store' },
     });
     const contents = data.contents.length > 0 ? data.contents : mockVenues;
     return contents.map(normalizeVenue);
