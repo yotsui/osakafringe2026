@@ -23,6 +23,13 @@ export interface PaperSizeOption {
   heightPt: number;
 }
 
+export const MAP_DIMENSIONS = {
+  widthMm: 200,
+  heightMm: 200,
+  widthPt: 566.93,
+  heightPt: 566.93,
+};
+
 export const PAPER_SIZES: Record<string, PaperSizeOption> = {
   'square': {
     id: 'square',
@@ -33,54 +40,9 @@ export const PAPER_SIZES: Record<string, PaperSizeOption> = {
     widthPt: 566.93,
     heightPt: 566.93,
   },
-  'a4-landscape': {
-    id: 'a4-landscape',
-    name: 'A4 横 (297 × 210 mm)',
-    nameEn: 'A4 Landscape',
-    widthMm: 297,
-    heightMm: 210,
-    widthPt: 841.89,
-    heightPt: 595.28,
-  },
-  'a4-portrait': {
-    id: 'a4-portrait',
-    name: 'A4 縦 (210 × 297 mm)',
-    nameEn: 'A4 Portrait',
-    widthMm: 210,
-    heightMm: 297,
-    widthPt: 595.28,
-    heightPt: 841.89,
-  },
-  'a3-landscape': {
-    id: 'a3-landscape',
-    name: 'A3 横 (420 × 297 mm)',
-    nameEn: 'A3 Landscape',
-    widthMm: 420,
-    heightMm: 297,
-    widthPt: 1190.55,
-    heightPt: 841.89,
-  },
-  'b5-landscape': {
-    id: 'b5-landscape',
-    name: 'B5 横 (257 × 182 mm)',
-    nameEn: 'B5 Landscape',
-    widthMm: 257,
-    heightMm: 182,
-    widthPt: 728.5,
-    heightPt: 515.9,
-  },
-  'postcard': {
-    id: 'postcard',
-    name: 'ポストカード (148 × 100 mm)',
-    nameEn: 'Postcard (148 × 100 mm)',
-    widthMm: 148,
-    heightMm: 100,
-    widthPt: 419.53,
-    heightPt: 283.46,
-  },
 };
 
-export type StylePresetId = 'fringe-pop' | 'print-mono' | 'clean-outline' | 'minimal-gray';
+export type StylePresetId = 'minimal-gray' | 'print-mono' | 'fringe-pop' | 'clean-outline';
 
 export interface StyleTheme {
   id: StylePresetId;
@@ -110,9 +72,35 @@ export interface StyleTheme {
 }
 
 export const STYLE_PRESETS: Record<StylePresetId, StyleTheme> = {
+  'minimal-gray': {
+    id: 'minimal-gray',
+    name: 'ミニマルグレー（標準・おすすめ）',
+    nameEn: 'Minimal Gray (Positron)',
+    description: '落ち着いたトーンで背景地図として使いやすいグレースケール調',
+    bg: '#fafaf8',
+    waterFill: '#e0e7ee',
+    waterStroke: '#ccd6e0',
+    greeneryFill: '#edf1ea',
+    greeneryStroke: '#d6dfd3',
+    buildingFill: '#f0f0ee',
+    buildingStroke: '#e3e3df',
+    roadMinorStroke: '#ffffff',
+    roadMinorWidth: 1.5,
+    roadMajorStroke: '#d6d6d2',
+    roadMajorWidth: 3.0,
+    railwayStroke: '#888888',
+    railwayWidth: 1.8,
+    stationCircleFill: '#ffffff',
+    stationCircleStroke: '#555555',
+    stationTextColor: '#222222',
+    venuePinColor: '#E6007E',
+    venueTextColor: '#E6007E',
+    scaleColor: '#555555',
+    gridColor: '#e5e5e0',
+  },
   'print-mono': {
     id: 'print-mono',
-    name: '印刷用モノクロ・線画（おすすめ）',
+    name: '印刷用モノクロ・線画',
     nameEn: 'Print Monochrome (B&W)',
     description: 'Illustratorで着色・編集しやすいモノクロ線画。印刷版下やチラシに最適',
     bg: '#ffffff',
@@ -187,32 +175,6 @@ export const STYLE_PRESETS: Record<StylePresetId, StyleTheme> = {
     venueTextColor: '#E6007E',
     scaleColor: '#475569',
     gridColor: '#e2e8f0',
-  },
-  'minimal-gray': {
-    id: 'minimal-gray',
-    name: 'ミニマルグレー（ポジトロン調）',
-    nameEn: 'Minimal Gray (Positron)',
-    description: '落ち着いたトーンで背景地図として使いやすいグレースケール調',
-    bg: '#fafaf8',
-    waterFill: '#e0e7ee',
-    waterStroke: '#ccd6e0',
-    greeneryFill: '#edf1ea',
-    greeneryStroke: '#d6dfd3',
-    buildingFill: '#f0f0ee',
-    buildingStroke: '#e3e3df',
-    roadMinorStroke: '#ffffff',
-    roadMinorWidth: 1.5,
-    roadMajorStroke: '#d6d6d2',
-    roadMajorWidth: 3.0,
-    railwayStroke: '#888888',
-    railwayWidth: 1.8,
-    stationCircleFill: '#ffffff',
-    stationCircleStroke: '#555555',
-    stationTextColor: '#222222',
-    venuePinColor: '#E6007E',
-    venueTextColor: '#E6007E',
-    scaleColor: '#555555',
-    gridColor: '#e5e5e0',
   },
 };
 

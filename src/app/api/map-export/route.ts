@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       centerLng,
       radiusKm = 1.0,
       paperSizeId = 'square',
-      stylePresetId = 'print-mono',
+      stylePresetId = 'minimal-gray',
       layers,
       venues = [],
       format = 'svg', // 'svg' | 'json'
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const paper = PAPER_SIZES[paperSizeId] || PAPER_SIZES['a4-landscape'];
+    const paper = PAPER_SIZES[paperSizeId] || PAPER_SIZES['square'];
     const aspectRatio = paper.widthPt / paper.heightPt;
     const bbox = calculateBbox(centerLat, centerLng, radiusKm, aspectRatio);
     const query = buildOverpassQuery(bbox);
