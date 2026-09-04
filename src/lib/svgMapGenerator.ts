@@ -436,32 +436,272 @@ export function parseOverpassData(osmJson: any): ParsedGeoData {
   return data;
 }
 
-function coordsToPathD(coords: [number, number][], projector: MercatorProjector, close = false): string {
-  if (coords.length < 2) return '';
-  const pts = coords.map(([lng, lat]) => projector.toCanvasPoint(lat, lng));
-  let d = `M ${pts[0][0]} ${pts[0][1]}`;
-  for (let i = 1; i < pts.length; i++) {
-    d += ` L ${pts[i][0]} ${pts[i][1]}`;
+// ============================================================================
+// 幾何学的クリッピングアルゴリズム (Geometric Clipping)
+// 200×200mm (0..widthPt, 0..heightPt) の範囲外に伸びるベクターを完全にカット
+// ============================================================================
+
+interface ClipBounds {
+  xmin: number;
+  ymin: number;
+  xmax: number;
+  ymax: number;
+}
+
+const INSIDE = 0; // 0000
+const LEFT = 1;   // 0001
+const RIGHT = 2;  // 0010
+const BOTTOM = 4; // 0100
+const TOP = 8;    // 1000
+
+function computeOutCode(x: number, y: number, bounds: ClipBounds): number {
+  let code = INSIDE;
+  if (x < bounds.xmin) code |= LEFT;
+  else if (x > bounds.xmax) code |= RIGHT;
+  if (y < bounds.ymin) code |= TOP;
+  else if (y > bounds.ymax) code |= BOTTOM;
+  return code;
+}
+
+/**
+ * Cohen-Sutherland 線分クリッピング
+ */
+function clipSegment(
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number,
+  bounds: ClipBounds
+): [number, number, number, number] | null {
+  let code0 = computeOutCode(x0, y0, bounds);
+  let code1 = computeOutCode(x1, y1, bounds);
+  let accept = false;
+
+  let curX0 = x0;
+  let curY0 = y0;
+  let curX1 = x1;
+  let curY1 = y1;
+
+  for (let iter = 0; iter < 10; iter++) {
+    if ((code0 | code1) === 0) {
+      accept = true;
+      break;
+    } else if ((code0 & code1) !== 0) {
+      break; // 完全外側
+    } else {
+      let x = 0;
+      let y = 0;
+      const codeOut = code0 !== 0 ? code0 : code1;
+
+      if (codeOut & BOTTOM) {
+        x = curX0 + ((curX1 - curX0) * (bounds.ymax - curY0)) / (curY1 - curY0);
+        y = bounds.ymax;
+      } else if (codeOut & TOP) {
+        x = curX0 + ((curX1 - curX0) * (bounds.ymin - curY0)) / (curY1 - curY0);
+        y = bounds.ymin;
+      } else if (codeOut & RIGHT) {
+        y = curY0 + ((curY1 - curY0) * (bounds.xmax - curX0)) / (curX1 - curX0);
+        x = bounds.xmax;
+      } else if (codeOut & LEFT) {
+        y = curY0 + ((curY1 - curY0) * (bounds.xmin - curX0)) / (curX1 - curX0);
+        x = bounds.xmin;
+      }
+
+      if (codeOut === code0) {
+        curX0 = x;
+        curY0 = y;
+        code0 = computeOutCode(curX0, curY0, bounds);
+      } else {
+        curX1 = x;
+        curY1 = y;
+        code1 = computeOutCode(curX1, curY1, bounds);
+      }
+    }
   }
-  if (close) d += ' Z';
+
+  if (accept) {
+    return [
+      Math.round(curX0 * 100) / 100,
+      Math.round(curY0 * 100) / 100,
+      Math.round(curX1 * 100) / 100,
+      Math.round(curY1 * 100) / 100,
+    ];
+  }
+  return null;
+}
+
+/**
+ * ポリラインクリッピング (境界外の線分をカットし、内部に残るセグメントのみ抽出)
+ */
+export function clipPolyline(pts: [number, number][], bounds: ClipBounds): [number, number][][] {
+  if (pts.length < 2) return [];
+  const result: [number, number][][] = [];
+  let currentLine: [number, number][] = [];
+
+  for (let i = 0; i < pts.length - 1; i++) {
+    const clipped = clipSegment(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1], bounds);
+    if (clipped) {
+      const [cx0, cy0, cx1, cy1] = clipped;
+      if (currentLine.length === 0) {
+        currentLine.push([cx0, cy0], [cx1, cy1]);
+      } else {
+        const lastPt = currentLine[currentLine.length - 1];
+        if (Math.abs(lastPt[0] - cx0) < 0.05 && Math.abs(lastPt[1] - cy0) < 0.05) {
+          currentLine.push([cx1, cy1]);
+        } else {
+          if (currentLine.length >= 2) result.push(currentLine);
+          currentLine = [[cx0, cy0], [cx1, cy1]];
+        }
+      }
+    } else {
+      if (currentLine.length >= 2) {
+        result.push(currentLine);
+      }
+      currentLine = [];
+    }
+  }
+
+  if (currentLine.length >= 2) {
+    result.push(currentLine);
+  }
+  return result;
+}
+
+/**
+ * Sutherland-Hodgman 多角形クリッピング (境界外のポリゴンを200×200枠でカット)
+ */
+export function clipPolygon(polygon: [number, number][], bounds: ClipBounds): [number, number][] {
+  if (polygon.length < 3) return [];
+  let outputList = polygon;
+
+  const edges = [
+    // Left edge
+    {
+      inside: (p: [number, number]) => p[0] >= bounds.xmin,
+      intersect: (p1: [number, number], p2: [number, number]): [number, number] => [
+        bounds.xmin,
+        p1[1] + ((p2[1] - p1[1]) * (bounds.xmin - p1[0])) / (p2[0] - p1[0]),
+      ],
+    },
+    // Right edge
+    {
+      inside: (p: [number, number]) => p[0] <= bounds.xmax,
+      intersect: (p1: [number, number], p2: [number, number]): [number, number] => [
+        bounds.xmax,
+        p1[1] + ((p2[1] - p1[1]) * (bounds.xmax - p1[0])) / (p2[0] - p1[0]),
+      ],
+    },
+    // Top edge
+    {
+      inside: (p: [number, number]) => p[1] >= bounds.ymin,
+      intersect: (p1: [number, number], p2: [number, number]): [number, number] => [
+        p1[0] + ((p2[0] - p1[0]) * (bounds.ymin - p1[1])) / (p2[1] - p1[1]),
+        bounds.ymin,
+      ],
+    },
+    // Bottom edge
+    {
+      inside: (p: [number, number]) => p[1] <= bounds.ymax,
+      intersect: (p1: [number, number], p2: [number, number]): [number, number] => [
+        p1[0] + ((p2[0] - p1[0]) * (bounds.ymax - p1[1])) / (p2[1] - p1[1]),
+        bounds.ymax,
+      ],
+    },
+  ];
+
+  for (const edge of edges) {
+    const inputList = outputList;
+    outputList = [];
+    if (inputList.length === 0) break;
+
+    let s = inputList[inputList.length - 1];
+    for (const e of inputList) {
+      if (edge.inside(e)) {
+        if (edge.inside(s)) {
+          outputList.push(e);
+        } else {
+          outputList.push(edge.intersect(s, e));
+          outputList.push(e);
+        }
+      } else if (edge.inside(s)) {
+        outputList.push(edge.intersect(s, e));
+      }
+      s = e;
+    }
+  }
+
+  if (outputList.length < 3) return [];
+  return outputList.map(([x, y]) => [Math.round(x * 100) / 100, Math.round(y * 100) / 100]);
+}
+
+/**
+ * 座標列からクリッピング済みのポリゴンパス文字列(d)を生成
+ */
+function coordsToPolygonPathD(
+  coords: [number, number][],
+  projector: MercatorProjector,
+  bounds: ClipBounds
+): string {
+  if (coords.length < 3) return '';
+  const rawPts: [number, number][] = coords.map(([lng, lat]) => projector.toCanvasPoint(lat, lng));
+  const clippedPts = clipPolygon(rawPts, bounds);
+  if (clippedPts.length < 3) return '';
+
+  let d = `M ${clippedPts[0][0]} ${clippedPts[0][1]}`;
+  for (let i = 1; i < clippedPts.length; i++) {
+    d += ` L ${clippedPts[i][0]} ${clippedPts[i][1]}`;
+  }
+  d += ' Z';
   return d;
 }
 
 /**
- * Adobe Illustrator 互換のレイヤー構造化SVGを生成
+ * 座標列からクリッピング済みのポリラインパス文字列リスト(d[])を生成
+ */
+function coordsToPolylinePathDs(
+  coords: [number, number][],
+  projector: MercatorProjector,
+  bounds: ClipBounds
+): string[] {
+  if (coords.length < 2) return [];
+  const rawPts: [number, number][] = coords.map(([lng, lat]) => projector.toCanvasPoint(lat, lng));
+  const clippedLines = clipPolyline(rawPts, bounds);
+
+  return clippedLines
+    .filter((line) => line.length >= 2)
+    .map((line) => {
+      let d = `M ${line[0][0]} ${line[0][1]}`;
+      for (let i = 1; i < line.length; i++) {
+        d += ` L ${line[i][0]} ${line[i][1]}`;
+      }
+      return d;
+    });
+}
+
+/**
+ * Adobe Illustrator 互換のレイヤー構造化SVGを生成 (200×200mm完全カット仕様)
  */
 export function generateIllustratorSvg(
   options: MapExportOptions,
   geoData: ParsedGeoData
 ): string {
   const paper = PAPER_SIZES[options.paperSizeId] || PAPER_SIZES['square'];
-  const theme = STYLE_PRESETS[options.stylePresetId] || STYLE_PRESETS['print-mono'];
+  const theme = STYLE_PRESETS[options.stylePresetId] || STYLE_PRESETS['minimal-gray'];
   const { widthPt, heightPt, widthMm, heightMm } = paper;
 
   const aspectRatio = widthPt / heightPt;
   const bbox = calculateBbox(options.centerLat, options.centerLng, options.radiusKm, aspectRatio);
-  const margin = 24;
-  const projector = new MercatorProjector(bbox, widthPt, heightPt, margin);
+  
+  // マップ領域を200×200mm (0..widthPt, 0..heightPt) 全体にフィット
+  const projector = new MercatorProjector(bbox, widthPt, heightPt, 0);
+
+  // 厳密なクリッピング境界 (0..widthPt, 0..heightPt)
+  const clipBounds: ClipBounds = {
+    xmin: 0,
+    ymin: 0,
+    xmax: widthPt,
+    ymax: heightPt,
+  };
 
   const svgParts: string[] = [];
 
@@ -475,6 +715,8 @@ export function generateIllustratorSvg(
   width="${widthMm}mm"
   height="${heightMm}mm"
   viewBox="0 0 ${widthPt} ${heightPt}"
+  overflow="hidden"
+  style="overflow: hidden;"
   xml:space="preserve"
 >
   <defs>
@@ -484,6 +726,10 @@ export function generateIllustratorSvg(
       .bold-text { font-weight: bold; }
       .stroke-round { stroke-linecap: round; stroke-linejoin: round; }
     ]]></style>
+    <!-- 200x200mm アートボード クリッピングマスク -->
+    <clipPath id="map-artboard-clip">
+      <rect x="0" y="0" width="${widthPt}" height="${heightPt}" />
+    </clipPath>
   </defs>
 `);
 
@@ -492,9 +738,8 @@ export function generateIllustratorSvg(
     svgParts.push(`  <!-- ========================================== -->
   <!-- LAYER 01: 背景 (用紙色) -->
   <!-- ========================================== -->
-  <g id="01_背景" inkscape:label="01_背景" inkscape:groupmode="layer" data-name="01_背景">
+  <g id="01_背景" inkscape:label="01_背景" inkscape:groupmode="layer" data-name="01_背景" clip-path="url(#map-artboard-clip)">
     <rect x="0" y="0" width="${widthPt}" height="${heightPt}" fill="${theme.bg}" />
-    <rect x="${margin}" y="${margin}" width="${widthPt - margin * 2}" height="${heightPt - margin * 2}" fill="${theme.bg}" stroke="${theme.gridColor}" stroke-width="1" />
   </g>
 `);
   }
@@ -503,72 +748,79 @@ export function generateIllustratorSvg(
   if (options.layers.water) {
     const polyPaths: string[] = [];
     geoData.waterPolygons.forEach((poly) => {
-      const d = coordsToPathD(poly, projector, true);
+      const d = coordsToPolygonPathD(poly, projector, clipBounds);
       if (d) polyPaths.push(d);
     });
 
     const linePaths: string[] = [];
     geoData.waterLines.forEach((line) => {
-      const d = coordsToPathD(line, projector, false);
-      if (d) linePaths.push(d);
+      const ds = coordsToPolylinePathDs(line, projector, clipBounds);
+      linePaths.push(...ds);
     });
 
-    svgParts.push(`  <!-- ========================================== -->
+    if (polyPaths.length > 0 || linePaths.length > 0) {
+      svgParts.push(`  <!-- ========================================== -->
   <!-- LAYER 02: 水域・河川・海 -->
   <!-- ========================================== -->
-  <g id="02_水域_河川" inkscape:label="02_水域・河川" inkscape:groupmode="layer" data-name="02_水域・河川">
+  <g id="02_水域_河川" inkscape:label="02_水域・河川" inkscape:groupmode="layer" data-name="02_水域・河川" clip-path="url(#map-artboard-clip)">
     ${polyPaths.map((d) => `<path d="${d}" fill="${theme.waterFill}" stroke="${theme.waterStroke}" stroke-width="0.8" class="stroke-round" />`).join('\n    ')}
     ${linePaths.map((d) => `<path d="${d}" fill="none" stroke="${theme.waterFill === 'none' ? theme.waterStroke : theme.waterFill}" stroke-width="3" class="stroke-round" />`).join('\n    ')}
   </g>
 `);
+    }
   }
 
   // レイヤー3: 公園・緑地 (Greenery)
   if (options.layers.greenery) {
     const greenPaths: string[] = [];
     geoData.greeneryPolygons.forEach((poly) => {
-      const d = coordsToPathD(poly, projector, true);
+      const d = coordsToPolygonPathD(poly, projector, clipBounds);
       if (d) greenPaths.push(d);
     });
 
-    svgParts.push(`  <!-- ========================================== -->
+    if (greenPaths.length > 0) {
+      svgParts.push(`  <!-- ========================================== -->
   <!-- LAYER 03: 公園・緑地 -->
   <!-- ========================================== -->
-  <g id="03_公園_緑地" inkscape:label="03_公園・緑地" inkscape:groupmode="layer" data-name="03_公園・緑地">
+  <g id="03_公園_緑地" inkscape:label="03_公園・緑地" inkscape:groupmode="layer" data-name="03_公園・緑地" clip-path="url(#map-artboard-clip)">
     ${greenPaths.map((d) => `<path d="${d}" fill="${theme.greeneryFill}" stroke="${theme.greeneryStroke}" stroke-width="0.8" class="stroke-round" />`).join('\n    ')}
   </g>
 `);
+    }
   }
 
   // レイヤー4: 建物フットプリント (Buildings)
   if (options.layers.buildings && geoData.buildingPolygons.length > 0) {
     const bldgPaths: string[] = [];
     geoData.buildingPolygons.forEach((poly) => {
-      const d = coordsToPathD(poly, projector, true);
+      const d = coordsToPolygonPathD(poly, projector, clipBounds);
       if (d) bldgPaths.push(d);
     });
 
-    svgParts.push(`  <!-- ========================================== -->
+    if (bldgPaths.length > 0) {
+      svgParts.push(`  <!-- ========================================== -->
   <!-- LAYER 04: 建物フットプリント -->
   <!-- ========================================== -->
-  <g id="04_建物" inkscape:label="04_建物" inkscape:groupmode="layer" data-name="04_建物">
+  <g id="04_建物" inkscape:label="04_建物" inkscape:groupmode="layer" data-name="04_建物" clip-path="url(#map-artboard-clip)">
     ${bldgPaths.map((d) => `<path d="${d}" fill="${theme.buildingFill}" stroke="${theme.buildingStroke}" stroke-width="0.5" class="stroke-round" />`).join('\n    ')}
   </g>
 `);
+    }
   }
 
   // レイヤー5: 一般道路 (Roads Minor)
   if (options.layers.roadsMinor && geoData.roadsMinor.length > 0) {
     const minorPaths: string[] = [];
     geoData.roadsMinor.forEach((line) => {
-      const d = coordsToPathD(line, projector, false);
-      if (d) minorPaths.push(d);
+      const ds = coordsToPolylinePathDs(line, projector, clipBounds);
+      minorPaths.push(...ds);
     });
 
-    svgParts.push(`  <!-- ========================================== -->
+    if (minorPaths.length > 0) {
+      svgParts.push(`  <!-- ========================================== -->
   <!-- LAYER 05: 一般道路・街路 -->
   <!-- ========================================== -->
-  <g id="05_一般道路" inkscape:label="05_一般道路" inkscape:groupmode="layer" data-name="05_一般道路">
+  <g id="05_一般道路" inkscape:label="05_一般道路" inkscape:groupmode="layer" data-name="05_一般道路" clip-path="url(#map-artboard-clip)">
     <g id="05_一般道路_縁取り" stroke="#cbd5e1" stroke-width="${theme.roadMinorWidth + 1}" fill="none" class="stroke-round">
       ${minorPaths.map((d) => `<path d="${d}" />`).join('\n      ')}
     </g>
@@ -577,20 +829,22 @@ export function generateIllustratorSvg(
     </g>
   </g>
 `);
+    }
   }
 
   // レイヤー6: 主要道路 (Roads Major)
   if (options.layers.roadsMajor && geoData.roadsMajor.length > 0) {
     const majorPaths: string[] = [];
     geoData.roadsMajor.forEach((line) => {
-      const d = coordsToPathD(line, projector, false);
-      if (d) majorPaths.push(d);
+      const ds = coordsToPolylinePathDs(line, projector, clipBounds);
+      majorPaths.push(...ds);
     });
 
-    svgParts.push(`  <!-- ========================================== -->
+    if (majorPaths.length > 0) {
+      svgParts.push(`  <!-- ========================================== -->
   <!-- LAYER 06: 主要道路・幹線道路 -->
   <!-- ========================================== -->
-  <g id="06_主要道路" inkscape:label="06_主要道路" inkscape:groupmode="layer" data-name="06_主要道路">
+  <g id="06_主要道路" inkscape:label="06_主要道路" inkscape:groupmode="layer" data-name="06_主要道路" clip-path="url(#map-artboard-clip)">
     <g id="06_主要道路_縁取り" stroke="#94a3b8" stroke-width="${theme.roadMajorWidth + 1.5}" fill="none" class="stroke-round">
       ${majorPaths.map((d) => `<path d="${d}" />`).join('\n      ')}
     </g>
@@ -599,20 +853,22 @@ export function generateIllustratorSvg(
     </g>
   </g>
 `);
+    }
   }
 
   // レイヤー7: 一般鉄道 (Railways)
   if (options.layers.railways && geoData.railways.length > 0) {
     const railPaths: string[] = [];
     geoData.railways.forEach((line) => {
-      const d = coordsToPathD(line, projector, false);
-      if (d) railPaths.push(d);
+      const ds = coordsToPolylinePathDs(line, projector, clipBounds);
+      railPaths.push(...ds);
     });
 
-    svgParts.push(`  <!-- ========================================== -->
+    if (railPaths.length > 0) {
+      svgParts.push(`  <!-- ========================================== -->
   <!-- LAYER 07: 鉄道線路 -->
   <!-- ========================================== -->
-  <g id="07_鉄道線路" inkscape:label="07_鉄道線路" inkscape:groupmode="layer" data-name="07_鉄道線路">
+  <g id="07_鉄道線路" inkscape:label="07_鉄道線路" inkscape:groupmode="layer" data-name="07_鉄道線路" clip-path="url(#map-artboard-clip)">
     <g id="07_線路下地" stroke="${theme.railwayStroke}" stroke-width="${theme.railwayWidth}" fill="none" class="stroke-round">
       ${railPaths.map((d) => `<path d="${d}" />`).join('\n      ')}
     </g>
@@ -621,6 +877,7 @@ export function generateIllustratorSvg(
     </g>
   </g>
 `);
+    }
   }
 
   // レイヤー8: Osaka Metro・地域路線（ローカル高精度データ連携）
@@ -635,19 +892,19 @@ export function generateIllustratorSvg(
       const width = feat.properties?.width ? feat.properties.width * 1.2 : 3.5;
       const name = feat.properties?.name || '路線';
 
-      const d = coordsToPathD(coords, projector, false);
-      if (d) {
+      const ds = coordsToPolylinePathDs(coords, projector, clipBounds);
+      ds.forEach((d) => {
         metroSvgLines.push(
           `      <path d="${d}" stroke="${color}" stroke-width="${width}" fill="none" data-name="${name}" class="stroke-round" />`
         );
-      }
+      });
     });
 
     if (metroSvgLines.length > 0) {
       svgParts.push(`  <!-- ========================================== -->
   <!-- LAYER 08: 地下鉄・高速鉄道路線 (Osaka Metro公式カラー) -->
   <!-- ========================================== -->
-  <g id="08_地下鉄路線" inkscape:label="08_地下鉄路線" inkscape:groupmode="layer" data-name="08_地下鉄路線">
+  <g id="08_地下鉄路線" inkscape:label="08_地下鉄路線" inkscape:groupmode="layer" data-name="08_地下鉄路線" clip-path="url(#map-artboard-clip)">
     <g id="08_路線グロー" stroke="#ffffff" stroke-width="5" fill="none" opacity="0.9" class="stroke-round">
       ${metroSvgLines.map((line) => line.replace(/stroke="[^"]+"/, 'stroke="#ffffff"').replace(/stroke-width="[^"]+"/, 'stroke-width="5.5"')).join('\n')}
     </g>
@@ -701,6 +958,9 @@ ${metroSvgLines.join('\n')}
 
     allStations.forEach((st) => {
       const [x, y] = projector.toCanvasPoint(st.lat, st.lng);
+      // 200x200mm 内に収まっているもののみ描画
+      if (x < 0 || x > widthPt || y < 0 || y > heightPt) return;
+
       const strokeCol = st.color || theme.stationCircleStroke;
 
       stationCircles.push(
@@ -712,10 +972,11 @@ ${metroSvgLines.join('\n')}
       );
     });
 
-    svgParts.push(`  <!-- ========================================== -->
+    if (stationCircles.length > 0 || stationTexts.length > 0) {
+      svgParts.push(`  <!-- ========================================== -->
   <!-- LAYER 09: 駅シンボル＆駅名ラベル -->
   <!-- ========================================== -->
-  <g id="09_駅_駅名" inkscape:label="09_駅・駅名" inkscape:groupmode="layer" data-name="09_駅・駅名">
+  <g id="09_駅_駅名" inkscape:label="09_駅・駅名" inkscape:groupmode="layer" data-name="09_駅・駅名" clip-path="url(#map-artboard-clip)">
     <g id="09_駅シンボル">
 ${stationCircles.join('\n')}
     </g>
@@ -724,6 +985,7 @@ ${stationTexts.join('\n')}
     </g>
   </g>
 `);
+    }
   }
 
   // レイヤー10: フェスティバル会場 (Venues)
@@ -738,6 +1000,8 @@ ${stationTexts.join('\n')}
 
       if (projector.isInside(lat, lng)) {
         const [x, y] = projector.toCanvasPoint(lat, lng);
+        if (x < 0 || x > widthPt || y < 0 || y > heightPt) return;
+
         const name = v.name;
 
         venuePins.push(`      <!-- 会場ピン: ${escapeXml(name)} -->
@@ -758,7 +1022,7 @@ ${stationTexts.join('\n')}
       svgParts.push(`  <!-- ========================================== -->
   <!-- LAYER 10: 大阪フリンジ 会場ピン＆名称 -->
   <!-- ========================================== -->
-  <g id="10_会場ピン_名称" inkscape:label="10_会場ピン・名称" inkscape:groupmode="layer" data-name="10_会場ピン・名称">
+  <g id="10_会場ピン_名称" inkscape:label="10_会場ピン・名称" inkscape:groupmode="layer" data-name="10_会場ピン・名称" clip-path="url(#map-artboard-clip)">
     <g id="10_会場ピン本体">
 ${venuePins.join('\n')}
     </g>
@@ -781,18 +1045,18 @@ ${venueLabels.join('\n')}
     );
     const scaleBarPx = Math.abs(pt2[0] - pt1[0]);
 
-    const scaleX = margin + 16;
-    const scaleY = heightPt - margin - 20;
+    const scaleX = 20;
+    const scaleY = heightPt - 24;
 
-    const northX = widthPt - margin - 30;
-    const northY = margin + 40;
+    const northX = widthPt - 28;
+    const northY = 32;
 
     svgParts.push(`  <!-- ========================================== -->
   <!-- LAYER 12: 縮尺バー・方位記号・マップ情報 -->
   <!-- ========================================== -->
-  <g id="12_縮尺_方角_情報" inkscape:label="12_縮尺・方角・情報" inkscape:groupmode="layer" data-name="12_縮尺・方角・情報">
-    <!-- 外枠トリムマーク / 枠線 -->
-    <rect x="${margin}" y="${margin}" width="${widthPt - margin * 2}" height="${heightPt - margin * 2}" fill="none" stroke="${theme.scaleColor}" stroke-width="1.5" />
+  <g id="12_縮尺_方角_情報" inkscape:label="12_縮尺・方角・情報" inkscape:groupmode="layer" data-name="12_縮尺・方角・情報" clip-path="url(#map-artboard-clip)">
+    <!-- 200x200mm 外枠線 -->
+    <rect x="0" y="0" width="${widthPt}" height="${heightPt}" fill="none" stroke="${theme.scaleColor}" stroke-width="1.5" />
 
     <!-- 縮尺スケールバー -->
     <g transform="translate(${scaleX}, ${scaleY})" id="12_縮尺スケールバー">
@@ -811,9 +1075,9 @@ ${venueLabels.join('\n')}
     </g>
 
     <!-- マップクレジット / 座標情報 -->
-    <g transform="translate(${margin + 10}, ${margin + 16})" id="12_マップ情報">
-      <text x="0" y="0" fill="${theme.scaleColor}" font-size="8" font-weight="800" class="layer-label">OSAKA FRINGE FESTIVAL MAP</text>
-      <text x="0" y="10" fill="#64748b" font-size="7" font-weight="normal" class="layer-label">CENTER: ${options.centerLat.toFixed(5)}°N, ${options.centerLng.toFixed(5)}°E | RADIUS: ${options.radiusKm}km | DATA: © OpenStreetMap</text>
+    <g transform="translate(18, 22)" id="12_マップ情報">
+      <text x="0" y="0" fill="${theme.scaleColor}" font-size="8" font-weight="800" class="layer-label">OSAKA FRINGE FESTIVAL MAP (200x200mm)</text>
+      <text x="0" y="10" fill="#64748b" font-size="7" font-weight="normal" class="layer-label">CENTER: ${options.centerLat.toFixed(5)}°N, ${options.centerLng.toFixed(5)}°E | RADIUS: ${options.radiusKm}km | © OpenStreetMap</text>
     </g>
   </g>
 `);
