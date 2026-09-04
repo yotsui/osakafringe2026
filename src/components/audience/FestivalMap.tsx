@@ -43,9 +43,28 @@ export default function FestivalMap({
   const isMapReadyRef = useRef<boolean>(false);
 
   const [activeVenue, setActiveVenue] = useState<Venue | null>(null);
+  const activeVenueRef = useRef<Venue | null>(null);
+  activeVenueRef.current = activeVenue;
+
   const [visibleVenues, setVisibleVenues] = useState<Venue[]>(venues);
 
-  // 地図の表示範囲（bounds）に含まれる会場を抽出する関数
+  // マーカーのハイライト色・前面表示を一括更新する関数
+  const updateMarkerColors = useCallback((selectedId: string | null) => {
+    markersRef.current.forEach(({ venue, pinEl, dotEl, el }) => {
+      const isSelected = venue.id === selectedId;
+      pinEl.style.background = isSelected ? '#FFF100' : '#E6007E';
+      pinEl.style.boxShadow = isSelected
+        ? '0 4px 14px rgba(0,0,0,0.35)'
+        : '0 4px 12px rgba(230,0,126,0.45)';
+      pinEl.style.transform = isSelected ? 'scale(1.1) rotate(-45deg)' : 'scale(1) rotate(-45deg)';
+      dotEl.style.background = isSelected ? '#000000' : '#ffffff';
+      if (el) {
+        el.style.zIndex = isSelected ? '10' : '1';
+      }
+    });
+  }, []);
+
+  // 地図の表示範囲（bounds）に含まれる会場を抽出＆範囲外時の最近傍会場選択
   const updateVisibleVenues = useCallback(
     (map: any) => {
       if (!map || !venues || venues.length === 0) {
@@ -62,11 +81,40 @@ export default function FestivalMap({
           return bounds.contains([lng, lat]);
         });
         setVisibleVenues(inBounds);
+
+        // 現在選択中の会場が表示範囲外に出た場合、中心に最も近い会場に切り替え
+        const currentActive = activeVenueRef.current;
+        const isActiveInBounds = currentActive && inBounds.some((v) => v.id === currentActive.id);
+
+        if (!isActiveInBounds) {
+          if (inBounds.length > 0) {
+            const center = map.getCenter();
+            let closestVenue = inBounds[0];
+            let minDistanceSq = Infinity;
+
+            inBounds.forEach((v) => {
+              const dLng = v.location.lng - center.lng;
+              const dLat = v.location.lat - center.lat;
+              const distSq = dLng * dLng + dLat * dLat;
+              if (distSq < minDistanceSq) {
+                minDistanceSq = distSq;
+                closestVenue = v;
+              }
+            });
+
+            setActiveVenue(closestVenue);
+            if (onSelectVenue) onSelectVenue(closestVenue.id);
+            updateMarkerColors(closestVenue.id);
+          } else {
+            setActiveVenue(null);
+            updateMarkerColors(null);
+          }
+        }
       } catch (err) {
         console.warn('[FestivalMap] error getting map bounds:', err);
       }
     },
-    [venues]
+    [venues, onSelectVenue, updateMarkerColors]
   );
 
   // 初期アクティブ会場
@@ -89,22 +137,6 @@ export default function FestivalMap({
       setVisibleVenues(venues);
     }
   }, [venues, updateVisibleVenues]);
-
-  // マーカーのハイライト色・前面表示を一括更新する関数
-  const updateMarkerColors = useCallback((selectedId: string | null) => {
-    markersRef.current.forEach(({ venue, pinEl, dotEl, el }) => {
-      const isSelected = venue.id === selectedId;
-      pinEl.style.background = isSelected ? '#FFF100' : '#E6007E';
-      pinEl.style.boxShadow = isSelected
-        ? '0 4px 14px rgba(0,0,0,0.35)'
-        : '0 4px 12px rgba(230,0,126,0.45)';
-      pinEl.style.transform = isSelected ? 'scale(1.1) rotate(-45deg)' : 'scale(1) rotate(-45deg)';
-      dotEl.style.background = isSelected ? '#000000' : '#ffffff';
-      if (el) {
-        el.style.zIndex = isSelected ? '10' : '1';
-      }
-    });
-  }, []);
 
   // 会場マーカーの配置・更新
   const renderMarkers = useCallback(
@@ -400,6 +432,21 @@ export default function FestivalMap({
         'top-right'
       );
 
+      // 縮尺コントロール（メートル単位: m / km 表記）
+      map.addControl(
+        new maplibregl.ScaleControl({
+          maxWidth: 100,
+          unit: 'metric',
+        }),
+        'bottom-left'
+      );
+
+      // 全画面表示コントロール（右下）
+      map.addControl(
+        new maplibregl.FullscreenControl(),
+        'bottom-right'
+      );
+
       map.addControl(
         new maplibregl.AttributionControl({ compact: true }),
         'bottom-right'
@@ -520,6 +567,23 @@ export default function FestivalMap({
           box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.18) !important;
           padding: 16px 18px 14px 18px !important;
           border: 1px solid #e2e8f0 !important;
+        }
+        .maplibregl-ctrl-scale {
+          background-color: rgba(255, 255, 255, 0.7) !important;
+          backdrop-filter: blur(2px) !important;
+          border-radius: 2px !important;
+          border-width: 1.5px !important;
+          border-style: solid !important;
+          border-color: #64748b !important;
+          border-top: none !important;
+          font-weight: 700 !important;
+          font-size: 10px !important;
+          color: #475569 !important;
+          padding: 1px 4px !important;
+          box-shadow: none !important;
+          margin-bottom: 6px !important;
+          margin-left: 6px !important;
+          line-height: 1.2 !important;
         }
       `}</style>
 
