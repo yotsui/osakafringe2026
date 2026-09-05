@@ -30,16 +30,6 @@ export interface Venue {
   capacity?: number;
 }
 
-export interface PerformanceSchedule {
-  date: string; // YYYY-MM-DD
-  startTime: string; // HH:mm
-  endTime: string; // HH:mm
-  venueId?: string; // 公演日時に会場が紐づく
-  venueName?: string;
-  venueNameEn?: string;
-  note?: string;
-}
-
 // ユーザー指定の8大ジャンル
 export type PerformanceGenre = 
   | 'street'      // 大道芸
@@ -51,11 +41,43 @@ export type PerformanceGenre =
   | 'exhibition'  // 作品展示
   | 'other';      // その他
 
+export interface Artist {
+  id: string;
+  name: string;
+  nameEn?: string;
+  origin?: string; // 拠点・出身 (例: "大阪 / 日本", "UK / Australia")
+  originEn?: string;
+  genre?: PerformanceGenre;
+  profile: string;
+  profileEn?: string;
+  image?: string;
+  images?: string[];
+  websiteUrl?: string;
+  snsTwitter?: string;
+  snsInstagram?: string;
+  snsYoutube?: string;
+  snsFacebook?: string;
+  snsOther?: string;
+  isFeatured?: boolean;
+}
+
+export interface PerformanceSchedule {
+  date: string; // YYYY-MM-DD
+  startTime: string; // HH:mm
+  endTime: string; // HH:mm
+  venueId?: string; // 公演日時に会場が紐づく
+  venueName?: string;
+  venueNameEn?: string;
+  note?: string;
+}
+
 export interface Performance {
   id: string;
   title: string;
   titleEn?: string;
-  artistName: string;
+  artistId: string;
+  artist?: Artist;
+  artistName?: string; // フォールバック・互換用 (artist.name)
   artistNameEn?: string;
   genre: PerformanceGenre;
   genreCustom?: string;
@@ -68,35 +90,10 @@ export interface Performance {
   ticketPrice?: string;
   ticketPriceEn?: string;
   ticketUrl?: string; // 空の場合は非表示
-  websiteUrl?: string;
-  snsTwitter?: string;
-  snsInstagram?: string;
-  snsYoutube?: string;
-  image: string;
+  image: string;      // メインビジュアル
+  images?: string[];  // 追加ギャラリー写真
   isFeatured?: boolean;
   durationMinutes?: number;
-}
-
-export interface Award {
-  id: string;
-  year: number;
-  awardName?: string;
-  awardNameEn?: string;
-  title?: string;
-  titleEn?: string;
-  category: string;
-  categoryEn?: string;
-  winnerName?: string;
-  winnerNameEn?: string;
-  winner?: string;
-  winnerEn?: string;
-  performanceTitle?: string;
-  performanceTitleEn?: string;
-  workTitle?: string;
-  workTitleEn?: string;
-  comment: string;
-  commentEn?: string;
-  image?: string;
 }
 
 export interface Partner {
@@ -108,7 +105,6 @@ export interface Partner {
   description?: string;
   descriptionEn?: string;
   category?: string;
-  order?: number;
 }
 
 export interface Banner {
@@ -144,9 +140,6 @@ export interface SiteInfo {
   donationTextEn?: string;
   donationBankInfo?: string;
   donationBankInfoEn?: string;
-  donationCrowdfundUrl?: string;
-  donationCrowdfundingUrl?: string;
-  googleFormUrl?: string;
   newsNotice?: string;
   newsNoticeEn?: string;
   newsNoticeUrl?: string;
@@ -154,5 +147,4 @@ export interface SiteInfo {
   officialXUrl?: string;
   officialWebsiteUrl?: string;
   contactEmail?: string;
-  awardsEnabled?: boolean; // 今年のアワード非表示フラグ（デフォルトfalse）
 }

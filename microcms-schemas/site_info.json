@@ -121,12 +121,6 @@
       "required": false
     },
     {
-      "fieldId": "donationCrowdfundUrl",
-      "name": "クラウドファンディングURL",
-      "kind": "text",
-      "required": false
-    },
-    {
       "fieldId": "officialInstagramUrl",
       "name": "公式Instagram URL",
       "kind": "text",
@@ -151,12 +145,6 @@
       "required": false
     },
     {
-      "fieldId": "googleFormUrl",
-      "name": "アーティスト応募・お問い合わせ用GoogleフォームURL",
-      "kind": "text",
-      "required": false
-    },
-    {
       "fieldId": "newsNotice",
       "name": "緊急告知・お知らせバナー（日本語）",
       "kind": "text",
@@ -172,12 +160,6 @@
       "fieldId": "newsNoticeUrl",
       "name": "お知らせリンク先URL",
       "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "awardsEnabled",
-      "name": "アワードページ有効フラグ",
-      "kind": "boolean",
       "required": false
     }
   ],

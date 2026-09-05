@@ -1,17 +1,20 @@
 import React from 'react';
-import { getPerformances, getVenues } from '@/lib/microcms';
+import { getArtists, getPerformances, getVenues } from '@/lib/microcms';
 import ArtistsClient from './ArtistsClient';
 
 export const metadata = {
-  title: 'アーティスト・公演一覧 | OSAKA FRINGE FESTIVAL 2026',
-  description: '大阪フリンジフェスティバルに参加する全アーティストと公演情報の一覧。',
+  title: 'アーティスト・劇団一覧 | OSAKA FRINGE FESTIVAL 2026',
+  description: '大阪フリンジフェスティバルに参加する全アーティスト・劇団情報と公演一覧。',
 };
 
+export const revalidate = 60;
+
 export default async function ArtistsPage() {
-  const [performances, venues] = await Promise.all([
+  const [artists, performances, venues] = await Promise.all([
+    getArtists(),
     getPerformances(),
     getVenues(),
   ]);
 
-  return <ArtistsClient performances={performances} venues={venues} />;
+  return <ArtistsClient artists={artists} performances={performances} venues={venues} />;
 }

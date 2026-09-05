@@ -13,16 +13,10 @@
       "required": false
     },
     {
-      "fieldId": "artistName",
-      "name": "アーティスト名（日本語）",
+      "fieldId": "artistId",
+      "name": "出演アーティストID（例: gekidan-osaka-chaos）",
       "kind": "text",
       "required": true
-    },
-    {
-      "fieldId": "artistNameEn",
-      "name": "アーティスト名（英語）",
-      "kind": "text",
-      "required": false
     },
     {
       "fieldId": "genre",
@@ -62,8 +56,9 @@
     },
     {
       "fieldId": "schedules",
-      "name": "公演スケジュール（JSON配列）",
-      "kind": "textArea",
+      "name": "公演スケジュール（繰り返しフィールド）",
+      "kind": "custom",
+      "customField": "scheduleItem",
       "required": false
     },
     {
@@ -85,32 +80,20 @@
       "required": false
     },
     {
-      "fieldId": "websiteUrl",
-      "name": "アーティスト公式サイトURL",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "snsTwitter",
-      "name": "アーティストX（Twitter）URL",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "snsInstagram",
-      "name": "アーティストInstagram URL",
-      "kind": "text",
-      "required": false
-    },
-    {
       "fieldId": "image",
-      "name": "メインビジュアル画像",
+      "name": "公演メインビジュアル画像",
+      "kind": "media",
+      "required": false
+    },
+    {
+      "fieldId": "images",
+      "name": "公演追加ギャラリー写真（複数画像）",
       "kind": "media",
       "required": false
     },
     {
       "fieldId": "isFeatured",
-      "name": "おすすめ・注目フラグ",
+      "name": "おすすめ・注目公演フラグ",
       "kind": "boolean",
       "required": false
     },
@@ -121,5 +104,42 @@
       "required": false
     }
   ],
-  "customFields": []
+  "customFields": [
+    {
+      "id": "scheduleItem",
+      "name": "公演日程・時間・会場",
+      "fields": [
+        {
+          "fieldId": "date",
+          "name": "公演日（例: 2026-10-08）",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "fieldId": "startTime",
+          "name": "開演時刻（例: 19:00）",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "fieldId": "endTime",
+          "name": "終演時刻（例: 20:15）",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "fieldId": "venueId",
+          "name": "会場ID（例: nakazaki-hall ※空欄の場合は主会場）",
+          "kind": "text",
+          "required": false
+        },
+        {
+          "fieldId": "note",
+          "name": "備考（例: 初日、千秋楽、アフタートーク有）",
+          "kind": "text",
+          "required": false
+        }
+      ]
+    }
+  ]
 }

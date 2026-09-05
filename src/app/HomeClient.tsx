@@ -2,20 +2,18 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Venue, Performance, Award, SiteInfo, Partner } from '@/types';
+import { Venue, Performance, SiteInfo, Partner } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import HomeHeroClient from './HomeHeroClient';
 import PerformanceCard from '@/components/audience/PerformanceCard';
 import PerformanceModal from '@/components/audience/PerformanceModal';
 import PartnerSection from '@/components/common/PartnerSection';
 import { ArrowRightIcon } from '@/components/common/CustomIcons';
-
 import { selectFeaturedPerformances } from '@/utils/performanceUtils';
 
 interface HomeClientProps {
   venues: Venue[];
   performances: Performance[];
-  awards: Award[];
   partners?: Partner[];
   siteInfo: SiteInfo;
 }
@@ -23,14 +21,13 @@ interface HomeClientProps {
 export default function HomeClient({
   venues,
   performances,
-  awards,
   partners = [],
   siteInfo,
 }: HomeClientProps) {
   const { t, getText } = useLanguage();
   const [selectedPerformance, setSelectedPerformance] = useState<Performance | null>(null);
 
-  // Smart selection for 3 featured shows (Filter past shows & fallback intelligently)
+  // Smart selection for 3 featured shows
   const displayPerformances = selectFeaturedPerformances(performances, 3);
 
   const aboutTitle = getText(siteInfo.aboutTitle, siteInfo.aboutTitleEn);

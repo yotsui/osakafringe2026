@@ -17,7 +17,6 @@ export const translations: Dictionary = {
   navAbout: { ja: 'Osaka Fringeとは', en: 'About' },
   navVenues: { ja: '会場一覧', en: 'Venues' },
   navArtists: { ja: 'アーティスト', en: 'Artists' },
-  navAwards: { ja: 'Award', en: 'Awards' },
   navDonate: { ja: '寄付・応援', en: 'Support & Donate' },
   navContact: { ja: 'お問い合わせ', en: 'Contact' },
   
@@ -37,10 +36,6 @@ export const translations: Dictionary = {
   launchApp: { ja: 'Audience App を起動する', en: 'Launch Audience App' },
   aboutPreviewBadge: { ja: 'ABOUT OSAKA FRINGE', en: 'ABOUT OSAKA FRINGE' },
   readMore: { ja: '詳しく読む', en: 'Read More' },
-  awardsPreviewBadge: { ja: 'OSAKA FRINGE AWARDS', en: 'OSAKA FRINGE AWARDS' },
-  awardsPreviewTitle: { ja: 'Osaka Fringe Awards', en: 'Osaka Fringe Awards' },
-  awardsPreviewSubtitle: { ja: '観客と審査員が選ぶ、未来を拓く最優秀作品', en: 'Honoring breakthrough works chosen by audience and jury' },
-  viewPastWinners: { ja: '歴代受賞者を見る', en: 'View Past Winners' },
   
   // Audience App
   audienceTitle: { ja: 'Audience App（観客向け公演ガイド）', en: 'Audience App (Festival Guide)' },
@@ -88,8 +83,11 @@ export const translations: Dictionary = {
   minutes: { ja: '分', en: 'min' },
   priceLabel: { ja: '料金 / Ticket Price', en: 'Ticket Price' },
   inquirePrice: { ja: '要問合せ', en: 'Inquire' },
-  aboutTheShow: { ja: '公演について / ABOUT THE SHOW', en: 'ABOUT THE SHOW' },
+  aboutTheShow: { ja: '公演概要 / ABOUT THE SHOW', en: 'ABOUT THE SHOW' },
+  aboutTheArtist: { ja: 'アーティスト紹介 / ABOUT THE ARTIST', en: 'ABOUT THE ARTIST' },
+  artistOrigin: { ja: '拠点・出身', en: 'Origin / Base' },
   officialLinks: { ja: '公式リンク & SNS', en: 'Official Links & Social' },
+  performancePhotos: { ja: '公演写真・ギャラリー', en: 'Performance Photos' },
   
   // Venues Page
   venuesPageBadge: { ja: 'FESTIVAL VENUES & MAP', en: 'FESTIVAL VENUES & MAP' },
@@ -105,25 +103,15 @@ export const translations: Dictionary = {
   photosCount: { ja: '枚の写真', en: 'photos' },
   
   // Artists Page
-  artistsPageBadge: { ja: 'ARTISTS & SHOWS', en: 'ARTISTS & SHOWS' },
-  artistsPageTitle: { ja: 'アーティスト・公演一覧', en: 'Artists & Performances' },
-  artistsPageSubtitle: { ja: '世界と日本から集まった情熱あふれる表現者たち。', en: 'Passionate performing artists from Japan and across the globe.' },
+  artistsPageBadge: { ja: 'FESTIVAL ARTISTS', en: 'FESTIVAL ARTISTS' },
+  artistsPageTitle: { ja: 'アーティスト・劇団一覧', en: 'Festival Artists & Companies' },
+  artistsPageSubtitle: { ja: '日本全国・世界各地から集結した、情熱と独創性あふれる表現者たち。', en: 'Passionate and visionary performing artists gathered from Osaka, Japan, and worldwide.' },
+  artistsCountUnit: { ja: '組のアーティスト', en: 'artists' },
+  artistProfileTitle: { ja: 'プロフィール・略歴', en: 'Profile / Bio' },
+  artistShowsTitle: { ja: 'フェスティバル上演作品', en: 'Festival Performances' },
   schedulesCount: { ja: '公演スケジュール', en: 'Schedules' },
   viewOnAudienceApp: { ja: 'Audience App で詳しく見る', en: 'View Details on Audience App' },
-  
-  // Awards Page
-  awardsPageBadge: { ja: 'OSAKA FRINGE AWARDS', en: 'OSAKA FRINGE AWARDS' },
-  awardsPageTitle: { ja: 'Osaka Fringe Awards', en: 'Osaka Fringe Awards' },
-  awardsPageSubtitle: { ja: '挑戦的な表現を称え、次なる世界舞台へと送り出すフリンジアワード。', en: 'Celebrating daring artistic expression and launching creators to international stages.' },
-  awardsOverview: { ja: 'アワード概要 & 特典', en: 'Awards Overview & Honors' },
-  grandPrixTitle: { ja: 'Osaka Fringe Grand Prix', en: 'Osaka Fringe Grand Prix' },
-  grandPrixDesc: { ja: '審査員および海外フリンジディレクターにより選出される最優秀作品賞。副賞として海外主要フリンジ（エディンバラ等）への渡航・登録サポートが授与されます。', en: 'The top prize awarded by the jury and international fringe directors. Includes travel and registration grants for major overseas fringe festivals.' },
-  audienceChoiceTitle: { ja: 'Audience Choice Award', en: 'Audience Choice Award' },
-  audienceChoiceDesc: { ja: 'Audience Appを通じて観客から最も多くの票を集めた作品に贈られる観客賞。観客の「一番心に残った」をダイレクトに反映します。', en: 'Voted directly by festival audiences via the Audience App to honor the show that captured hearts the most.' },
-  innovationTitle: { ja: 'Innovation in Arts Award', en: 'Innovation in Arts Award' },
-  innovationDesc: { ja: '従来のジャンルや枠組みを大胆に打ち破る革新的な表現・演出を讃える審査員特別賞。', en: 'Special jury prize honoring ground-breaking, unconventional works pushing performance boundaries.' },
-  pastWinnersTitle: { ja: '歴代受賞作品一覧', en: 'Award Winners Archive' },
-  awardsComingSoon: { ja: '現在、第1回 Osaka Fringe Awards の審査準備中です。フェスティバル期間中に観客投票・審査が行われます。', en: 'Preparations are underway for the 1st Osaka Fringe Awards. Voting will open during the festival.' },
+  noShowsForArtist: { ja: '現在登録されている公演はありません', en: 'No performances currently listed' },
   
   // Donate Page
   donatePageBadge: { ja: 'SUPPORT & DONATE', en: 'SUPPORT & DONATE' },
@@ -154,8 +142,8 @@ export const translations: Dictionary = {
   feature1Desc: { ja: '審査や選考を排し、誰もが自由に表現を発表・挑戦できる舞台です。', en: 'Non-curated and democratic: an open stage for anyone with artistic passion.' },
   feature2Title: { ja: '街全体がステージ', en: 'City-wide Stage' },
   feature2Desc: { ja: '劇場だけでなく、カフェ、古民家、公園など大阪角々が劇場に変わります。', en: 'Transforming traditional houses, cafes, parks, and warehouses into vibrant stages.' },
-  feature3Title: { ja: '観客との共創', en: 'Co-created with Audience' },
-  feature3Desc: { ja: '観客の投票によってアワードが決まり、次世代アーティストを共に育てます。', en: 'Audience votes directly decide awards, nurturing tomorrow’s stage stars together.' },
+  feature3Title: { ja: '観客とのダイレクトな共創', en: 'Direct Connection with Audience' },
+  feature3Desc: { ja: 'アーティストと観客が密に交わり、街全体で熱気と創造性を育みます。', en: 'Artists and audience connect closely, generating spontaneous energy across the city.' },
   
   // Contact Page (Formspree Integrated)
   contactPageBadge: { ja: 'CONTACT US', en: 'CONTACT US' },

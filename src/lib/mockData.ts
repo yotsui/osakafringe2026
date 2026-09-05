@@ -1,4 +1,4 @@
-import { Venue, Performance, Award, Banner, SiteInfo, Partner } from '@/types';
+import { Venue, Artist, Performance, Banner, SiteInfo, Partner } from '@/types';
 
 export const mockVenues: Venue[] = [
   {
@@ -111,13 +111,110 @@ export const mockVenues: Venue[] = [
   },
 ];
 
+export const mockArtists: Artist[] = [
+  {
+    id: 'gekidan-osaka-chaos',
+    name: '劇団オオサカ・カオス',
+    nameEn: 'Gekidan Osaka Chaos',
+    origin: '大阪 / 日本',
+    originEn: 'Osaka / Japan',
+    genre: 'theater',
+    profile: '大阪を拠点に活動する身体表現×現代演劇集団。アクロバティックな身体性とエレクトロ浪曲を融合させた独自のスタイルで、国内外の観客から熱狂的な支持を集める。',
+    profileEn: 'An Osaka-based avant-garde physical theater company blending energetic acrobatic movement and electro-traditional rokyoku chanting.',
+    image: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1469488865564-c2de10f69f96?auto=format&fit=crop&w=800&q=80'
+    ],
+    websiteUrl: 'https://osakafringe.com',
+    snsTwitter: 'https://twitter.com/osakafringe',
+    snsInstagram: 'https://instagram.com/osakafringe',
+    isFeatured: true,
+  },
+  {
+    id: 'alexei-and-maya',
+    name: 'Alexei & Maya',
+    nameEn: 'Alexei & Maya',
+    origin: 'UK / Australia',
+    originEn: 'UK / Australia',
+    genre: 'street',
+    profile: 'エディンバラ・フリンジで数々の賞を受賞した国際デュオ。重力を超える空中アクロバットとファイヤーフープのスペクタクルを展開。',
+    profileEn: 'Award-winning international street circus duo bringing breathtaking aerial acrobatics and fire hoop artistry to the city streets.',
+    image: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80'
+    ],
+    websiteUrl: 'https://osakafringe.com',
+    snsInstagram: 'https://instagram.com/osakafringe',
+    isFeatured: true,
+  },
+  {
+    id: 'kenji-comedy',
+    name: 'Kenji & The International Osaka Club',
+    nameEn: 'Kenji & The International Osaka Club',
+    origin: '大阪 / 日本',
+    originEn: 'Osaka / Japan',
+    genre: 'dance',
+    profile: '大阪在住のバイリンガルコメディアンたちによるスタンドアップコメディ集団。大阪カルチャー、食文化、国際感覚をユーモラスに交差させたステージを届ける。',
+    profileEn: 'A bilingual stand-up comedy collective exploring Osaka culture, food obsessions, and international culture shocks.',
+    image: 'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?auto=format&fit=crop&w=800&q=80',
+    websiteUrl: 'https://osakafringe.com',
+    snsYoutube: 'https://youtube.com/@osakafringe',
+    isFeatured: true,
+  },
+  {
+    id: 'sakuya-dance',
+    name: '咲夜 -Sakuya-',
+    nameEn: 'Sakuya',
+    origin: '京都・大阪 / 日本',
+    originEn: 'Kyoto & Osaka / Japan',
+    genre: 'traditional',
+    profile: '伝統的な上方舞と現代三味線の奏者によるコラボレーションユニット。幽玄な伝統美にコンテンポラリーの即興性を重ね合わせ、日本の古典芸能を革新する。',
+    profileEn: 'A collaboration unit between classical Kamigata dance masters and contemporary shamisen players.',
+    image: 'https://images.unsplash.com/photo-1528164344705-475426879c0d?auto=format&fit=crop&w=800&q=80',
+    websiteUrl: 'https://osakafringe.com',
+    snsTwitter: 'https://twitter.com/osakafringe',
+    isFeatured: false,
+  },
+  {
+    id: 'naniwa-hyoshigi',
+    name: 'なにわ拍子木座',
+    nameEn: 'Naniwa Hyoshigi-za',
+    origin: '大阪 / 日本',
+    originEn: 'Osaka / Japan',
+    genre: 'kamishibai',
+    profile: '昭和レトロな自転車紙芝居を現代に蘇らせる街頭紙芝居師。子どもから大人まで巻き込む参加型パフォーマンスを展開。',
+    profileEn: 'Interactive picture storytelling artists performing from vintage bicycle carts. Fun and nostalgic for all generations.',
+    image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80',
+    websiteUrl: 'https://osakafringe.com',
+    isFeatured: false,
+  },
+  {
+    id: 'studio-ripple',
+    name: 'Studio Ripple',
+    nameEn: 'Studio Ripple',
+    origin: '大阪・ベルリン',
+    originEn: 'Osaka & Berlin',
+    genre: 'exhibition',
+    profile: '大阪とベルリンを拠点に、水・音・光の相互作用を探求するメディアアートコレクティブ。',
+    profileEn: 'An international media art collective exploring the intersection of water dynamics, urban acoustics, and responsive light.',
+    image: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=800&q=80',
+    websiteUrl: 'https://osakafringe.com',
+    snsTwitter: 'https://twitter.com/osakafringe',
+    snsInstagram: 'https://instagram.com/osakafringe',
+    isFeatured: false,
+  },
+];
+
 export const mockPerformances: Performance[] = [
   {
     id: 'perf-1',
     title: 'ネオ浪速フィジカルシアター『道頓堀の底から』',
     titleEn: 'Neo Naniwa Physical Theater: From the Depths of Dotonbori',
-    artistName: '劇団オオサカ・カオス (Japan)',
-    artistNameEn: 'Gekidan Osaka Chaos (Japan)',
+    artistId: 'gekidan-osaka-chaos',
+    artistName: '劇団オオサカ・カオス',
+    artistNameEn: 'Gekidan Osaka Chaos',
     genre: 'theater',
     genreCustom: 'フィジカルシアター',
     genreCustomEn: 'Physical Theater',
@@ -132,9 +229,11 @@ export const mockPerformances: Performance[] = [
     ticketPrice: '前売 ¥2,500 / 当日 ¥3,000 / 学生 ¥1,500',
     ticketPriceEn: 'Adv: ¥2,500 / Door: ¥3,000 / Student: ¥1,500',
     ticketUrl: 'https://osakafringe.com',
-    websiteUrl: 'https://osakafringe.com',
-    snsTwitter: 'https://twitter.com/osakafringe',
     image: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=800&q=80'
+    ],
     isFeatured: true,
     durationMinutes: 75,
   },
@@ -142,8 +241,9 @@ export const mockPerformances: Performance[] = [
     id: 'perf-2',
     title: 'Fire & Gravity: Street Circus Explosion',
     titleEn: 'Fire & Gravity: Street Circus Explosion',
-    artistName: 'Alexei & Maya (UK / Australia)',
-    artistNameEn: 'Alexei & Maya (UK / Australia)',
+    artistId: 'alexei-and-maya',
+    artistName: 'Alexei & Maya',
+    artistNameEn: 'Alexei & Maya',
     genre: 'street',
     genreCustom: '大道芸・ファイヤーフープ',
     genreCustomEn: 'Street Circus & Fire Hoop',
@@ -159,6 +259,9 @@ export const mockPerformances: Performance[] = [
     ticketPriceEn: 'Free entry / Tip-based',
     ticketUrl: '',
     image: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80'
+    ],
     isFeatured: true,
     durationMinutes: 45,
   },
@@ -166,6 +269,7 @@ export const mockPerformances: Performance[] = [
     id: 'perf-3',
     title: '浪速バイリンガルスタンドアップコメディ',
     titleEn: 'Osaka Stories: Bilingual Stand-up Comedy',
+    artistId: 'kenji-comedy',
     artistName: 'Kenji & The International Osaka Club',
     artistNameEn: 'Kenji & The International Osaka Club',
     genre: 'dance',
@@ -189,8 +293,9 @@ export const mockPerformances: Performance[] = [
     id: 'perf-4',
     title: '古典×現代 響きあう和の音色と舞',
     titleEn: 'Classical Resonance: Japanese Traditional Dance & Shamisen',
-    artistName: '咲夜 -Sakuya- (Kyoto / Osaka)',
-    artistNameEn: 'Sakuya (Kyoto / Osaka)',
+    artistId: 'sakuya-dance',
+    artistName: '咲夜 -Sakuya-',
+    artistNameEn: 'Sakuya',
     genre: 'traditional',
     genreCustom: '古典芸能・現代三味線',
     genreCustomEn: 'Traditional Arts & Modern Shamisen',
@@ -211,7 +316,8 @@ export const mockPerformances: Performance[] = [
     id: 'perf-5',
     title: '街頭紙芝居レボリューション 2026',
     titleEn: 'Street Kamishibai Revolution 2026',
-    artistName: 'なにわ拍子木座 (Naniwa Hyoshigi-za)',
+    artistId: 'naniwa-hyoshigi',
+    artistName: 'なにわ拍子木座',
     artistNameEn: 'Naniwa Hyoshigi-za',
     genre: 'kamishibai',
     genreCustom: '街頭紙芝居・水飴つき',
@@ -233,8 +339,9 @@ export const mockPerformances: Performance[] = [
     id: 'perf-6',
     title: '都市の呼吸：水都大阪インスタレーション',
     titleEn: 'Urban Breath: Aqua Metropolis Osaka Art Installation',
-    artistName: 'Studio Ripple (Osaka / Berlin)',
-    artistNameEn: 'Studio Ripple (Osaka / Berlin)',
+    artistId: 'studio-ripple',
+    artistName: 'Studio Ripple',
+    artistNameEn: 'Studio Ripple',
     genre: 'exhibition',
     genreCustom: 'サウンド＆ライト展示',
     genreCustomEn: 'Sound & Light Art Installation',
@@ -252,8 +359,6 @@ export const mockPerformances: Performance[] = [
     durationMinutes: 60,
   },
 ];
-
-export const mockAwards: Award[] = [];
 
 export const mockBanners: Banner[] = [
   {
@@ -326,14 +431,10 @@ Branch: Abeno Branch
 Account Type: Ordinary / Savings
 Account Number: 8173108
 Account Name: OSAKA BUNKA FRINGE KIKOU SETSURITSU JUNBISHITSU`,
-  donationCrowdfundUrl: 'https://camp-fire.jp/example-osaka-fringe',
-  donationCrowdfundingUrl: 'https://camp-fire.jp/example-osaka-fringe',
-  googleFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLScX_ExampleFormId/viewform?embedded=true',
   officialInstagramUrl: 'https://www.instagram.com/osakafringe',
   officialXUrl: 'https://twitter.com/osakafringe',
   officialWebsiteUrl: 'https://osakafringe.com',
   contactEmail: 'info@osakafringe.com',
-  awardsEnabled: false,
 };
 
 export const mockPartners: Partner[] = [
@@ -346,7 +447,6 @@ export const mockPartners: Partner[] = [
     description: '水都大阪の魅力を世界へ発信する大阪観光局。大阪フリンジの観光・インバウンド連携パートナー。',
     descriptionEn: 'Official tourism board promoting Osaka worldwide as an international cultural hub.',
     category: 'tourism',
-    order: 1,
   },
   {
     id: 'partner-tomofes',
@@ -357,7 +457,6 @@ export const mockPartners: Partner[] = [
     description: '大阪を舞台に人と街がつながる都市型カルチャーフェスティバル。連携企画を実施。',
     descriptionEn: 'Urban cultural festival connecting people and community in Osaka.',
     category: 'partner_event',
-    order: 2,
   },
   {
     id: 'partner-minami',
@@ -368,6 +467,5 @@ export const mockPartners: Partner[] = [
     description: '心斎橋・道頓堀・アメリカ村を舞台にしたミナミエリア連携アートフェス。',
     descriptionEn: 'Minami area collaborative art and performance festival.',
     category: 'partner_event',
-    order: 3,
   },
 ];

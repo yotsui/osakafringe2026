@@ -106,8 +106,8 @@ export default function AudienceApp({
         const q = searchQuery.toLowerCase();
         const titleJa = perf.title.toLowerCase();
         const titleEn = (perf.titleEn || '').toLowerCase();
-        const artistJa = perf.artistName.toLowerCase();
-        const artistEn = (perf.artistNameEn || '').toLowerCase();
+        const artistJa = (perf.artist?.name || perf.artistName || '').toLowerCase();
+        const artistEn = (perf.artist?.nameEn || perf.artistNameEn || '').toLowerCase();
         const descJa = perf.description.toLowerCase();
         const descEn = (perf.descriptionEn || '').toLowerCase();
 

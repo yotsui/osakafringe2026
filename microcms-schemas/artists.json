@@ -1,0 +1,83 @@
+{
+  "apiFields": [
+    {
+      "fieldId": "name",
+      "name": "アーティスト・劇団名（日本語）",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "nameEn",
+      "name": "アーティスト・劇団名（英語）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "origin",
+      "name": "拠点・出身地（日本語 例: 大阪 / 日本）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "originEn",
+      "name": "拠点・出身地（英語 例: Osaka, Japan）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "genre",
+      "name": "メインジャンル（street/dance/music/theater/traditional/kamishibai/exhibition/other）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "profile",
+      "name": "プロフィール・略歴（日本語）",
+      "kind": "textArea",
+      "required": true
+    },
+    {
+      "fieldId": "profileEn",
+      "name": "プロフィール・略歴（英語）",
+      "kind": "textArea",
+      "required": false
+    },
+    {
+      "fieldId": "image",
+      "name": "アーティスト写真・メイン画像",
+      "kind": "media",
+      "required": false
+    },
+    {
+      "fieldId": "websiteUrl",
+      "name": "公式サイトURL",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "snsTwitter",
+      "name": "X（Twitter）URL",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "snsInstagram",
+      "name": "Instagram URL",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "snsYoutube",
+      "name": "YouTube URL",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "isFeatured",
+      "name": "注目アーティストフラグ",
+      "kind": "boolean",
+      "required": false
+    }
+  ],
+  "customFields": []
+}

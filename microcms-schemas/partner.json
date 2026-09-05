@@ -41,12 +41,6 @@
       "name": "パートナー区分（観光局/連携フェス/会場協力/スポンサー等）",
       "kind": "text",
       "required": false
-    },
-    {
-      "fieldId": "order",
-      "name": "表示順（数値）",
-      "kind": "number",
-      "required": false
     }
   ],
   "customFields": []
