@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import Link from 'next/link';
 import { Venue, Performance } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
-import { Navigation, ExternalLink, Calendar, Train, Printer } from 'lucide-react';
+import { Navigation, ExternalLink, Calendar, Train } from 'lucide-react';
 import {
   OSAKA_TRANSIT_LINES,
   OSAKA_TRANSIT_STATIONS,
@@ -593,17 +592,6 @@ export default function FestivalMap({
         {/* Vector Map Container */}
         <div className="lg:col-span-8 relative rounded-2xl overflow-hidden min-h-[460px] lg:min-h-[600px] bg-slate-100 border border-slate-200 isolate">
           <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />
-
-          {/* Quick SVG Export Tool Button */}
-          <div className="absolute top-3 left-3 z-10">
-            <Link
-              href="/svgmapgenerator"
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-slate-900 text-white font-black text-xs shadow-md border border-slate-700/80 backdrop-blur-md transition-all hover:scale-105 cursor-pointer"
-            >
-              <Printer className="w-3.5 h-3.5 text-[#E6007E]" />
-              <span>印刷用SVG出力 (Illustrator)</span>
-            </Link>
-          </div>
 
           {/* Map Legend: Osaka Metro 9 Lines (将来表示用として保持・現在は非表示) */}
           <div className="hidden absolute bottom-4 left-4 z-10 bg-white/95 backdrop-blur-md p-3 rounded-2xl border border-slate-200/90 shadow-lg flex-col gap-2 max-w-sm">
