@@ -10,8 +10,7 @@ import {
   BookOpen, 
   Theater, 
   Landmark, 
-  Building2,
-  ImageOff
+  Building2
 } from 'lucide-react';
 import { PerformanceGenre } from '@/types';
 
@@ -57,6 +56,40 @@ const GENRE_STYLES: Record<string, { bg: string; icon: React.ComponentType<{ cla
   },
 };
 
+/**
+ * microCMS (imgix) や Unsplash などの CDN 画像 URL に最適化パラメータを付与
+ */
+function optimizeCdnImageUrl(url: string, quality: number = 75): string {
+  if (!url) return url;
+  try {
+    // microCMS (imgix)
+    if (url.includes('images.microcms-assets.io')) {
+      const parsed = new URL(url);
+      if (!parsed.searchParams.has('auto')) {
+        parsed.searchParams.set('auto', 'format,compress');
+      }
+      if (!parsed.searchParams.has('q')) {
+        parsed.searchParams.set('q', quality.toString());
+      }
+      return parsed.toString();
+    }
+    // Unsplash
+    if (url.includes('unsplash.com')) {
+      const parsed = new URL(url);
+      if (!parsed.searchParams.has('auto')) {
+        parsed.searchParams.set('auto', 'format');
+      }
+      if (!parsed.searchParams.has('q')) {
+        parsed.searchParams.set('q', quality.toString());
+      }
+      return parsed.toString();
+    }
+  } catch {
+    return url;
+  }
+  return url;
+}
+
 export default function SafeImage({
   src,
   alt,
@@ -67,6 +100,8 @@ export default function SafeImage({
   fill,
   width,
   height,
+  quality = 75,
+  sizes,
   ...rest
 }: SafeImageProps) {
   const [hasError, setHasError] = useState(false);
@@ -107,13 +142,17 @@ export default function SafeImage({
     );
   }
 
+  const optimizedSrc = optimizeCdnImageUrl(src, Number(quality) || 75);
+
   return (
     <Image
-      src={src}
+      src={optimizedSrc}
       alt={alt || 'Osaka Fringe Festival'}
       fill={fill}
       width={width}
       height={height}
+      quality={quality}
+      sizes={sizes || (fill ? '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw' : undefined)}
       className={className}
       onError={() => setHasError(true)}
       {...rest}

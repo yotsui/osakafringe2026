@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Venue, Performance } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import { Navigation, ExternalLink, Calendar, Train } from 'lucide-react';
+import SafeImage from '@/components/common/SafeImage';
 import {
   OSAKA_TRANSIT_LINES,
   OSAKA_TRANSIT_STATIONS,
@@ -629,11 +630,25 @@ export default function FestivalMap({
         {/* Venue Info Side Panel */}
         <div className="lg:col-span-4 flex flex-col justify-between space-y-6 p-2 sm:p-4">
           {activeVenue ? (
-            <div className="space-y-5">
-              <div className="space-y-2 border-b border-pink-100 pb-4">
-                <span className="inline-block px-3 py-1 rounded-full bg-pink-50 text-[#E6007E] font-black text-xs uppercase tracking-wide">
+            <div className="space-y-4">
+              {/* Venue Thumbnail Image */}
+              <div className="relative aspect-16/9 w-full rounded-2xl overflow-hidden bg-slate-900 shadow-xs">
+                <SafeImage
+                  src={activeVenue.image || (activeVenue.images && activeVenue.images[0])}
+                  alt={getText(activeVenue.name, activeVenue.nameEn)}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 380px"
+                  quality={75}
+                  fallbackType="venue"
+                  fallbackText={getText(activeVenue.name, activeVenue.nameEn)}
+                  className="object-cover"
+                />
+                <div className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full bg-[#E6007E] text-white font-black text-[11px] shadow-sm z-10">
                   {getText(activeVenue.area, activeVenue.areaEn)}
-                </span>
+                </div>
+              </div>
+
+              <div className="space-y-1.5 border-b border-pink-100 pb-3">
                 <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
                   {getText(activeVenue.name, activeVenue.nameEn)}
                 </h3>

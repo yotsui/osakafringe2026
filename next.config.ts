@@ -4,6 +4,8 @@ const nextConfig: NextConfig = {
   // Vercel環境以外かつBUILD_STANDALONE指定時のみstandaloneを出力（Vercelとのビルド競合を防止）
   output: process.env.BUILD_STANDALONE === 'true' ? 'standalone' : undefined,
   images: {
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 60 * 60 * 24 * 30, // 30日間のエッジ/ブラウザキャッシュ
     remotePatterns: [
       {
         protocol: 'https',

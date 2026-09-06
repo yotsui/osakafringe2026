@@ -103,6 +103,8 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                           src={photoGallery[0]}
                           alt={venueName}
                           fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 580px"
+                          quality={75}
                           fallbackType="venue"
                           fallbackText={venueName}
                           className="object-cover"
@@ -116,7 +118,15 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                         <div className="grid grid-cols-3 gap-2">
                           {photoGallery.slice(1, 4).map((imgUrl, imgIdx) => (
                             <div key={imgIdx} className="relative aspect-16/10 rounded-xl overflow-hidden bg-slate-900 border border-slate-100">
-                              <SafeImage src={imgUrl} alt={`${venueName} ${imgIdx + 2}`} fill fallbackType="venue" className="object-cover" />
+                              <SafeImage
+                                src={imgUrl}
+                                alt={`${venueName} ${imgIdx + 2}`}
+                                fill
+                                sizes="(max-width: 640px) 33vw, 180px"
+                                quality={70}
+                                fallbackType="venue"
+                                className="object-cover"
+                              />
                             </div>
                           ))}
                         </div>
