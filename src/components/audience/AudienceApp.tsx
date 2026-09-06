@@ -3,9 +3,19 @@
 import React, { useState, useMemo } from 'react';
 import { Performance, Venue } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
+import dynamic from 'next/dynamic';
 import PerformanceCard from './PerformanceCard';
 import PerformanceModal from './PerformanceModal';
-import FestivalMap from './FestivalMap';
+
+const FestivalMap = dynamic(() => import('./FestivalMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[600px] bg-slate-100 rounded-3xl animate-pulse flex flex-col items-center justify-center text-slate-400 gap-3 border border-slate-200">
+      <div className="w-8 h-8 border-3 border-[#E6007E] border-t-transparent rounded-full animate-spin" />
+      <span className="text-xs font-bold text-slate-500 tracking-wider">MAP LOADING...</span>
+    </div>
+  ),
+});
 import { 
   Search, 
   Filter, 

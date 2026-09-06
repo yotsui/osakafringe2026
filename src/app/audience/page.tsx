@@ -1,8 +1,8 @@
-﻿import React from 'react';
+import React from 'react';
 import { getPerformances, getVenues } from '@/lib/microcms';
 import AudienceApp from '@/components/audience/AudienceApp';
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 export const metadata = {
   title: 'Audience App | OSAKA FRINGE FESTIVAL 2026',

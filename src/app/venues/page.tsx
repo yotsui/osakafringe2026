@@ -7,6 +7,8 @@ export const metadata = {
   description: '大阪フリンジフェスティバルの全会場情報。住所、アクセス、Google Maps経路案内、各会場の公演一覧。',
 };
 
+export const revalidate = 300;
+
 export default async function VenuesPage() {
   const [venues, performances] = await Promise.all([
     getVenues(),

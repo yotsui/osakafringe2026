@@ -1,7 +1,9 @@
+import { cache } from 'react';
 import { createClient } from 'microcms-js-sdk';
 import { Venue, Artist, Performance, Banner, SiteInfo, PerformanceSchedule, Partner } from '@/types';
 import { mockVenues, mockArtists, mockPerformances, mockBanners, mockSiteInfo, mockPartners } from './mockData';
-import { translateIfEmpty } from './gemini';
+
+const REVALIDATE_TIME = 300; // 5分キャッシュ (ISR)
 
 const rawServiceDomain = process.env.MICROCMS_SERVICE_DOMAIN || process.env.NEXT_PUBLIC_MICROCMS_SERVICE_DOMAIN || '';
 // URL形式（https://xxx.microcms.io/）が渡された場合もサブドメイン部分（xxx）を安全に抽出
@@ -45,22 +47,14 @@ const DEFAULT_COORDINATES: Record<string, { lat: number; lng: number }> = {
 };
 
 /**
- * 会場一覧を取得（英語未入力時のAI自動翻訳＆キャッシュ対応）
+ * 会場一覧を取得 (React cache & ISR 300s)
  */
-export async function getVenues(): Promise<Venue[]> {
-  const normalizeVenue = async (v: any): Promise<Venue> => {
+export const getVenues = cache(async (): Promise<Venue[]> => {
+  const normalizeVenue = (v: any): Venue => {
     const imgUrl = extractImageUrl(v.image);
     const lat = v.lat != null && v.lat !== '' ? Number(v.lat) : (v.location?.lat ?? DEFAULT_COORDINATES[v.id]?.lat ?? 34.6937);
     const lng = v.lng != null && v.lng !== '' ? Number(v.lng) : (v.location?.lng ?? DEFAULT_COORDINATES[v.id]?.lng ?? 135.5023);
     const coords = { lat, lng };
-
-    const [nameEn, areaEn, addressEn, accessEn, descriptionEn] = await Promise.all([
-      translateIfEmpty(v.name, v.nameEn, 'Venue name in Osaka'),
-      translateIfEmpty(v.area, v.areaEn, 'Osaka area name'),
-      translateIfEmpty(v.address, v.addressEn, 'Address in Osaka'),
-      translateIfEmpty(v.access, v.accessEn, 'Transit access instructions'),
-      translateIfEmpty(v.description, v.descriptionEn, 'Venue description'),
-    ]);
 
     const images = Array.isArray(v.images)
       ? v.images.map(extractImageUrl).filter(Boolean) as string[]
@@ -68,11 +62,11 @@ export async function getVenues(): Promise<Venue[]> {
 
     return {
       ...v,
-      nameEn: nameEn || v.nameEn,
-      areaEn: areaEn || v.areaEn,
-      addressEn: addressEn || v.addressEn,
-      accessEn: accessEn || v.accessEn,
-      descriptionEn: descriptionEn || v.descriptionEn,
+      nameEn: v.nameEn || v.name,
+      areaEn: v.areaEn || v.area,
+      addressEn: v.addressEn || v.address,
+      accessEn: v.accessEn || v.access,
+      descriptionEn: v.descriptionEn || v.description,
       lat,
       lng,
       image: imgUrl,
@@ -87,7 +81,7 @@ export async function getVenues(): Promise<Venue[]> {
       const data = await client.getList<any>({
         endpoint: 'venues',
         queries: { limit: 100 },
-        customRequestInit: { cache: 'no-store' },
+        customRequestInit: { next: { revalidate: REVALIDATE_TIME } },
       });
       if (data.contents && data.contents.length > 0) {
         rawList = data.contents;
@@ -97,38 +91,32 @@ export async function getVenues(): Promise<Venue[]> {
     }
   }
 
-  return await Promise.all(rawList.map(normalizeVenue));
-}
+  return rawList.map(normalizeVenue);
+});
 
 /**
  * 会場詳細を取得
  */
-export async function getVenueById(id: string): Promise<Venue | undefined> {
+export const getVenueById = cache(async (id: string): Promise<Venue | undefined> => {
   const venues = await getVenues();
   return venues.find((v) => v.id === id);
-}
+});
 
 /**
- * アーティスト一覧を取得（英語未入力時のAI自動翻訳＆キャッシュ対応）
+ * アーティスト一覧を取得 (React cache & ISR 300s)
  */
-export async function getArtists(): Promise<Artist[]> {
-  const normalizeArtist = async (a: any): Promise<Artist> => {
+export const getArtists = cache(async (): Promise<Artist[]> => {
+  const normalizeArtist = (a: any): Artist => {
     const imgUrl = extractImageUrl(a.image);
-    const [nameEn, originEn, profileEn] = await Promise.all([
-      translateIfEmpty(a.name, a.nameEn, 'Artist/Theater group name'),
-      translateIfEmpty(a.origin, a.originEn, 'Artist origin city/country'),
-      translateIfEmpty(a.profile, a.profileEn, 'Artist biography and profile'),
-    ]);
-
     const images = Array.isArray(a.images)
       ? a.images.map(extractImageUrl).filter(Boolean) as string[]
       : (imgUrl ? [imgUrl] : []);
 
     return {
       ...a,
-      nameEn: nameEn || a.nameEn,
-      originEn: originEn || a.originEn,
-      profileEn: profileEn || a.profileEn,
+      nameEn: a.nameEn || a.name,
+      originEn: a.originEn || a.origin,
+      profileEn: a.profileEn || a.profile,
       image: imgUrl,
       images,
     };
@@ -140,7 +128,7 @@ export async function getArtists(): Promise<Artist[]> {
       const data = await client.getList<any>({
         endpoint: 'artists',
         queries: { limit: 100 },
-        customRequestInit: { cache: 'no-store' },
+        customRequestInit: { next: { revalidate: REVALIDATE_TIME } },
       });
       if (data.contents && data.contents.length > 0) {
         rawList = data.contents;
@@ -150,21 +138,21 @@ export async function getArtists(): Promise<Artist[]> {
     }
   }
 
-  return await Promise.all(rawList.map(normalizeArtist));
-}
+  return rawList.map(normalizeArtist);
+});
 
 /**
  * アーティスト詳細を取得
  */
-export async function getArtistById(id: string): Promise<Artist | undefined> {
+export const getArtistById = cache(async (id: string): Promise<Artist | undefined> => {
   const artists = await getArtists();
   return artists.find((a) => a.id === id);
-}
+});
 
 /**
- * 公演一覧を取得 (会場情報およびアーティスト情報をマージ & AI自動翻訳キャッシュ対応)
+ * 公演一覧を取得 (会場情報およびアーティスト情報をマージ & React cache & ISR 300s)
  */
-export async function getPerformances(): Promise<Performance[]> {
+export const getPerformances = cache(async (): Promise<Performance[]> => {
   const [venues, artists] = await Promise.all([
     getVenues(),
     getArtists(),
@@ -173,11 +161,11 @@ export async function getPerformances(): Promise<Performance[]> {
   const venueMap = new Map(venues.map((v) => [v.id, v]));
   const artistMap = new Map(artists.map((a) => [a.id, a]));
 
-  const normalizePerformance = async (perf: any): Promise<Performance> => {
+  const normalizePerformance = (perf: any): Performance => {
     // 1. 画像URLの正規化
     const imgUrl = extractImageUrl(perf.image);
 
-    // 2. schedulesの安全なパース（繰り返しフィールド配列 または JSON文字列）
+    // 2. schedulesの安全なパース
     let rawSchedules: any[] = [];
     if (Array.isArray(perf.schedules)) {
       rawSchedules = perf.schedules;
@@ -189,7 +177,7 @@ export async function getPerformances(): Promise<Performance[]> {
       }
     }
 
-    // 2. アーティスト参照の解決
+    // 3. アーティスト参照の解決
     let resolvedArtist: Artist | undefined = undefined;
     let resolvedArtistId = '';
     
@@ -208,9 +196,9 @@ export async function getPerformances(): Promise<Performance[]> {
     }
 
     const artistName = resolvedArtist?.name || perf.artistName || '出演アーティスト';
-    const artistNameEn = resolvedArtist?.nameEn || perf.artistNameEn;
+    const artistNameEn = resolvedArtist?.nameEn || perf.artistNameEn || artistName;
 
-    // 3. メイン会場参照の解決
+    // 4. メイン会場参照の解決
     let mainVenue: Venue | undefined = undefined;
     let mainVenueId = '';
 
@@ -226,9 +214,9 @@ export async function getPerformances(): Promise<Performance[]> {
     }
 
     const venueName = mainVenue?.name || perf.venueName || '特設会場';
-    const venueNameEn = mainVenue?.nameEn || perf.venueNameEn;
+    const venueNameEn = mainVenue?.nameEn || perf.venueNameEn || venueName;
 
-    // 4. 公演日程（dates リピーターまたは schedules 配列）の展開と解決
+    // 5. 公演日程（dates リピーターまたは schedules 配列）の展開と解決
     const durationMins = typeof perf.durationMinutes === 'number' && perf.durationMinutes > 0 ? perf.durationMinutes : 60;
     let rawDateItems: any[] = [];
 
@@ -341,21 +329,9 @@ export async function getPerformances(): Promise<Performance[]> {
       });
     }
 
-    // 5. 日英翻訳の自動補完
+    // 6. 日英フォールバック
     const rawGenre = perf.genre || perf.genreCustom || '';
-    const rawGenreEn = perf.genreEn || perf.genreCustomEn || '';
-
-    const [
-      titleEn,
-      genreEnTranslated,
-      descriptionEn,
-      ticketPriceEn,
-    ] = await Promise.all([
-      translateIfEmpty(perf.title, perf.titleEn, 'Performance title in fringe festival'),
-      translateIfEmpty(rawGenre, rawGenreEn, 'Artistic genre subcategory'),
-      translateIfEmpty(perf.description, perf.descriptionEn, 'Performance synopsis'),
-      translateIfEmpty(perf.ticketPrice, perf.ticketPriceEn, 'Ticket price details'),
-    ]);
+    const rawGenreEn = perf.genreEn || perf.genreCustomEn || rawGenre;
 
     const images = Array.isArray(perf.images) 
       ? perf.images.map(extractImageUrl).filter(Boolean) as string[]
@@ -365,15 +341,15 @@ export async function getPerformances(): Promise<Performance[]> {
       ...perf,
       id: perf.id,
       title: perf.title,
-      titleEn: titleEn || perf.titleEn || perf.title,
+      titleEn: perf.titleEn || perf.title,
       genre: perf.genre || 'theater',
-      genreEn: genreEnTranslated || rawGenreEn,
+      genreEn: rawGenreEn,
       genreCustom: rawGenre,
-      genreCustomEn: genreEnTranslated || rawGenreEn,
+      genreCustomEn: rawGenreEn,
       description: perf.description,
-      descriptionEn: descriptionEn || perf.descriptionEn || perf.description,
+      descriptionEn: perf.descriptionEn || perf.description,
       ticketPrice: perf.ticketPrice,
-      ticketPriceEn: ticketPriceEn || perf.ticketPriceEn,
+      ticketPriceEn: perf.ticketPriceEn || perf.ticketPrice,
       ticketUrl: perf.ticketUrl,
       durationMinutes: durationMins,
       isFeatured: Boolean(perf.isFeatured),
@@ -399,6 +375,7 @@ export async function getPerformances(): Promise<Performance[]> {
       const data = await client.getList<any>({
         endpoint: 'performances',
         queries: { limit: 100 },
+        customRequestInit: { next: { revalidate: REVALIDATE_TIME } },
       });
       if (data.contents && data.contents.length > 0) {
         rawList = data.contents;
@@ -408,31 +385,26 @@ export async function getPerformances(): Promise<Performance[]> {
     }
   }
 
-  return await Promise.all(rawList.map(normalizePerformance));
-}
+  return rawList.map(normalizePerformance);
+});
 
 /**
  * 公演詳細を取得
  */
-export async function getPerformanceById(id: string): Promise<Performance | undefined> {
+export const getPerformanceById = cache(async (id: string): Promise<Performance | undefined> => {
   const list = await getPerformances();
   return list.find((p) => p.id === id);
-}
+});
 
 /**
- * パートナー/連携団体一覧を取得 (microCMSの並び順で取得 & AI自動翻訳キャッシュ対応)
+ * パートナー/連携団体一覧を取得 (React cache & ISR 300s)
  */
-export async function getPartners(): Promise<Partner[]> {
-  const normalizePartner = async (p: any): Promise<Partner> => {
-    const [nameEn, descriptionEn] = await Promise.all([
-      translateIfEmpty(p.name, p.nameEn, 'Partner organization name'),
-      translateIfEmpty(p.description, p.descriptionEn, 'Partner description'),
-    ]);
-
+export const getPartners = cache(async (): Promise<Partner[]> => {
+  const normalizePartner = (p: any): Partner => {
     return {
       ...p,
-      nameEn: nameEn || p.nameEn,
-      descriptionEn: descriptionEn || p.descriptionEn,
+      nameEn: p.nameEn || p.name,
+      descriptionEn: p.descriptionEn || p.description,
       image: extractImageUrl(p.image) || p.image || '',
       url: p.url || p.linkUrl || '#',
     };
@@ -444,6 +416,7 @@ export async function getPartners(): Promise<Partner[]> {
       const data = await client.getList<any>({
         endpoint: 'partner',
         queries: { limit: 50 },
+        customRequestInit: { next: { revalidate: REVALIDATE_TIME } },
       });
       if (data.contents && data.contents.length > 0) {
         rawList = data.contents;
@@ -453,13 +426,13 @@ export async function getPartners(): Promise<Partner[]> {
     }
   }
 
-  return await Promise.all(rawList.map(normalizePartner));
-}
+  return rawList.map(normalizePartner);
+});
 
 /**
- * バナー一覧を取得 (互換用)
+ * バナー一覧を取得 (React cache & ISR 300s)
  */
-export async function getBanners(): Promise<Banner[]> {
+export const getBanners = cache(async (): Promise<Banner[]> => {
   if (!client) {
     return mockBanners;
   }
@@ -467,23 +440,25 @@ export async function getBanners(): Promise<Banner[]> {
     const data = await client.getList<Banner>({
       endpoint: 'banners',
       queries: { limit: 10 },
+      customRequestInit: { next: { revalidate: REVALIDATE_TIME } },
     });
     return data.contents.length > 0 ? data.contents : mockBanners;
   } catch (error) {
     console.warn('[MicroCMS] Failed to fetch banners, using mock data:', error);
     return mockBanners;
   }
-}
+});
 
 /**
- * サイト基本情報を取得（AI自動翻訳＆キャッシュ対応）
+ * サイト基本情報を取得 (React cache & ISR 300s)
  */
-export async function getSiteInfo(): Promise<SiteInfo> {
+export const getSiteInfo = cache(async (): Promise<SiteInfo> => {
   let baseInfo = mockSiteInfo;
   if (client) {
     try {
       const data = await client.getObject<any>({
         endpoint: 'site_info',
+        customRequestInit: { next: { revalidate: REVALIDATE_TIME } },
       });
       if (data && data.siteTitle) {
         baseInfo = { ...mockSiteInfo, ...data };
@@ -493,44 +468,18 @@ export async function getSiteInfo(): Promise<SiteInfo> {
     }
   }
 
-  const [
-    siteTitleEn,
-    heroTaglineEn,
-    heroSubtitleEn,
-    festivalPeriodEn,
-    locationSummaryEn,
-    aboutTitleEn,
-    aboutTextEn,
-    donationTitleEn,
-    donationTextEn,
-    donationBankInfoEn,
-    newsNoticeEn,
-  ] = await Promise.all([
-    translateIfEmpty(baseInfo.siteTitle, baseInfo.siteTitleEn, 'Website title'),
-    translateIfEmpty(baseInfo.heroTagline, baseInfo.heroTaglineEn, 'Festival catchphrase'),
-    translateIfEmpty(baseInfo.heroSubtitle, baseInfo.heroSubtitleEn, 'Festival subtitle'),
-    translateIfEmpty(baseInfo.festivalPeriod, baseInfo.festivalPeriodEn, 'Festival period dates'),
-    translateIfEmpty(baseInfo.locationSummary, baseInfo.locationSummaryEn, 'Festival location areas'),
-    translateIfEmpty(baseInfo.aboutTitle, baseInfo.aboutTitleEn, 'About section title'),
-    translateIfEmpty(baseInfo.aboutText, baseInfo.aboutTextEn, 'About Osaka Fringe Festival description'),
-    translateIfEmpty(baseInfo.donationTitle, baseInfo.donationTitleEn, 'Donation section title'),
-    translateIfEmpty(baseInfo.donationText, baseInfo.donationTextEn, 'Donation philosophy and message'),
-    translateIfEmpty(baseInfo.donationBankInfo, baseInfo.donationBankInfoEn, 'Bank account information for donation'),
-    translateIfEmpty(baseInfo.newsNotice, baseInfo.newsNoticeEn, 'Important news notice banner'),
-  ]);
-
   return {
     ...baseInfo,
-    siteTitleEn: siteTitleEn || baseInfo.siteTitleEn,
-    heroTaglineEn: heroTaglineEn || baseInfo.heroTaglineEn,
-    heroSubtitleEn: heroSubtitleEn || baseInfo.heroSubtitleEn,
-    festivalPeriodEn: festivalPeriodEn || baseInfo.festivalPeriodEn,
-    locationSummaryEn: locationSummaryEn || baseInfo.locationSummaryEn,
-    aboutTitleEn: aboutTitleEn || baseInfo.aboutTitleEn,
-    aboutTextEn: aboutTextEn || baseInfo.aboutTextEn,
-    donationTitleEn: donationTitleEn || baseInfo.donationTitleEn,
-    donationTextEn: donationTextEn || baseInfo.donationTextEn,
-    donationBankInfoEn: donationBankInfoEn || baseInfo.donationBankInfoEn,
-    newsNoticeEn: newsNoticeEn || baseInfo.newsNoticeEn,
+    siteTitleEn: baseInfo.siteTitleEn || baseInfo.siteTitle,
+    heroTaglineEn: baseInfo.heroTaglineEn || baseInfo.heroTagline,
+    heroSubtitleEn: baseInfo.heroSubtitleEn || baseInfo.heroSubtitle,
+    festivalPeriodEn: baseInfo.festivalPeriodEn || baseInfo.festivalPeriod,
+    locationSummaryEn: baseInfo.locationSummaryEn || baseInfo.locationSummary,
+    aboutTitleEn: baseInfo.aboutTitleEn || baseInfo.aboutTitle,
+    aboutTextEn: baseInfo.aboutTextEn || baseInfo.aboutText,
+    donationTitleEn: baseInfo.donationTitleEn || baseInfo.donationTitle,
+    donationTextEn: baseInfo.donationTextEn || baseInfo.donationText,
+    donationBankInfoEn: baseInfo.donationBankInfoEn || baseInfo.donationBankInfo,
+    newsNoticeEn: baseInfo.newsNoticeEn || baseInfo.newsNotice,
   };
-}
+});

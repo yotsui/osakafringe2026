@@ -7,7 +7,7 @@ export const metadata = {
   description: '大阪フリンジフェスティバルに参加する全アーティスト・劇団情報と公演一覧。',
 };
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 export default async function ArtistsPage() {
   const [artists, performances, venues] = await Promise.all([

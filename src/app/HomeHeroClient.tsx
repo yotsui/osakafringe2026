@@ -75,7 +75,6 @@ export default function HomeHeroClient({ siteInfo }: HomeHeroClientProps) {
                   src="/images/osakafringe04.svg"
                   alt="Osaka Fringe"
                   fill
-                  priority
                   className="object-contain object-center lg:object-left"
                 />
               </div>
@@ -88,7 +87,6 @@ export default function HomeHeroClient({ siteInfo }: HomeHeroClientProps) {
                   src="/images/date.svg"
                   alt="2026 10.8 THU - 11.8 SUN 南大阪エリア・阿倍野・天王寺・新世界・西成"
                   fill
-                  priority
                   className="object-contain object-center lg:object-left"
                 />
               </div>

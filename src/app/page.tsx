@@ -2,7 +2,7 @@ import React from 'react';
 import { getPerformances, getVenues, getPartners, getSiteInfo } from '@/lib/microcms';
 import HomeClient from './HomeClient';
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 export default async function HomePage() {
   const [performances, venues, partners, siteInfo] = await Promise.all([

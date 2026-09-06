@@ -5,12 +5,7 @@ import { Venue, Performance } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import { Navigation, ExternalLink, Calendar, Train } from 'lucide-react';
 import SafeImage from '@/components/common/SafeImage';
-import {
-  OSAKA_TRANSIT_LINES,
-  OSAKA_TRANSIT_STATIONS,
-  METRO_LINES_INFO,
-} from '@/data/transitData';
-import { CARTO_POSITRON_VECTOR_STYLE } from '@/data/cartoPositronStyle';
+import { METRO_LINES_INFO } from '@/data/transitLinesInfo';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 interface FestivalMapProps {
@@ -275,11 +270,11 @@ export default function FestivalMap({
   // 鉄道レイヤー（路線ライン＆駅）を追加する関数
   const addTransitLayers = useCallback((map: any) => {
     try {
-      // 1. 鉄道路線（OSAKA_TRANSIT_LINES）
+      // 1. 鉄道路線（/data/transit-lines.geojson）
       if (!map.getSource('osaka-transit-lines')) {
         map.addSource('osaka-transit-lines', {
           type: 'geojson',
-          data: OSAKA_TRANSIT_LINES,
+          data: '/data/transit-lines.geojson',
         });
 
         // 下地ホワイトグロー（視認性を向上させる半透明白ライン）
@@ -307,11 +302,11 @@ export default function FestivalMap({
         });
       }
 
-      // 2. 主要駅（OSAKA_TRANSIT_STATIONS）
+      // 2. 主要駅（/data/transit-stations.geojson）
       if (!map.getSource('osaka-transit-stations')) {
         map.addSource('osaka-transit-stations', {
           type: 'geojson',
-          data: OSAKA_TRANSIT_STATIONS,
+          data: '/data/transit-stations.geojson',
         });
 
         // 1. 主要駅（ターミナル・乗換・会場最寄り）の丸印（ズーム11.5以上）
@@ -422,7 +417,7 @@ export default function FestivalMap({
       // CARTO Positron MVT ベクタータイルスタイルを直接適用
       const map = new maplibregl.Map({
         container: mapContainerRef.current,
-        style: CARTO_POSITRON_VECTOR_STYLE,
+        style: '/data/carto-positron-style.json',
         center: [135.5023, 34.6937],
         zoom: 12,
         attributionControl: false,
