@@ -5,8 +5,8 @@ import AudienceApp from '@/components/audience/AudienceApp';
 export const revalidate = 300;
 
 export const metadata = {
-  title: 'Audience App | OSAKA FRINGE FESTIVAL 2026',
-  description: '大阪フリンジフェスティバル 観客向け公式アプリ。WHAT (ジャンル・キーワード) / WHERE (会場・エリア・マップ) / WHEN (日付・本日の公演) で簡単検索！',
+  title: '公演を探す | 大阪文化万博 Osaka Fringe 2026',
+  description: '大阪文化万博 Osaka Fringe 2026 公演ガイド。WHAT (何を見る？) / WHERE (どこで見る？) / WHEN (いつ見る？) で簡単検索！',
 };
 
 export default async function AudiencePage() {

@@ -11,8 +11,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'OSAKA FRINGE FESTIVAL 2026 | 大阪フリンジフェスティバル 公式サイト',
-  description: '大阪フリンジフェスティバル（Osaka Fringe Festival）公式ウェブサイト＆Audience App。世界中のパフォーミングアーツが大阪の街に集結。WHAT / WHERE / WHEN で公演を簡単検索・会場ナビ！',
+  title: '大阪文化万博 Osaka Fringe 2026 公式サイト',
+  description: '大阪文化万博 Osaka Fringe 2026（2026年10月8日〜11月8日開催）公式サイト。spill over 文化芸術が街にあふれだす。劇場、広場、歴史的建築、カフェなど大阪各地の会場とイベントをめぐるオープンアクセス型芸術祭。',
   icons: {
     icon: [
       { url: '/icon.svg', type: 'image/svg+xml' },
@@ -27,8 +27,8 @@ export const metadata: Metadata = {
   },
   manifest: '/manifest.webmanifest',
   openGraph: {
-    title: 'OSAKA FRINGE FESTIVAL 2026',
-    description: '熱気と驚きが交差する、大阪の街角ステージ。Audience Appで公演・会場を検索！',
+    title: '大阪文化万博 Osaka Fringe 2026',
+    description: 'spill over 文化芸術が街にあふれだす。2026年10月8日〜11月8日開催。大阪の街じゅうが舞台になるオープンアクセス型芸術祭。',
     type: 'website',
   },
 };

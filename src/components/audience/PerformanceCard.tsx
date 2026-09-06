@@ -61,11 +61,11 @@ export default function PerformanceCard({
 
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
-          <span className="px-2.5 py-1 rounded-lg bg-[#E6007E] text-white text-[11px] font-black uppercase shadow-xs">
+          <span className="px-2.5 py-1 rounded-md bg-[#E6007E] text-white text-[11px] font-black uppercase shadow-xs">
             {performance.genre}
           </span>
           {genreCustom && (
-            <span className="px-2 py-1 rounded-lg bg-[#FFF100] text-black text-[11px] font-bold shadow-xs">
+            <span className="px-2 py-1 rounded-md bg-white/90 text-slate-800 text-[11px] font-bold shadow-xs">
               {genreCustom}
             </span>
           )}
@@ -90,11 +90,16 @@ export default function PerformanceCard({
           </button>
         )}
 
-        {/* Artist Name Overlay */}
-        <div className="absolute bottom-2.5 left-3 right-3 z-10 pointer-events-none">
+        {/* Artist Name & Partner Event Overlay */}
+        <div className="absolute bottom-2.5 left-3 right-3 z-10 pointer-events-none flex items-center justify-between gap-2">
           <p className="text-xs font-bold text-pink-200 truncate">
             {artistName}
           </p>
+          {performance.partner && typeof performance.partner === 'object' && performance.partner.category === '連携イベント・フェス' && (
+            <span className="text-[10px] font-black text-[#FFF100] bg-black/60 px-2 py-0.5 rounded shrink-0">
+              with {getText(performance.partner.name, performance.partner.nameEn)}
+            </span>
+          )}
         </div>
       </div>
 

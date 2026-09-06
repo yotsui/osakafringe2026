@@ -126,21 +126,21 @@ export default function HomeClient({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 pt-6 border-t border-slate-100">
             <div className="bg-pink-50/50 p-5 rounded-2xl border border-pink-100 space-y-1.5">
               <div className="text-[#E6007E] font-black text-sm">
-                <span>【CORE】発信拠点</span>
+                <span>【CORE】{t('venueTypeCoreTitle')}</span>
               </div>
-              <p className="text-xs text-slate-600 font-medium">アトリウム・広場・デッキ</p>
+              <p className="text-xs text-slate-600 font-medium">{t('venueTypeCoreDesc')}</p>
             </div>
-            <div className="bg-blue-50/50 p-5 rounded-2xl border border-blue-100 space-y-1.5">
-              <div className="text-[#0078D7] font-black text-sm">
-                <span>【HISTORICAL】歴史的空間</span>
+            <div className="bg-amber-50/50 p-5 rounded-2xl border border-amber-100 space-y-1.5">
+              <div className="text-amber-800 font-black text-sm">
+                <span>【HISTORICAL】{t('venueTypeHistoricalTitle')}</span>
               </div>
-              <p className="text-xs text-slate-600 font-medium">登録有形文化財・近代建築</p>
+              <p className="text-xs text-slate-600 font-medium">{t('venueTypeHistoricalDesc')}</p>
             </div>
-            <div className="bg-emerald-50/50 p-5 rounded-2xl border border-emerald-100 space-y-1.5">
-              <div className="text-[#00A960] font-black text-sm">
-                <span>【LOCAL】ユニークベニュー</span>
+            <div className="bg-purple-50/50 p-5 rounded-2xl border border-purple-100 space-y-1.5">
+              <div className="text-purple-700 font-black text-sm">
+                <span>【LOCAL】{t('venueTypeLocalTitle')}</span>
               </div>
-              <p className="text-xs text-slate-600 font-medium">カフェ・バー・倉庫・路地裏</p>
+              <p className="text-xs text-slate-600 font-medium">{t('venueTypeLocalDesc')}</p>
             </div>
           </div>
         </div>

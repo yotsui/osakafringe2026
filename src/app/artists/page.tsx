@@ -3,8 +3,8 @@ import { getArtists, getPerformances, getVenues } from '@/lib/microcms';
 import ArtistsClient from './ArtistsClient';
 
 export const metadata = {
-  title: 'アーティスト・劇団一覧 | OSAKA FRINGE FESTIVAL 2026',
-  description: '大阪フリンジフェスティバルに参加する全アーティスト・劇団情報と公演一覧。',
+  title: 'アーティスト・劇団一覧 | 大阪文化万博 Osaka Fringe 2026',
+  description: '大阪文化万博 Osaka Fringe 2026 に参加する全アーティスト・劇団情報と公演一覧。',
 };
 
 export const revalidate = 300;

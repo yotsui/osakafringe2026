@@ -182,28 +182,24 @@ export default function AudienceApp({
 
   const genres = [
     { id: 'all', label: t('allGenres') },
-    { id: 'street', label: 'street' },
-    { id: 'dance', label: 'dance' },
-    { id: 'music', label: 'music' },
-    { id: 'theater', label: 'theater' },
-    { id: 'traditional', label: 'traditional' },
-    { id: 'kamishibai', label: 'kamishibai' },
-    { id: 'exhibition', label: 'exhibition' },
-    { id: 'other', label: 'other' },
+    { id: 'street', label: t('genre_street') },
+    { id: 'dance', label: t('genre_dance') },
+    { id: 'music', label: t('genre_music') },
+    { id: 'theater', label: t('genre_theater') },
+    { id: 'traditional', label: t('genre_traditional') },
+    { id: 'kamishibai', label: t('genre_kamishibai') },
+    { id: 'exhibition', label: t('genre_exhibition') },
+    { id: 'other', label: t('genre_other') },
   ];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* App Header */}
-      <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-50 border border-pink-200 text-pink-600 text-xs font-black uppercase tracking-wider">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>{t('appCtaBadge')}</span>
-        </div>
-        <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
+      <div className="border-l-4 border-[#E6007E] pl-4 sm:pl-6 space-y-2">
+        <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
           {t('audienceTitle')}
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+        <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-2xl">
           {t('audienceSubtitle')}
         </p>
       </div>

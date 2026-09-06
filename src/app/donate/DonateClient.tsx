@@ -92,15 +92,11 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
       {/* Header */}
-      <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-50 border border-pink-200 text-[#E6007E] text-xs font-black uppercase tracking-wider">
-          <Heart className="w-3.5 h-3.5" />
-          <span>{t('donatePageBadge')}</span>
-        </div>
-        <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
+      <div className="border-l-4 border-[#E6007E] pl-4 sm:pl-6 space-y-2">
+        <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
           {title || t('donatePageTitle')}
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500 font-medium max-w-xl mx-auto">
+        <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-2xl">
           {t('donatePageSubtitle')}
         </p>
       </div>

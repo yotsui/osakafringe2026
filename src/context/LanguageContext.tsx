@@ -13,41 +13,78 @@ interface Dictionary {
 export const translations: Dictionary = {
   // Navigation
   navHome: { ja: 'ホーム', en: 'Home' },
-  navAudience: { ja: 'Audience App', en: 'Audience App' },
+  navAudience: { ja: '公演を探す', en: 'Find Shows' },
   navAbout: { ja: 'Osaka Fringeとは', en: 'About' },
-  navVenues: { ja: '会場一覧', en: 'Venues' },
+  navVenues: { ja: '会場', en: 'Venues' },
   navArtists: { ja: 'アーティスト', en: 'Artists' },
-  navDonate: { ja: '寄付・応援', en: 'Support & Donate' },
+  navDonate: { ja: '応援・連携', en: 'Support' },
   navContact: { ja: 'お問い合わせ', en: 'Contact' },
   
   // Hero & Home
+  heroBrandTitle: { ja: '大阪文化万博 Osaka Fringe 2026', en: 'Osaka Fringe 2026' },
+  heroSpillOver: { ja: 'spill over', en: 'spill over' },
+  heroSpillOverSub: { ja: '文化芸術が街にあふれだす', en: 'Arts and Culture Spill Over the City' },
   heroTagline: { ja: '街の一角を、世界の舞台へ。', en: 'Turning Every Corner of Osaka into a World Stage.' },
-  heroSubtitle: { ja: '劇場だけでなく街中のあらゆる場所を舞台に。プロ・アマ問わずアーティストが自由に参加するオープンアクセス型芸術祭。', en: 'An open-access performing arts festival across converted heritage buildings, cafes, alleys, and rooftops.' },
-  heroOpenAudience: { ja: 'Audience Appで公演を探す', en: 'Find Shows on Audience App' },
+  heroSubtitle: { 
+    ja: '大阪の街じゅうが、舞台になる。\n\n劇場、広場、歴史的建築、カフェ、商店街。\n大阪各地の会場とイベントをめぐりながら、さまざまな表現に出会う1か月。', 
+    en: 'The entire city of Osaka becomes a stage.\n\nFrom theaters and public plazas to heritage spaces and local cafes, explore dynamic performances across the city.' 
+  },
+  heroOpenAudience: { ja: '公演を探す', en: 'Find Shows' },
   heroVenuesMap: { ja: '会場マップ・一覧', en: 'Venues & Map' },
-  heroLocationSummary: { ja: '大阪市内各所（CORE・HISTORICAL・LOCALベニュー）', en: 'Various Venues across Osaka (CORE, HISTORICAL, LOCAL)' },
+  heroLocationSummary: { ja: '大阪市内各所（CORE・HISTORICAL・LOCAL）', en: 'Various Venues across Osaka (CORE, HISTORICAL, LOCAL)' },
   pickUpShows: { ja: 'PICK UP SHOWS', en: 'PICK UP SHOWS' },
-  pickUpTitle: { ja: '注目のハイライト公演', en: 'Featured Highlight Shows' },
-  pickUpSubtitle: { ja: '見逃せないフェスティバル厳選パフォーマンス', en: 'Selected festival performances you cannot miss' },
-  viewAllAudience: { ja: 'Audience Appで全公演を検索', en: 'Search all shows in Audience App' },
-  appCtaBadge: { ja: '観客専用ウェブアプリ', en: 'Official Audience Web App' },
-  appCtaTitle: { ja: '大阪の街を歩きながら、次の公演を今すぐ見つけよう', en: 'Explore the streets of Osaka and find your next show right now' },
-  appCtaDesc: { ja: '「いま見られる公演（WHAT）」「近くの会場（WHERE）」「今日の上演（WHEN）」をスマホで直感検索。Google Maps連携で会場まで迷わずナビゲーション。', en: 'Search intuitively on your smartphone by WHAT (shows), WHERE (nearby venues), and WHEN (today’s schedule). Navigate effortlessly with direct Google Maps integration.' },
-  launchApp: { ja: 'Audience App を起動する', en: 'Launch Audience App' },
+  pickUpTitle: { ja: '今週の注目公演', en: 'Shows to Watch' },
+  pickUpSubtitle: { ja: 'まもなく開催される注目のパフォーマンス', en: 'Upcoming performances to check out across the city' },
+  viewAllAudience: { ja: 'すべての公演を探す', en: 'Find All Shows' },
+  appCtaBadge: { ja: '公演ガイド', en: 'Show Guide' },
+  appCtaTitle: { ja: '大阪の街を歩きながら、次の公演を今すぐ見つけよう', en: 'Explore the streets of Osaka and find your next show' },
+  appCtaDesc: { 
+    ja: 'ジャンル（WHAT）、場所（WHERE）、日時（WHEN）から、今の気分に合う公演をスマホで直感検索。Google Maps連携で会場まで迷わずナビゲーション。', 
+    en: 'Find shows tailored to your mood by WHAT (genre), WHERE (venues), and WHEN (dates). Navigate effortlessly with direct Google Maps integration.' 
+  },
+  launchApp: { ja: '公演を探す', en: 'Find Shows' },
   aboutPreviewBadge: { ja: 'ABOUT OSAKA FRINGE', en: 'ABOUT OSAKA FRINGE' },
   readMore: { ja: '詳しく読む', en: 'Read More' },
   
-  // Audience App
-  audienceTitle: { ja: 'Audience App（観客向け公演ガイド）', en: 'Audience App (Festival Guide)' },
-  audienceSubtitle: { ja: 'WHAT / WHERE / WHEN から探す・地図で巡る', en: 'Explore by WHAT / WHERE / WHEN & Map' },
-  tabSearch: { ja: '公演を探す (Search)', en: 'Find Shows' },
-  tabMap: { ja: '会場マップ (Map)', en: 'Venue Map' },
-  tabFavorites: { ja: 'お気に入り (My List)', en: 'My Favorites' },
+  // Connected Events (連携イベント)
+  connectedEventsSectionTitle: { ja: '大阪のイベントとつながる', en: 'Connecting with Osaka Events' },
+  connectedEventsSectionDesc: { 
+    ja: 'Osaka Fringeは、大阪各地で開催されるイベントとも連携。街のあちこちにFringeプログラムが現れます。', 
+    en: 'Osaka Fringe collaborates with diverse festivals and events across Osaka, popping up all over the city.' 
+  },
+  partnerEventLabel: { ja: '連携イベント', en: 'Partner Event' },
+  partnerEventDesc: { ja: 'この公演は連携イベント内のOsaka Fringeプログラムとして開催されます。', en: 'This performance is presented as an Osaka Fringe program within a partner event.' },
+  partnerEventWebsite: { ja: '連携イベント公式サイト', en: 'Official Partner Event Site' },
   
-  // Filters
-  filterWhat: { ja: 'WHAT (何を見る？)', en: 'WHAT (Genre & Keyword)' },
-  filterWhere: { ja: 'WHERE (どこで見る？)', en: 'WHERE (Venues & Areas)' },
-  filterWhen: { ja: 'WHEN (いつ見る？)', en: 'WHEN (Dates & Today)' },
+  // Partner Categories (4区分)
+  partnerCategorySupport: { ja: '後援・協力', en: 'Endorsement & Cooperation' },
+  partnerCategorySponsor: { ja: 'スポンサー', en: 'Sponsors' },
+  partnerCategoryVenue: { ja: '会場協力', en: 'Venue Partners' },
+  partnerCategoryEvent: { ja: '連携イベント・フェス', en: 'Partner Events & Festivals' },
+  
+  // Venue Types (3分類)
+  venueTypeCore: { ja: 'CORE', en: 'CORE' },
+  venueTypeCoreTitle: { ja: '公共空間・広場・商業施設', en: 'Public Plazas & Transit Hubs' },
+  venueTypeCoreDesc: { ja: '人が集まる広場・商業施設・交通結節点など、フェスティバルの賑わいをつくる会場', en: 'Public plazas, shopping complexes, and transit hubs creating festival energy.' },
+  venueTypeHistorical: { ja: 'HISTORICAL', en: 'HISTORICAL' },
+  venueTypeHistoricalTitle: { ja: '近代建築・文化財・歴史空間', en: 'Heritage & Historic Architecture' },
+  venueTypeHistoricalDesc: { ja: '近代建築・文化財など、大阪の歴史的空間を舞台にした会場', en: 'Modern heritage architectures and cultural properties hosting unique performances.' },
+  venueTypeLocal: { ja: 'LOCAL', en: 'LOCAL' },
+  venueTypeLocalTitle: { ja: 'カフェ・小劇場・日常空間', en: 'Cafes & Neighborhood Spaces' },
+  venueTypeLocalDesc: { ja: 'カフェ、バー、倉庫、小劇場など、街の日常の中にある会場', en: 'Cafes, bars, warehouses, and independent spaces embedded in daily city life.' },
+  
+  // Audience App
+  audienceTitle: { ja: '公演を探す（公演ガイド）', en: 'Find Shows (Festival Guide)' },
+  audienceSubtitle: { ja: 'ジャンル、場所、日時から今の気分に合う公演を探せます', en: 'Find performances tailored to your mood by genre, venue, and date' },
+  tabSearch: { ja: '公演を探す', en: 'Find Shows' },
+  tabMap: { ja: '会場マップ', en: 'Venue Map' },
+  tabFavorites: { ja: 'お気に入り', en: 'My Favorites' },
+  
+  // Filters (WHAT / WHERE / WHEN)
+  filterWhat: { ja: 'WHAT — 何を見る？', en: 'WHAT — What to Watch' },
+  filterWhere: { ja: 'WHERE — どこで見る？', en: 'WHERE — Venues & Areas' },
+  filterWhen: { ja: 'WHEN — いつ見る？', en: 'WHEN — Dates & Today' },
+  filterGuide: { ja: 'ジャンル、場所、日時から、今の気分に合う公演を探せます。', en: 'Find performances tailored to your mood by genre, location, and date.' },
   searchPlaceholder: { ja: '公演名、アーティスト名、キーワードで検索...', en: 'Search by title, artist, keyword...' },
   allGenres: { ja: '全ジャンル', en: 'All Genres' },
   allVenues: { ja: '全会場・全エリア', en: 'All Venues & Areas' },
@@ -81,6 +118,8 @@ export const translations: Dictionary = {
   bookTickets: { ja: 'チケット予約・購入', en: 'Book / Reserve Tickets' },
   scheduleList: { ja: '公演日時・会場', en: 'Schedule & Venue' },
   venueLabel: { ja: '会場', en: 'Venue' },
+  venueTypeLabel: { ja: '会場タイプ', en: 'Venue Type' },
+  areaLabel: { ja: 'エリア', en: 'Area' },
   durationLabel: { ja: '上演時間', en: 'Duration' },
   minutes: { ja: '分', en: 'min' },
   priceLabel: { ja: '料金 / Ticket Price', en: 'Ticket Price' },
@@ -92,7 +131,6 @@ export const translations: Dictionary = {
   performancePhotos: { ja: '公演写真・ギャラリー', en: 'Performance Photos' },
   
   // Venues Page
-  venuesPageBadge: { ja: 'FESTIVAL VENUES & MAP', en: 'FESTIVAL VENUES & MAP' },
   venuesPageTitle: { ja: '会場一覧 & アクセスマップ', en: 'Venues & Access Map' },
   venuesPageSubtitle: { ja: '大阪の個性豊かなスペースが劇場に。ピンをタップして経路案内を確認できます。', en: 'Unique Osaka spaces transformed into stages. Tap pins for direct navigation.' },
   allVenuesTitle: { ja: '全会場詳細', en: 'All Festival Venues' },
@@ -105,19 +143,17 @@ export const translations: Dictionary = {
   photosCount: { ja: '枚の写真', en: 'photos' },
   
   // Artists Page
-  artistsPageBadge: { ja: 'FESTIVAL ARTISTS', en: 'FESTIVAL ARTISTS' },
   artistsPageTitle: { ja: 'アーティスト・劇団一覧', en: 'Festival Artists & Companies' },
   artistsPageSubtitle: { ja: '日本全国・世界各地から集結した、情熱と独創性あふれる表現者たち。', en: 'Passionate and visionary performing artists gathered from Osaka, Japan, and worldwide.' },
   artistsCountUnit: { ja: '組のアーティスト', en: 'artists' },
   artistProfileTitle: { ja: 'プロフィール・略歴', en: 'Profile / Bio' },
   artistShowsTitle: { ja: 'フェスティバル上演作品', en: 'Festival Performances' },
   schedulesCount: { ja: '公演スケジュール', en: 'Schedules' },
-  viewOnAudienceApp: { ja: 'Audience App で詳しく見る', en: 'View Details on Audience App' },
+  viewOnAudienceApp: { ja: '公演の詳細を見る', en: 'View Show Details' },
   noShowsForArtist: { ja: '現在登録されている公演はありません', en: 'No performances currently listed' },
   
   // Donate Page
-  donatePageBadge: { ja: 'SUPPORT & DONATE', en: 'SUPPORT & DONATE' },
-  donatePageTitle: { ja: '大阪フリンジを育てる寄付・サポーター募集', en: 'Support Osaka Fringe: Donations & Partnership' },
+  donatePageTitle: { ja: '大阪文化万博 Osaka Fringe 2026 を育てる寄付・サポーター募集', en: 'Support Osaka Fringe: Donations & Partnership' },
   donatePageSubtitle: { ja: '自由な舞台芸術の発展と、大阪の文化を世界へ発信するためのご支援をお願いいたします。', en: 'Join us in empowering independent artists and sharing Osaka’s vibrant culture with the world.' },
   donateMessageHeader: { ja: '街とアーティストの未来を共に創るパートナーへ', en: 'Partnering to Build the Future of the City and Artists' },
   donatePurpose: { ja: '寄付の目的と活用方法', en: 'Purpose & Impact of Your Support' },
@@ -156,23 +192,25 @@ export const translations: Dictionary = {
   // Donation Success Page
   successBadge: { ja: 'THANK YOU', en: 'THANK YOU' },
   successTitle: { ja: '温かいご支援ありがとうございます！', en: 'Thank You for Your Generous Support!' },
-  successSubtitle: { ja: '大阪フリンジフェスティバル2026へのご寄付を受け付けました。', en: 'Your donation to Osaka Fringe Festival 2026 has been successfully processed.' },
+  successSubtitle: { ja: '大阪文化万博 Osaka Fringe 2026へのご寄付を受け付けました。', en: 'Your donation to Osaka Fringe 2026 has been successfully processed.' },
   successDesc: { ja: 'いただいたご寄付は、若手アーティストの参加支援、アクセシビリティ向上、舞台環境の充実などに大切に活用させていただきます。街と表現者が輝く最高の芸術祭を共に創り上げてまいります。', en: 'Your contribution directly supports emerging artists, multilingual guides, and festival production. Thank you for making Osaka a vibrant stage for world-class creativity.' },
   successReceiptNote: { ja: 'ご登録いただいたメールアドレス宛にStripeより決済受領メールが送信されます。別途領収証や公式サポーターに関するお問い合わせは、お問い合わせページよりご連絡ください。', en: 'A payment confirmation receipt has been sent via Stripe. For inquiries regarding formal certificates or sponsorship, please contact our team.' },
   successBackHome: { ja: 'トップページへ戻る', en: 'Back to Home' },
   successExploreShows: { ja: '公演スケジュールを探す', en: 'Explore Performances' },
   
   // About Page
-  aboutPageBadge: { ja: 'ABOUT FESTIVAL', en: 'ABOUT FESTIVAL' },
-  feature1Title: { ja: 'オープンアクセス', en: 'Open Access' },
-  feature1Desc: { ja: '審査や選考を排し、誰もが自由に表現を発表・挑戦できる舞台です。', en: 'Non-curated and democratic: an open stage for anyone with artistic passion.' },
-  feature2Title: { ja: '街全体がステージ', en: 'City-wide Stage' },
-  feature2Desc: { ja: '劇場だけでなく、カフェ、古民家、公園など大阪角々が劇場に変わります。', en: 'Transforming traditional houses, cafes, parks, and warehouses into vibrant stages.' },
-  feature3Title: { ja: '観客とのダイレクトな共創', en: 'Direct Connection with Audience' },
-  feature3Desc: { ja: 'アーティストと観客が密に交わり、街全体で熱気と創造性を育みます。', en: 'Artists and audience connect closely, generating spontaneous energy across the city.' },
+  feature1Title: { ja: '誰もが参加できる', en: 'Open Access' },
+  feature1Desc: { ja: 'ジャンル、国籍、キャリアを問わず参加を受け付ける、オープンアクセス型の芸術祭です。', en: 'Non-curated and democratic: an open stage for performers across genres, nationalities, and backgrounds.' },
+  feature2Title: { ja: '街そのものが舞台になる', en: 'The City is the Stage' },
+  feature2Desc: { ja: '劇場だけでなく、広場、歴史的建築、カフェ、商店街など大阪各地が舞台に変わります。', en: 'Transforming public plazas, historic heritage buildings, cafes, and shopping arcades into vibrant stages.' },
+  feature3Title: { ja: '大阪と世界が交わる', en: 'Osaka Meets the World' },
+  feature3Desc: { ja: '国内外の多彩なアーティストと観客が出会い、街全体で熱気と創造性を育みます。', en: 'Diverse artists and audiences from Osaka and around the globe connect to spark spontaneous creativity.' },
+  aboutAreasTitle: { ja: '大阪の街を巡るエリア', en: 'Explore the Areas of Osaka' },
+  aboutAreasDesc: { ja: '個性豊かな大阪の街を舞台に、多様な表現に出会う体験。', en: 'Discover dynamic performing arts across the vibrant districts of Osaka.' },
+  aboutVenueTypesTitle: { ja: '3つのベニューカテゴリ', en: '3 Venue Categories' },
+  aboutVenueTypesDesc: { ja: '大阪の街全体が劇場に。それぞれの空間特性を活かした多彩な表現が展開されます。', en: 'The entire city turns into a theater, creating unique experiences across different space types.' },
   
   // Contact Page (Formspree Integrated)
-  contactPageBadge: { ja: 'CONTACT US', en: 'CONTACT US' },
   contactPageTitle: { ja: 'お問い合わせ', en: 'Contact Us' },
   contactPageSubtitle: { ja: '公演へのご質問、会場パートナー・アーティスト参加、取材申請などお気軽にお寄せください。', en: 'Feel free to get in touch regarding shows, venue partnerships, artist registration, or media inquiries.' },
   contactFormTitle: { ja: 'お問い合わせフォーム', en: 'Contact Form' },
@@ -202,10 +240,10 @@ export const translations: Dictionary = {
   // Banners & Footer
   instagramBannerTitle: { ja: '公式Instagramでフェスティバルの熱気をチェック！', en: 'Catch the Festival Vibe on Official Instagram!' },
   tourismBannerTitle: { ja: '大阪観光局 公式ポータルサイト', en: 'Osaka Convention & Tourism Bureau' },
-  footerTagline: { ja: '大阪文化丁 - Osaka Fringe 2026 / 大阪文化フリンジ機構設立準備室', en: 'Osaka Fringe Festival Executive Committee' },
+  footerTagline: { ja: '大阪文化万博 Osaka Fringe 2026 実行委員会', en: 'Osaka Fringe 2026 Executive Committee' },
   footerDesc: { ja: '大阪の街全体が舞台になるオープンアクセス芸術祭。演劇、ダンス、大道芸、音楽、古典芸能、紙芝居、作品展示がジャンルを超えて交差するフェスティバル。', en: 'An open-access performing arts festival turning all of Osaka into a vibrant stage across theater, dance, street circus, music, traditional arts, and art exhibitions.' },
   poweredByMicroCMS: { ja: 'Data powered by MicroCMS & Gemini AI Translation', en: 'Data powered by MicroCMS & Gemini AI Translation' },
-  allRightsReserved: { ja: '© osaka fringe2026 All Rights Reserved.', en: '© osaka fringe2026 All Rights Reserved.' }
+  allRightsReserved: { ja: '© Osaka Fringe 2026 All Rights Reserved.', en: '© Osaka Fringe 2026 All Rights Reserved.' }
 };
 
 interface LanguageContextType {

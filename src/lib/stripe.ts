@@ -11,7 +11,7 @@ export function getStripe(): Stripe {
     stripeInstance = new Stripe(apiKey, {
       apiVersion: '2025-02-24.acacia' as Stripe.LatestApiVersion,
       appInfo: {
-        name: 'Osaka Fringe Festival 2026',
+        name: 'Osaka Fringe 2026',
         version: '1.0.0',
       },
     });

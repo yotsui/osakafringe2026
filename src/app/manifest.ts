@@ -2,9 +2,9 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'OSAKA FRINGE FESTIVAL 2026 | 大阪フリンジフェスティバル',
-    short_name: 'Osaka Fringe',
-    description: '大阪フリンジフェスティバル 公式ウェブサイト＆Audience App',
+    name: '大阪文化万博 Osaka Fringe 2026',
+    short_name: 'Osaka Fringe 2026',
+    description: '大阪文化万博 Osaka Fringe 2026（2026年10月8日〜11月8日）公式サイト＆公演ガイド',
     start_url: '/',
     display: 'standalone',
     background_color: '#0f172a',

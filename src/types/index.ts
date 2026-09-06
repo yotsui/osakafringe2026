@@ -11,6 +11,7 @@ export interface Venue {
   nameEn?: string;
   area: string;
   areaEn?: string;
+  venueType?: 'CORE' | 'LOCAL' | 'HISTORICAL' | string;
   address: string;
   addressEn?: string;
   access: string;
@@ -120,13 +121,24 @@ export interface Performance {
   images?: string[];
   isFeatured?: boolean;
   durationMinutes?: number;
+
+  // 連携イベント・パートナー
+  partner?: Partner | string;
+  partnerId?: string;
 }
+
+export type PartnerCategory =
+  | '組織（後援・協力）'
+  | '連携イベント・フェス'
+  | '会場協力'
+  | 'スポンサー'
+  | string;
 
 export interface Partner {
   id: string;
   name: string;
   nameEn?: string;
-  category: 'platinum' | 'gold' | 'silver' | 'bronze' | 'media' | 'supporter' | 'tourism' | 'partner_event';
+  category: PartnerCategory;
   logoUrl?: string;
   image?: string;
   url?: string;

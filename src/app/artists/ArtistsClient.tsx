@@ -55,25 +55,19 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
       {/* Header */}
-      <div className="text-center space-y-3">
-        <div className="flex items-center justify-center gap-2 flex-wrap">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-50 border border-pink-200 text-[#E6007E] text-xs font-black uppercase tracking-wider">
-            <Users className="w-3.5 h-3.5" />
-            <span>{t('artistsPageBadge')}</span>
-          </div>
-          {isDemoMode && (
-            <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-100 border border-amber-300 text-amber-800 text-xs font-black tracking-wide shadow-xs">
-              <Eye className="w-3.5 h-3.5" />
-              <span>DEMO MODE（出演公演未登録アーティストを含む全件表示中）</span>
-            </div>
-          )}
-        </div>
-        <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
+      <div className="border-l-4 border-[#E6007E] pl-4 sm:pl-6 space-y-2">
+        <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
           {t('artistsPageTitle')}
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500 font-medium max-w-xl mx-auto">
+        <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-2xl">
           {t('artistsPageSubtitle')}
         </p>
+        {isDemoMode && (
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold mt-2">
+            <Eye className="w-3.5 h-3.5" />
+            <span>DEMO MODE（出演公演未登録アーティストを含む全件表示中）</span>
+          </div>
+        )}
       </div>
 
       {/* Artists Count */}

@@ -3,8 +3,8 @@ import { getSiteInfo, getPartners } from '@/lib/microcms';
 import AboutClient from './AboutClient';
 
 export const metadata = {
-  title: 'Osaka Fringeについて | OSAKA FRINGE FESTIVAL 2026',
-  description: '大阪フリンジフェスティバルの理念、フリンジの歴史、フェスティバルの楽しみ方について。',
+  title: 'Osaka Fringeとは | 大阪文化万博 Osaka Fringe 2026',
+  description: '大阪文化万博 Osaka Fringe 2026 の理念、3つの特徴、ベニューカテゴリ、フェスティバルの楽しみ方について。',
 };
 
 export default async function AboutPage() {

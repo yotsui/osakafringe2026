@@ -33,8 +33,8 @@ export async function POST(req: NextRequest) {
             currency: 'jpy',
             product_data: {
               name: isEn
-                ? 'Osaka Fringe Festival 2026 - Donation & Support'
-                : '大阪フリンジフェスティバル2026 応援寄付',
+                ? 'Osaka Fringe 2026 - Donation & Support'
+                : '大阪文化万博 Osaka Fringe 2026 応援寄付',
               description: isEn
                 ? 'Empowering emerging artists and street performing arts across Osaka.'
                 : '若手アーティスト支援・多言語環境整備・フェスティバル運営支援へのご寄付',

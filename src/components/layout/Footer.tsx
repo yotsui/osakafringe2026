@@ -105,7 +105,7 @@ export default function Footer() {
 
         {/* Bottom copyright */}
         <div className="pt-8 border-t border-white/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-bold text-white/80">
-          <p>© 2026 Osaka Fringe Festival Executive Committee. All rights reserved.</p>
+          <p>© 2026 Osaka Fringe 2026 Executive Committee. All rights reserved.</p>
           <div className="flex items-center gap-4 text-xs font-black">
 
           </div>

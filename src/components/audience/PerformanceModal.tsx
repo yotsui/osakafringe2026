@@ -371,6 +371,42 @@ export default function PerformanceModal({
               </div>
             </div>
 
+            {/* Partner Event Info (If linked with a partner festival/event) */}
+            {performance.partner && typeof performance.partner === 'object' && performance.partner.category === '連携イベント・フェス' && (
+              <div className="space-y-3">
+                <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-[#E6007E]" />
+                  <span>連携イベント情報（Partner Event）</span>
+                </h3>
+                <div className="p-5 rounded-2xl bg-amber-50/60 border border-amber-200/80 space-y-3">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-200 text-amber-900 text-xs font-black">
+                      連携イベント
+                    </span>
+                    <h4 className="text-sm font-black text-slate-900">
+                      {getText(performance.partner.name, performance.partner.nameEn)}
+                    </h4>
+                  </div>
+                  {performance.partner.description && (
+                    <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium whitespace-pre-line">
+                      {getText(performance.partner.description, performance.partner.descriptionEn)}
+                    </p>
+                  )}
+                  {performance.partner.websiteUrl && (
+                    <a
+                      href={performance.partner.websiteUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#E6007E] hover:underline pt-1"
+                    >
+                      <span>公式サイトを見る</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Ticket Price Info */}
             <div className="p-5 rounded-2xl bg-pink-50/70 border border-pink-100 flex items-center justify-between gap-4">
               <div className="space-y-0.5">

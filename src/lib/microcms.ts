@@ -67,6 +67,7 @@ export const getVenues = cache(async (): Promise<Venue[]> => {
       addressEn: v.addressEn || v.address,
       accessEn: v.accessEn || v.access,
       descriptionEn: v.descriptionEn || v.description,
+      venueType: v.venueType || undefined,
       lat,
       lng,
       image: imgUrl,
@@ -153,13 +154,15 @@ export const getArtistById = cache(async (id: string): Promise<Artist | undefine
  * 公演一覧を取得 (会場情報およびアーティスト情報をマージ & React cache & ISR 300s)
  */
 export const getPerformances = cache(async (): Promise<Performance[]> => {
-  const [venues, artists] = await Promise.all([
+  const [venues, artists, partners] = await Promise.all([
     getVenues(),
     getArtists(),
+    getPartners(),
   ]);
 
   const venueMap = new Map(venues.map((v) => [v.id, v]));
   const artistMap = new Map(artists.map((a) => [a.id, a]));
+  const partnerMap = new Map(partners.map((p) => [p.id, p]));
 
   const normalizePerformance = (perf: any): Performance => {
     // 1. 画像URLの正規化
@@ -341,6 +344,21 @@ export const getPerformances = cache(async (): Promise<Performance[]> => {
     const customGenre = perf.genre || '';
     const customGenreEn = perf.genreEn || customGenre;
 
+    // 7. パートナー（連携イベント等）参照の解決
+    let resolvedPartner: Partner | undefined = undefined;
+    let resolvedPartnerId = '';
+
+    if (perf.partner && typeof perf.partner === 'object' && perf.partner.id) {
+      resolvedPartner = partnerMap.get(perf.partner.id) || perf.partner;
+      resolvedPartnerId = perf.partner.id;
+    } else if (typeof perf.partner === 'string' && perf.partner.trim()) {
+      resolvedPartner = partnerMap.get(perf.partner.trim());
+      resolvedPartnerId = perf.partner.trim();
+    } else if (typeof perf.partnerId === 'string' && perf.partnerId.trim()) {
+      resolvedPartner = partnerMap.get(perf.partnerId.trim());
+      resolvedPartnerId = perf.partnerId.trim();
+    }
+
     const images = Array.isArray(perf.images) 
       ? perf.images.map(extractImageUrl).filter(Boolean) as string[]
       : (imgUrl ? [imgUrl] : []);
@@ -372,6 +390,8 @@ export const getPerformances = cache(async (): Promise<Performance[]> => {
       venueNameEn,
       dates: rawDateItems,
       schedules: enrichedSchedules,
+      partner: resolvedPartner,
+      partnerId: resolvedPartnerId || undefined,
       image: imgUrl || resolvedArtist?.image || mainVenue?.image || '',
       images,
     };

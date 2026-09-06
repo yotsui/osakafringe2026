@@ -93,13 +93,9 @@ export default function ContactClient({ siteInfo }: ContactClientProps) {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
       {/* Header */}
-      <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-50 border border-pink-200 text-pink-600 text-xs font-black uppercase tracking-wider">
-          <Mail className="w-3.5 h-3.5" />
-          <span>{t('contactPageBadge')}</span>
-        </div>
-        <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">{t('contactPageTitle')}</h1>
-        <p className="text-xs sm:text-sm text-slate-500 font-medium max-w-xl mx-auto">
+      <div className="border-l-4 border-[#E6007E] pl-4 sm:pl-6 space-y-2">
+        <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">{t('contactPageTitle')}</h1>
+        <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-2xl">
           {t('contactPageSubtitle')}
         </p>
       </div>
