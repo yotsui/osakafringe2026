@@ -1,13 +1,16 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import { getPerformances, getVenues } from '@/lib/microcms';
+import { createPageMetadata } from '@/lib/siteMetadata';
 import AudienceApp from '@/components/audience/AudienceApp';
 
 export const revalidate = 300;
 
-export const metadata = {
-  title: '公演を探す | 大阪文化万博Osaka Fringe 2026',
+export const metadata: Metadata = createPageMetadata({
+  title: '公演を探す',
   description: '大阪文化万博Osaka Fringe 2026 公演ガイド。WHAT (何を見る？) / WHERE (どこで見る？) / WHEN (いつ見る？) で簡単検索！',
-};
+  path: '/audience',
+});
 
 export default async function AudiencePage() {
   const [performances, venues] = await Promise.all([

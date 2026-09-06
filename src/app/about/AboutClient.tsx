@@ -1,10 +1,23 @@
 'use client';
 
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { SiteInfo, Partner } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import PartnerSection from '@/components/common/PartnerSection';
 import BrandLogo from '@/components/common/BrandLogo';
+
+const WorldFringeMap = dynamic(
+  () => import('@/components/about/WorldFringeMap'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-[400px] sm:h-[480px] lg:h-[560px] rounded-3xl bg-slate-900 animate-pulse flex items-center justify-center text-slate-500 font-bold text-sm border border-slate-800">
+        Loading World Fringe Map...
+      </div>
+    ),
+  }
+);
 
 interface AboutClientProps {
   siteInfo: SiteInfo;
@@ -187,6 +200,89 @@ export default function AboutClient({ siteInfo, partners = [] }: AboutClientProp
             </p>
           </div>
         </div>
+      </div>
+
+      {/* FRINGE AROUND THE WORLD (World Map Section) */}
+      <div className="space-y-8">
+        {/* Section Header */}
+        <div className="space-y-3 border-b border-slate-200/80 pb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-50 border border-pink-200 text-[#E6007E] text-xs font-black tracking-widest uppercase">
+            {t('fromEdinburghToOsaka')}
+          </div>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                {t('fringeWorldSectionTitle')}
+              </h2>
+              <p className="text-base sm:text-lg font-bold text-[#E6007E] mt-1">
+                {t('fringeWorldSectionSub')}
+              </p>
+            </div>
+
+            {/* Timeline Typography (1947 EDINBURGH -> 2026 OSAKA) */}
+            <div className="flex items-center gap-3 sm:gap-4 bg-slate-900 text-white px-5 py-3 rounded-2xl shrink-0 shadow-sm border border-slate-800">
+              <div className="text-left">
+                <div className="text-base sm:text-lg font-black text-[#E6007E] leading-none tracking-tight">
+                  1947
+                </div>
+                <div className="text-[10px] sm:text-xs font-bold text-slate-300 tracking-widest uppercase">
+                  EDINBURGH
+                </div>
+              </div>
+
+              <div className="flex items-center text-[#FFF100] px-1 font-black text-sm sm:text-base">
+                →
+              </div>
+
+              <div className="text-left">
+                <div className="text-base sm:text-lg font-black text-[#FFF100] leading-none tracking-tight">
+                  2026
+                </div>
+                <div className="text-[10px] sm:text-xs font-bold text-slate-200 tracking-widest uppercase">
+                  OSAKA
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Editorial Story Text */}
+        <div className="max-w-4xl text-slate-700 text-sm sm:text-base leading-relaxed space-y-4 font-medium">
+          {language === 'en' ? (
+            <>
+              <p>
+                Fringe began in Edinburgh in 1947.
+              </p>
+              <p>
+                Since then, the idea of artists creating their own opportunities and turning unexpected places across the city into stages has spread across Europe, North America, Oceania, Asia and Africa.
+              </p>
+              <p>
+                Each city has developed its own way of making space for artistic experimentation.
+              </p>
+              <p className="font-bold text-slate-900">
+                In 2026, Osaka joins the map.
+              </p>
+            </>
+          ) : (
+            <>
+              <p>
+                「Fringe」のはじまりは、1947年のエディンバラ。
+              </p>
+              <p>
+                そこから、アーティストが自ら表現の場をつくり、街のさまざまな場所を舞台に変えていくFringeの文化は、ヨーロッパから北米、オセアニア、アジア、アフリカへと広がってきました。
+              </p>
+              <p>
+                それぞれの街が、それぞれの方法でアーティストの挑戦を受け入れています。
+              </p>
+              <p className="font-bold text-slate-900">
+                2026年、大阪もその地図に加わります。
+              </p>
+            </>
+          )}
+        </div>
+
+        {/* Interactive World Fringe Map */}
+        <WorldFringeMap />
       </div>
 
       {/* Partners Section */}

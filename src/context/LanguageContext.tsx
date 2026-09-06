@@ -229,6 +229,19 @@ export const translations: Dictionary = {
   aboutVenueTypesTitle: { ja: '3つのベニューカテゴリ', en: '3 Venue Categories' },
   aboutVenueTypesDesc: { ja: '大阪の街全体が劇場に。それぞれの空間特性を活かした多彩な表現が展開されます。', en: 'The entire city turns into a theater, creating unique experiences across different space types.' },
   
+  // World Fringe (About Page)
+  fromEdinburghToOsaka: { ja: 'FROM EDINBURGH TO OSAKA', en: 'FROM EDINBURGH TO OSAKA' },
+  fringeWorldSectionTitle: { ja: 'FRINGE AROUND THE WORLD', en: 'FRINGE AROUND THE WORLD' },
+  fringeWorldSectionSub: { ja: '世界に広がるFringe', en: 'Fringe Around the World' },
+  fringeWorldNote: {
+    ja: '世界各地で開催されている、または開催されてきたFringe Festivalの一部を紹介しています。',
+    en: 'A selection of Fringe festivals taking place — or having taken place — around the world.'
+  },
+  viewAllFestivals: { ja: 'FESTIVAL一覧を表示する', en: 'VIEW ALL FESTIVALS' },
+  hideAllFestivals: { ja: 'FESTIVAL一覧を閉じる', en: 'HIDE FESTIVALS' },
+  visitOfficialSite: { ja: '公式サイトを見る', en: 'VISIT OFFICIAL SITE' },
+  youAreHere: { ja: 'YOU ARE HERE', en: 'YOU ARE HERE' },
+  
   // Contact Page (Formspree Integrated)
   contactPageTitle: { ja: 'お問い合わせ', en: 'Contact Us' },
   contactPageSubtitle: { ja: '公演へのご質問、会場パートナー・アーティスト参加、取材申請などお気軽にお寄せください。', en: 'Feel free to get in touch regarding shows, venue partnerships, artist registration, or media inquiries.' },

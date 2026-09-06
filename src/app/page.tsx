@@ -1,6 +1,12 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import { getPerformances, getVenues, getPartners, getSiteInfo } from '@/lib/microcms';
+import { createPageMetadata } from '@/lib/siteMetadata';
 import HomeClient from './HomeClient';
+
+export const metadata: Metadata = createPageMetadata({
+  path: '/',
+});
 
 export const revalidate = 300;
 

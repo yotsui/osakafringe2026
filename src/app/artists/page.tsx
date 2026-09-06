@@ -1,11 +1,14 @@
 import React, { Suspense } from 'react';
+import type { Metadata } from 'next';
 import { getArtists, getPerformances, getVenues } from '@/lib/microcms';
+import { createPageMetadata } from '@/lib/siteMetadata';
 import ArtistsClient from './ArtistsClient';
 
-export const metadata = {
-  title: 'アーティスト・劇団一覧 | 大阪文化万博Osaka Fringe 2026',
+export const metadata: Metadata = createPageMetadata({
+  title: 'アーティスト・劇団一覧',
   description: '大阪文化万博Osaka Fringe 2026 に参加する全アーティスト・劇団情報と公演一覧。',
-};
+  path: '/artists',
+});
 
 export const revalidate = 300;
 
