@@ -1,7 +1,466 @@
-id,name,nameEn,origin,originEn,genre,profile,profileEn,image,websiteUrl,snsTwitter,snsInstagram,snsYoutube,isFeatured
-gekidan-osaka-chaos,劇団オオサカ・カオス,Gekidan Osaka Chaos,大阪 / 日本,Osaka / Japan,theater,"大阪を拠点に活動する身体表現×演劇集団。アクロバティックな身体表現とエレクトロ浪曲を融合させた独自のスタイルで熱狂的な支持を集める。","An Osaka-based avant-garde physical theater company blending energetic acrobatic movement and electro-traditional rokyoku chanting.",https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=800&q=80,https://osakafringe.com,https://twitter.com/osakafringe,https://instagram.com/osakafringe,,true
-alexei-and-maya,Alexei & Maya,Alexei & Maya,UK / Australia,UK / Australia,street,"エディンバラ・フリンジで数々の賞を受賞した国際デュオ。重力を超える空中アクロバットとファイヤーフープのスペクタクルを展開。","Award-winning international street circus duo bringing breathtaking aerial acrobatics and fire hoop artistry to the city streets.",https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80,https://osakafringe.com,,https://instagram.com/osakafringe,,true
-kenji-comedy,Kenji & The International Osaka Club,Kenji & The International Osaka Club,大阪 / 日本,Osaka / Japan,dance,"大阪在住のバイリンガルコメディアンたちによるスタンドアップコメディ集団。大阪カルチャーと国際感覚を交差させた笑いを届ける。","A bilingual stand-up comedy collective exploring Osaka culture, food obsessions, and international culture shocks.",https://images.unsplash.com/photo-1585699324551-f6c309eedeca?auto=format&fit=crop&w=800&q=80,https://osakafringe.com,,,https://youtube.com/@osakafringe,true
-sakuya-dance,咲夜 -Sakuya-,Sakuya,京都・大阪 / 日本,Kyoto & Osaka / Japan,traditional,"伝統的な上方舞と現代三味線の奏者によるコラボレーションユニット。幽玄な伝統美にコンテンポラリーの即興性を重ね合わせる。","A collaboration unit between classical Kamigata dance masters and contemporary shamisen players.",https://images.unsplash.com/photo-1528164344705-475426879c0d?auto=format&fit=crop&w=800&q=80,https://osakafringe.com,https://twitter.com/osakafringe,,,false
-naniwa-hyoshigi,なにわ拍子木座,Naniwa Hyoshigi-za,大阪 / 日本,Osaka / Japan,kamishibai,"昭和レトロな自転車紙芝居を現代に蘇らせる街頭紙芝居師。子どもから大人まで巻き込む参加型パフォーマンスを展開。","Interactive picture storytelling artists performing from vintage bicycle carts. Fun and nostalgic for all generations.",https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80,https://osakafringe.com,,,,false
-studio-ripple,Studio Ripple,Studio Ripple,大阪・ベルリン,Osaka & Berlin,exhibition,"大阪とベルリンを拠点に、水・音・光の相互作用を探求するメディアアートコレクティブ。","An international media art collective exploring the intersection of water dynamics, urban acoustics, and responsive light.",https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=800&q=80,https://osakafringe.com,https://twitter.com/osakafringe,https://instagram.com/osakafringe,,false
+﻿id,name,nameEn,origin,originEn,genre,profile,profileEn,image,websiteUrl,snsTwitter,snsInstagram,snsYoutube,isFeatured
+,FAMILY DISCO,FAMILY DISCO,,,dance,"大阪を中心に、音楽や遊び、マルシェなどを通して、人と人、人と街がつながるイベントを企画・運営しています。
+商業施設や公園、公共空間などを舞台に、親子向けイベントをはじめ、地域や施設と連携したさまざまな場づくりを行ってきました。
+2024年には「大人も子どもも、どちらかが付き合うのではなく一緒に楽しめる場所をつくりたい」という想いから「FAMILY DISCO」をスタート。
+あべのキューズモールでの継続開催を中心に、てんしばなど大阪の街なかへ開催場所を広げています。
+子どものためだけでも、大人のためだけでもない。
+世代を越えて、それぞれが本気で楽しめる体験を街の中につくることを大切に活動しています。",,,https://www.instagram.com/qs_family_disco/,,https://www.instagram.com/qs_family_disco/,,
+,高久知也,TAKAKU TOMOYA,,,music,"高久知也
+様々なアーティストの作品やライブに参加するなど、幅広く活動するヴァイオリニスト、ギタリスト。ストリングスアレンジなども手がけ、楽曲提供もしている。その経験を活かした独自のスタイルで、自ら作編曲を手がけた曲と共に精力的にアーティスト活動中。
+愛内里菜、ZARD、倉木麻衣、doa、Sensation、浅岡雄也(ex.FIELD OF VIEW)、植田真梨恵、近藤夏子、さあさ、Chicago Poodleなど数多くのアーティストのライブや録音に参加。(敬称略)",,,http://tomoyatakaku.com/,,https://www.instagram.com/tomoyasuseisakusyo/,,
+,竹歳みずほ,TaketoshiMizuho,,,music,"関西関東中心に活動している竹歳みずほです。
+毎年1回は関西にてバンドワンマンライブを開催しており、その他に単独ライブ、フリーライブといろんな場所でライブをしております。
+歌って踊るポップな楽曲中心のオリジナル曲でパフォーマンスさせていただいております。
+よろしくお願いいたします。",,,https://linktr.ee/taketoshimizuho,https://mobile.twitter.com/TakeMi_0814,https://www.instagram.com/0814_mizuho/,,
+,ReLiFE!,ReLiFE!,,,dance,iLiFE!のコピーダンスグループです！,,,,https://x.com/ReLiFE_i,,,
+,友安製作所,TOMOYASU SEISAKUSYO,,,exhibition,Add Colors to Everyone’s life. 1948年に、町工場として創業した友安製作所。今では、インテリアやDIYアイテムの製造・輸入・販売、空間のプロデュース、カフェの運営、まちづくりなどなど、人生に関わる多彩な事業を手がける会社です。,,,https://tomoyasu.co.jp/,,https://www.instagram.com/tomoyasuseisakusyo/,,
+,木村石鹸工業株式会社,KIMURASOAP,,,music,上記作品紹介と同じ,,,,,,,
+,Tミュージックファクトリー,T musicfactory,,,music,２００２年に設立し文化財、寺院、古民家、美術館など人々が心のよりどころを見つけにやってくる会場でのコンサートに力を入れて取り組んでいます。人々の胸を打つ音楽提供に徹している団体です。地域や助成先の信頼が厚く演奏者たちにとっても貴重な活躍の場となっています。若手の育成にも力を尽くしています。現代音楽のすばらしさ、日本の心を表す音楽のすばらしさをプログラムに必ず取り入れることを公演の意義としています。人々の胸を打たない音楽はやらないようにプログラムは厳選しています。皆さんそうだと思いますが個性を重視して個性がよく伝わるように厳選しています。運営は厳格に。聴衆からのご意見は毎回好評を頂いています。長く続けていますので信頼を得ています。若狭と金沢の２拠点での演奏活動で２拠点を結んで往来が生じるようにしています。これまでに北陸新幹線音楽プロジェクトや鯖街道音旅プロジェクトなどを成功させています。固定のファンも多くいます。,,,,,,,
+,クレモナラボ,CREMONALABO,,,music,"クラシック音楽の「次の100年」へ——。
+2016年結成。アストル・ピアソラの遺志を継ぐ、国内唯一の「ピアソラ専門」木管四重奏団。
+50曲以上のすべての楽曲を自分たちの手でオリジナルアレンジし、楽譜を置かない「暗譜」スタイルでステージに挑む。
+緻密な対位法と4本の管楽器の限界に挑むアドリブ、そしてクリアな音像。4本とは思えないダイナミックなサウンドと先進的な音響アプローチで、従来の室内楽の枠を軽やかに飛び越えていく。
+ザ・シンフォニーホールでの主催公演の成功や、アルバムが「レコード芸術」誌にて特選盤・準特選盤に選出されるなど評価を高める一方、『となりの人間国宝さん』にも認定。2025年からは「クレモナユース・アンサンブル」を立ち上げ、次世代の育成にも力を注ぐ。
+音楽・自家焙煎コーヒー・教育を軸に、五感を揺さぶる「新しい日常」を発信し続けるクリエイティブ集団。",,,https://cremona-luke.com,,https://www.instagram.com/cremona_labo,https://youtube.com/@cremonalabo,
+,中村だいすけ,NAKAMURA DAISUKE,,,music,"生まれ故郷の長崎県で雲仙普賢岳噴火、小学生の時に移り住んだ神戸で阪神淡路大震災や犯罪事件を身近で経験。
+心理学に関心を持ち臨床心理士となり神戸で開業。音楽療法、犯罪心理学を専門とし、刑事事件の心理分析を数多く担当。
+シンガーソングライターとしての活動は大学生の頃に始め、2011年には、『風薫る』で全国CDデビューを果たす。
+東日本大震災や熊本地震での支援活動、学校や地域での講演活動をはじめ、その活動は『歌う臨床心理士』として取り上げられ、新聞やテレビ、ラジオなどでもパーソナリティとして活動している。",,,https://nakamuradaisuke.com/,,,,
+,うさぎや関西,USAGIYAKANSAI,,,music,関西発結成32年目の３ピースバンドうさぎやから、関西在住の2人（ギターボーカル＆ハーモニカ）が演奏します。,,,,,https://www.instagram.com/usagiya47,,
+,シュジャイン,シュジャイン,,,exhibition,台湾出身。現在、日本で生活しながら、絵画を通して愛や希望を伝える活動を行っています。日本で暮らす中で、言葉だけではなく、絵画という視覚的な表現を通して人の心に届く方法を考えるようになりました。普段アートに触れない人にも、街の中で作品と出会ってもらいたいと考えています。,,,,,https://www.instagram.com/jovina_christianart,,
+,倭太鼓飛龍,wadaikohiryu,,,music,"1998年、和太鼓奏者・日本舞踊家である飛鳥峯英により設立。
+日本文化の様式美を取り入れた、スピード感あふれるダイナミックな演奏を持ち味とし、 国内外で幅広く活動しております。
+常識に捉われない緻密且つ芸術性に優れた「より新しい和太鼓」の舞台を、関西から世界に向け、発信し続けています。",,,https://wadaiko-hiryu.jp/,,,,
+,"Tomomi Ukumori, Tomoya Tsutsui, Shigetomo Egashira, Makoto Yoshida","Tomomi Ukumori, Tomoya Tsutsui, Shigetomo Egashira, Makoto Yoshida",,,music,クラリネット、ボーカル、クリスタルボウル、ギター、エレクトロニクスを軸に、異なる音色と振動が交差する新たな音響表現を探求するアンサンブル。即興性と緻密なサウンドデザインを行き来しながら、静かに変容し、宇宙的な広がりを感じさせる音世界を描く。公演ごとに、パフォーミングアーツや映像、インスタレーションなど異なる領域の表現者をゲストに迎え、音楽を空間へと拡張。聴覚だけにとどまらない、多層的な体験としてのパフォーマンスを展開する。,,,,,,,
+,山本欽也,KINYA YAMAMOTO,,,music,2004年より、京阪神中心に、プロデュースイベント、コンサートを約350公演開催。,,,https://www.ongakuin.jp/lecturerlist/kinyayamamoto,,,,
+,原 由莉子,Hara Yuriko,,,music,"原 由莉子 プロフィール
+ウィーン国立音楽大学大学院ピアノ演奏科修了、修士号取得。
+イタリア第20回エウテルペ国際音楽コンクール第１位、ドイツ第5回オイレギオ国際ピアノコンクール審査員特別賞等多数受賞。また、各々イタリアで行われた第２回ヴィッラフランカ・ディ・ヴェローナ国際音楽コンクール、第５回タディーニ国際音楽コンクールでは、最高得点獲得者に贈られる絶対的第１位を受賞。ヨーロッパ各地で受賞記念リサイタルを行う。
+大阪府立夕陽丘高等学校音楽科、京都市立芸術大学ピアノ科卒業。これまでに辻田裕子、小出ひろみ、大冨栄里子、故・田辺緑、坂井千春、イリーナ・メジューエワの各女史に師事。
+第59回及び第62回全日本学生音楽コンクール大阪大会 中学生、高校生の部それぞれ入選。第16回堺ピアノコンクール、第6回宝塚ベガ学生ピアノコンクール、第16回KOBE国際音楽コンクール等で第１位を受賞。第19回松方ホール音楽賞入選。
+渡欧後、クリストファー・ヒンターフーバー、クリストフ・トラキシラーの両氏に師事。ウィーン市内のサロンGesellschaft für Musiktheater での定期的なリサイタルや、ハイリゲンシュタットの遺書の家で行われた演奏会でベートーヴェンのピアノソナタを演奏する等、様々な演奏会に出演し研鑽を積む。
+ウィーン国立音楽大学内で行われた演奏会『Klang Pause』において、E.W.コルンゴルトの室内楽作品を演奏。その模様はオーストリア国営ラジオ（Ö1）でオーストリア全土に放送された。また大学院修了時に執筆した同作品についての論文がヨーロッパ全土において出版されている。
+大阪交響楽団、大阪フィルハーモニー交響楽団、日本センチュリー交響楽団、関西フィルハーモニー管弦楽団、兵庫芸術文化センター管弦楽団(PAC)等のオーケストラと共演。
+『文化庁/日本演奏連盟主催・新進演奏家育成プロジェクトリサイタル・シリーズKYOTO』、『生で聴く、のだめカンタービレの音楽会』、『大阪クラシック～街にあふれる音楽～』、『兵庫県立芸術文化センター ワンコインコンサート』、『PAC WINDS!』、『富士山河口湖音楽祭』、『NHK-FMリサイタル・パッシオ』等の人気コンサートシリーズに出演し、ソロ室内楽問わず演奏活動を展開。関西テレビ『ピーチケパーチケ』、MBSラジオ『ありがとう浜村淳です』、FM大阪『くらこれ！』等メディア出演多数。
+浪切ホールアンバサダーアーティスト。『原 由莉子ウィーン世紀末シリーズ』主宰。
+現在、京都市立芸術大学指揮科にて、阪 哲朗氏の下コレペティトゥアを務める。",,,https://yuriko-hara.jimdosite.com/,https://x.com/yuriko_hara_pf,,,
+,LEFT&RIGHT,LEFT&RIGHT,,,music,ライトとレフト2人でやってます！,,,,,https://www.instagram.com/left_yuji,,
+,関西フォークブルース＆ラグタイム協会,Kansai Folk Blues & Ragtime Association,,,music,"「関西フォークブルース＆ラグタイム協会」と申します。
+主に関西地域におけるフォークブルース及びラグタイム・ブルース愛好家やアマチュア・ミュージシャンからなる、ちょっとマニアックな会員制のFB公開グループです。
+先の見えないコロナ禍で音楽界全体が閉塞していた2020年に、関西のアコースティックなブルース・シーンを盛り上げようと立ち上げました。おかげ様で現在では約500名の会員さんにメンバー参加いただいています。",,,https://www.facebook.com/groups/513082139332029,,,,
+,ghost,Ghost,,,street,なし,,,,,,,
+,Kaz-You,Kaz-You,,,music,"生まれつき目の見えない双子によるユニット。NATIVE、まぜこぜ大阪など、イベント出演歴多数。
+NHK『バリバラ』などのメディア出演歴や受賞歴も多数。
+大阪市生野区長表敬訪問。
+ダンサーKaz-maは、2025年スペインで開かれたダンスワールドカップにてリリカル部門世界３位。九州国際ダンスコンペティションでもバリアフリー部門2025・2026年優勝。見えない、立てない身体から生まれる表現で心を魅了する。
+パーカッショニストYou-maは、ダンサーとの作品に多く参加する傍ら、音楽バンドのドラム奏者としても活動中。ライブ主催歴も多く、ボーカルや作詞にも取り組んでいる。
+生まれつき目の見えない2人から生まれパフォーマンスは唯一無二。1人でも多くの方の心に届きますように。",,,https://www.facebook.com/share/1CBbWxDxqu/,,https://www.instagram.com/kazmayouma,,
+,clearance,clearance,,,music,"「clearance」…
+2003年結成。大阪を拠点に20年以上にわたり活動を続けているアカペラボーカルグループ。
+ポップで明るく親しみやすいサウンドと、観客との一体感を大切にしたステージを特徴とし、コンサートホールをはじめ、音楽フェスティバル、スポーツイベント、芸術鑑賞会などの学校公演、行政・企業イベントなど、全国各地で幅広く活動している。
+プロ野球「オリックス・バファローズ vs 阪神タイガース(京セラドーム)」での国歌斉唱や、2025年「大阪・関西万博」への出演など、大規模なイベントやさまざまな舞台でパフォーマンスを披露している。
+音楽活動に加え、病院内学級でのコンサート、子ども虐待防止オレンジリボン運動などの社会貢献活動にも継続して取り組むほか、自治体や教育機関、企業との連携を通じて、音楽をきっかけとした地域づくりや交流事業を展開している。
+また、2007年よりラジオ番組のパーソナリティとしても活動。現在はFM大阪・FMくらしきでレギュラー番組を担当するほか、YouTubeライブ配信を通じて、音楽・トーク・ゲスト企画など、リスナーとの交流を大切にした発信を続けている。
+2025年の大阪・関西万博では、ミクロネシア連邦ナショナルデーでの国歌歌唱をきっかけに、ミクロネシアと共同でライブイベントを開催。音楽を通じて人・地域・文化をつなぐ活動を国内外へ広げている。
+オリジナル楽曲の制作をはじめ、企業・自治体・教育機関・各種団体への楽曲提供やCMソング、ラジオジングルなども多数制作。「歌を届ける」だけではなく、「人と人をつなぐ」ことを大切に、音楽を通じた新たな価値を創造し続けている。",,,http://clear5.seesaa.net/,,https://www.instagram.com/clearance2003official,https://twitter.com/clearance2003,
+,ハンコウキ,hankouki,,,music,ロックミュージシャンのバンクさんと、骨髄バンク活動家バン子のコラボ,,,,,https://www.instagram.com/banko__chan,,
+,リンクライブス,link lives,,,music,"バス運転手の
+まつやまさひこ
+骨髄バンク活動家
+バン子ちゃん",,,,,https://www.instagram.com/banko__chan,,
+,SHOGUN,SHOGUN,,,music,"ジャグリングアーティスト。東京都出身。
+スティックを自在に操るジャグリング「デビルスティック」を専門とする。
+【出演歴・受賞歴】
+東京2020パラリンピック開会式 出演
+ドイツ ストリートパフォーマンスフェス
+Internationales Kleinkunstfestival Insel Usedom 出演
+スティックジャグリング競技会
+Fantastick 2024 SticKING シニア部門 審査員特別賞受賞
+欧州最大のジャグリングイベント
+European Juggling Convention 2016 デビルスティックバトル 準優勝
+サンリオピューロランド
+ノンバーバルショー「びょんわぁ〜beyond words〜」レギュラー出演中",,,,,,,
+,バンバンディ,banvandy,,,music,"ロックミュージシャンの
+バンディ石田さんと、
+骨髄バンク活動家のバン子
+様々な場所で歌っています。",,,,,https://www.instagram.com/banko__chan,,
+,Tatsuki,Tatsuki,,,dance,未定,,,,,Instagramhttps://www.instagram.com/oootatsukiooo,,
+,MINORI,MINORI,,,dance,"MINORI（田中みのり）
+2002年8月、ダウン症で生まれた24歳です。
+筋力、体力があまり無かったため、少しでも運動になればと思い、3歳の時に連れて行ったダンススクールがきっかけで踊り始めました。
+ラブジャンクスやワントライブなどのスクールに通い続けてもう20年ですが、何年経っても気ままにマイペースを貫いています。
+20歳の時、シュンジ先生が主催する「みんなのダンス」にも参加し、それからすぐに、ショーケースに出演するためのチームにお声掛けいただいて「Chews flavors!」のメンバーになりました。
+Chews flavors! では、イベントのゲストとしてお呼びいただいたり、NHKのバリアフリーバラエティ「バリバラ」に出演させていただいたり、「大阪府障がい者芸術・文化コンテスト2025」においてグランプリを受賞したり。
+また、春には大阪朝日放送さまの密着取材をお受けしたり。
+全国の各種イベントへの出演をはじめ、色々と貴重な経験を積み重ねている最中です。
+それと同時にソロやユニットで踊る機会も増えました。
+特にフリースタイルの即興コンタクトでは、大いに彼女らしさを発揮して世界に潜り込んでゆき、そのダンスから目を離せません。
+どんな踊りで自分を表現してゆくのか、はたまた踊らずともその佇まいが人を惹きつける、MINORIのこれからを一緒に楽しんでいただけると嬉しいです。",,,,,https://www.instagram.com/chit.t.a,,
+,SHOWSUN,SHOWSUN,,,music,"シンガーソングライターSHOWSUN
+「ちょっぴりハッピーなスパイスを」をコンセプトに、大阪を拠点に活動。
+作詞・作曲、レコーディング、ミックスをはじめ、幅広くセルフプロデュースで手がけ、ギター弾き語りを中心にカバー楽曲やオリジナル楽曲を自身の言葉と音で届けている。
+親しみやすいメロディーと日常に寄り添う言葉を大切にし、ライブ配信やSNS、ステージを通じて、一人ひとりの心に小さな幸せを届けることを目指している。
+これまでにオリジナル楽曲を7曲リリース。SpotifyやApple Musicなど各種プラットフォームで配信中。
+日々の出来事や感情を音楽に乗せながら、新たな作品づくりに取り組んでいる。",,,,,https://www.instagram.com/n4turalkillers_band,,
+,CHARHAN,charhan,,,street,"CHARHAN(チャーハン)
+フットバッグという脚でボールを操る競技スポーツとダンスを融合した世界初のスタイルで各地で活動中。同競技において全国2位。エナジードリンクSHARKの公式アンバサダー。2024年神戸まちなかアーティストに選出。大阪・関西万博でもパフォーマンスを行う。",,,http://lifeunderen.web.fc2.com/,,,,
+,昭和流行歌歌手 ももえ,showa area songs singer MOMOE,,,music,大正から昭和の古めかしい流行歌を復刻させるレトロな歌手。,,,https://momoe.wepage.com,,,,
+,メナード化粧品花香月代行店,Ｍenard cosmetic hanakazuki daikouten,,,other,いつも綺麗、いつまでも綺麗をコンセプトに自分らしさをみつけるサポート団体,,,,,,,
+,GRANOLA,GRANOLA,,,music,"HIRO （Vo.Gt）MINA（Vo）音源に合わせながらマイクパフォーマンスいたします。
+男女ダブルボーカルユニットになります。
+2020年にHIROとMINAの男女で結成されたユニット。
+GRANOLAは聴く人の心の栄養素になれるよう、どんな時でも寄り添える音楽を目指し、ストリートライブや花火大会、サンガスタジアム、野外イベントなど幅広く活動中。
+男女ならではの独特なハーモニーと形にはまらない幅広いジャンルで沢山の人を魅了する。
+クリス・ハート氏がジャケットデザインしたアルバム【Change of Heart】
+待望のフルアルバム【U&I-An unfading prayer-】が2025年8月11日にリリースされる。
+観客を巻き込んだ一体感のあるステージングで会場を沸かします。",,,https://pont.co/u/granola,,,,
+,株式会社花実かざり,"KAMIKAZARI Co.,Ltd.",,,music,2023年に設立から、現在は大阪・東京・名古屋・福岡・上海・バンコク・パリ・ミラノ・マニラに拠点を広げ、タレントマネジメント、モデルキャスティング、パフォーマーキャスティング、映像制作等を行っております。,,,https://www.kamikazari.info/,,,,
+,ゆめとまほう,YumetoMahou2026,,,music,Disneyの曲をインストゥルメンタル（楽器隊、編成によりVo有）アレンジで演奏する2026年はピアノ&ギター・ウクレレ&カホン編成のユニットです♪,,,,,https://www.instagram.com/disneyyusuke,,
+,Mr.K,misutah kei,,,music,仲良し夫婦ユニットです。共通の趣味として昨年6月から音楽を始めました。楽しみながら活動しています。,,,,,,,
+,世古美月,SEKO MIZUKI,,,music,上記と同じです。,,,https://sekomizuki.mystrikingly.com/,,https://www.instagram.com/sekomizuki/,,
+,Halal o lanimoani,Halal o lanimoani,,,dance,ハワイとフラを愛するメンバーが集まって、創作フラを楽しくレッスンしています。100歳まで笑顔で踊ろうをモットーに、年齢層も20代から70代まで幅広いメンバーで楽しく踊っています。テクニックだけではなく、ダンスやチームの雰囲気から暖かいメッセージが伝える事を大切にしています。,,,https://lanimoanihula.wixsite.com/my-site-3,,,,
+,madam Copán,madamCopán,,,music,"小学校からの同級生4人で
+20年前に結成！
+青春時代の懐かしい洋楽や邦楽で、一生青春やってます",,,,,,,
+,HIMIKO VOICE,HIMIKO VOICE,,,music,"猿丸詩摩子が率いる祈りを歌う集団。2022年5月に結成。現在では、
+東京、大阪、名古屋、福岡にチームがあり、在籍メンバーは、100名を超える。
+スピリチュアルヒーリングを取り入れた独自の発声法を軸に、
+魂を輝かせ生きることの大切さをステージで表現している。
+2023年〜梅田ゴスペルフェスティバル毎年出場
+2025年7月、OSAKA EXPO 2025 メンバー100人で出演や",,,https://www.joy-with-himiko.com/,,,,
+,MUTSUKIN,MUTSUKIN,,,street,"MUTSUKINは、「異世界」をテーマにしたフィジカルパフォーマンスを創作・上演しています。
+ダンスを軸に、ムーンウォーク、ボーンブレイク、パントマイムなど多彩な身体表現を融合し、まるで重力や時間が歪んだような幻想的な世界を描きます。
+ストリートを中心に国内外で活動し、子どもから大人まで、年齢や国籍、言語を問わず楽しめる作品づくりを追求しています。観客との距離が近い空間から劇場まで、場所に合わせて柔軟に上演できることも特徴です。
+主な受賞歴は、2026年 全国芸王グランプリ オープン部門優勝、ムーンウォーク世界大会 市長賞",,,,,https://www.instagram.com/mutsuki_dancetravelist,,
+,宝塚過激団,4,,,street,生前の ~某タレント様・マネージャーさん支援にて、活動して参りましたm(_ _)m,,,,,,,
+,小浜一家,OBAMA family,,,dance,"小浜一家は、太鼓の響きと民謡の声を家族で受け継ぎながら育ててきた音楽団体です。
+親から子へ、暮らしの中で自然に積み重ねてきた音が、
+ステージで生命力あふれるリズムとなって広がります。
+観客と一体になれる参加型パフォーマンスを展開しています。",,,,,,,
+,AIWエンタメプロレス,AIW Entertainment Pro-Wrestling,,,street,"【主な所属選手】
+オカネ・クレチカ
+上谷沙弥えんどう
+エッフェル塔羅ナツコ
+MCパンク
+タナバタ弘至
+おサカナい藤哲也
+BURI
+おカエリ・セイン
+Kaere Sane
+佐々木変介
+北斗晶めた
+お鹿島沙希
+クルシ・ジェリコ
+リック・古いヤー
+シャーロット・古いヤー
+大仁田暑い",,,https://x.com/aiw2026jp,,,,
+,オリーブ,Olive,,,street,"女性マイムアーティスト
+パントマイムを軸に、テレビ・広告・MV・映画・イベントでの出演、演技指導、動作監修を行っています。映画『鬼の花嫁』妖術演技指導をはじめ、大手企業CM、NHK・民放ドラマなどに参加。芸能人・子役タレントを含む300名超の指導経験があり、初心者から上級者まで、柔らかく丁寧な指導を行っています。ロボットダンス、からくり人形のような動き、表情豊かな無言演技、空間を使った演出を得意としています。ホテル・商業施設などでのイベント出演にも対応しています。
+テアトルアカデミー 演技指導講師
+日本芸術高等学園 身体演技講師
+芸能事務所 トゥインクル・コーポレーション所属
+東京都ヘブンアーティスト",,,https://twinkle-co.co.jp/talent/oribemachiko/,https://x.com/olivemime,,,
+,YUKI&MAI,YUKI&MAI,,,music,"音楽を通して楽しい時間を過ごす事が出来るステージをと思い応募しました。
+マルシェなどのステージやホールで演奏したり、老人ホームなどで唱歌などを歌うボランティア活動を関西中心に活動しています。音楽は、世代や世界を超えて届ける事が出来る！その魅力を精一杯の愛を込めて演奏し届けています。
+演奏場所を提供していただける事に感謝の気持ちを込めて、ステージ作りをします。
+どうぞ宜しくお願い致します。",,,,,https://www.instagram.com/yuki02090708mai,https://youtu.be/0ug13QIkeH0,
+,沙門優,shamon YU,,,exhibition,"普段は寺の副住職。御朱印に絵を描くうちに、だんだんと絵が大きくなりました。
+愛知県を中心に文化施設やデパート、イベント等でライブペイントをしています。ミュージシャンとのコラボも積極的にしています。",,,,,https://www.instagram.com/kannonji81,,
+,The Art of Losing,The Art of Losing,,,music,"2018年頃より活動開始し、主にストリートライブを中心にツインドラムを披露しています。
+ドラムは非常に楽しく、かっこいい楽器なので、それを伝えるために多くの人が通る場所でストリートライブを実施していますぁ",,,,,https://www.instagram.com/theartoflosing_/?hl=ja,https://www.youtube.com/channel/UCjuweRbIoxynxTFkWg2PPjw,
+,一般社団法人嗚呼A－yan！！日本をアートで盛り上げる団,ippansyadanhoujin aaeyan‼︎nihonwoaatodemoriagerudan,,,exhibition,"アートに携わる人々の創作活動を支援する非営利団体です。
+2005年2月、A-yan!!の前身「関西をアートで盛り上げる会」 が活動開始。
+同年10月には御堂筋パレードに出場し、毎日放送で特番として放送されました。
+現在に至るまで、様々なアーティストの活躍の場を作り、卒業を見送ったアーティストもたくさんいます。人材の入れ替わりや時代の流れなど、様々に変化してきた部分も多くありますが、基本的な理念は設立当初から全く変わる所がありません。
+A-yan!!は「みんなでオモロイコトを楽しもう」を合言葉に人種年齢性別を超えて人々が繋がるコミニケーションアートを実践していきます。",,,https://a-yan4649.com/,,,,
+,ヨウヤルウズ,YOUYALUZ,,,music,2026.6.9 ロックの日に始動したヨウヤルウズです。いろんなバンド経験したメンバーが、これが俺たちの音楽ってやつを生み出すために結成しました。「ホンマあいつらヨウヤルな」それが最高の褒め言葉、関西発、日本へ世界へ！ロックバンド「ヨウヤルウズ」ここからスタートです。,,,https://www.facebook.com/share/14iFoLk8NYw/,,,https://youtu.be/NiVGgjfKTPs,
+,ろうパフォーマー ムッシュー・マサ,DEAF Performer Monsieur MASA,,,street,ストリートで出会う小さな子供から大人までのお客さんが私のする「ありがとう」という手話を見て、「ご苦労様！」と手話で返事を返してくれました。私の大道芸によって、観る人々が笑顔で始まり、笑顔で終わり、ショーをご覧になってみんなが幸せになれたらいいなぁと思います。もし私のパフォーマンスで皆さんが幸せな気持ちになれたら、ヒラヒラの拍手をお願いします。,,,,,https://www.instagram.com/mashengchangfan/,,
+,澁澤メルモ,SHIBUSAWA Melmo,,,music,ジャズやボサノヴァなどのシンガー経験を経て2016年よりコンサーティーナ ( 小さなボタンアコーディオンの一種 ) 弾き語りでのソロ活動を開始。主に大阪、京都のジャズバー、ライブハウスにて活動中。,,,https://kuronekomelmo.wixsite.com/melmo,,,,
+,石水タヰキ,ISHIMIZU TAIKI,,,street,"京都を拠点に活動。ディアボロを得意としており、2022年と2024年のジャグリング全国大会で準優勝を獲得。京都の「ノンバーバルシアターGEAR」にレギュラー出演中。
+活動履歴
+・新日本海フェリー船内パフォーマンス出演
+・たかつき大道芸グランプリ2023決勝進出
+等
+・モリコロパーク大道芸フェスティバル2024・2025 出演
+・ふくやま大道芸2024 出演
+・豊岡演劇祭2024・2025ストリート出演",,,,,instagram: https://www.instagram.com/taiki_diabolo,,
+,Taiga Nakasuka,Taiga Nakasuka,,,music,うシンガーソングライターのTaiga Nakasuka(中須賀 大河)と申します。オリジナル曲を歌っています。オリジナル曲は100曲以上あってオリジナル曲での引き出しでは誰にも負けません。よろしくお願い致します。,,,,,https://www.instagram.com/taiga_nakasuka,https://youtube.com/channel/UCyV7fYNOdO9zbbuJbUyU6-A,
+,タカ,TAC.A.,,,music,"TAC.A. (タカ) 兵庫県で活動。シンガーソングライター×PA、音楽専門学校コンポーザー、アレンジャー科卒（CA科）
+弾き語り、バンド演奏、音響。
+心地良い、癒やしと創造を目指して。",,,https://lit.link/tacapage24,,,,
+,SEI ANアートプロジェクト,SEI AN ART PROJECT,,,exhibition,同上,,,,,https://www.instagram.com/stories/kainotorajp/,,
+,アカンターレ,Aquantare,,,music,ギターとベースだけで、これまで飲食店やライブスペースなどでその場の空間を最大限に心地よくするインスト音楽を演奏してきました。,,,https://aquantare.com,,,,
+,ピムク,PiMC,,,music,"PiMC（ピムク）は、大阪を拠点に活動する音楽プロデューサー／パフォーマーです。
+ファンク、R&B、ラテン、エレクトロなどジャンルの垣根を越えたサウンドで、思わず体が動き出す音楽を制作しています。
+活動のテーマは「ワクワクを伝染させること。」音楽を通して人が笑顔になり、そのワクワクが周りへと広がり、さらに新しい表現や挑戦が生まれる循環を目指しています。ライブでは、観客も参加者となり、一緒に空間をつくり上げる体験を大切にしています。大阪から世界へ向けて、ジャンルや言葉を越えて楽しめるエンターテインメントを発信しています。",,,https://www.pimcmusic.com,,,,
+,石の上にも藤の花（ふじわらの。）,fujiwarano,,,music,団体ではありません,,,,,https://www.instagram.com/fujiwarano_?utm_source=qr,,
+,Renato Leao,Renato Leao,,,dance,"Fato Cia Danca
+98年ブラジルで立ち上げる。
+2005年来日後、日本での活動開始。",,,https://fatoindance.jimdofree.com/,,,,
+,Concordia Dance Works,Concordia Dance Works,,,dance,"**Concordia Dance Works（コンコルディア ダンス ワークス）**は、大阪・心斎橋を拠点とするアメリカンスタイルペアダンススタジオです。30種類以上の多彩なペアダンスを学べる、国内でも数少ないスタジオとして活動しています。
+私たちが大切にしているのは、言葉を使わずに相手と意思を交わす、ペアダンス特有のコミュニケーション「リード＆フォロー」です。
+趣味や健康のためにダンスを楽しむ方、人との交流を求める方、ショーやコンペティションへの挑戦を目指す方まで、年齢や経験、目的の異なる人々が共に踊り、つながることのできるコミュニティづくりに取り組んでいます。
+私たちはペアダンスを、単に観せるためのパフォーマンスではなく、人と人を結び、世代や言葉、異なる文化を自然につなぐ「コミュニケーション文化」だと考えています。
+大阪から世界へ、自由で多彩なペアダンス文化を発信し、誰もが笑顔で参加できるダンスコミュニティを広げることを目指しています。",,,https://concordiadanceworks.com,,https://www.instagram.com/concordia_dance_works/,,
+,CHOP POP,CHOP POP,,,exhibition,"アーティスト名は好きな英語のフレーズ「Chop Chop」（急げ！急げ！）に由来。2008年から制作活動を開始。ストップアニメーションの背景を Paper cutting with collage（オリジナルスタイル）で制作し、現在に至る。UK/US Indie Rock、特にグラスゴーのミュージックシーンから影響を受けており、英国スコットランドのインディバンド CAMERA OBSCURAのミュージックビデオ, Let's Get Out Of This Country を Paper Cover Version として2015年から2年の歳月を経て原画196枚を制作、2017年にグラスゴーにて展示会を開催。2022年には同バンドのB面レア集アルバム “Making Money”のレコードジャケットに起用される。
+2024年は4月二ューヨーク、5月大阪大丸心斎橋店、7月グラスゴーにて展示。",,,http://choppop.web.fc2.com/,,https://www.instagram.com/chop_pop_paper/,https://youtu.be/535mHDsScp8,
+,Naomi Harica,Naomi Harica,,,dance,"Naomi Harica（ナオミ・ハリカ）
+2023年『妖精ダンサー®』の商標権を取得。
+ベリーダンスをベースに、ボリウッドダンス、チャイニーズフュージョン、ベトナムフュージョン、女神ダンス等、華やかでカラフルなステージや、幻想的で神秘的なパフォーマンスを幅広く披露。
+活動は海外にも広がっており
+2016年 ニューヨークで生演奏ショー
+2018年 ベトナムのフェスティバルに出演
+2019年より毎年、インドデリーでの『Namaste Japan Fest』に出演
+2025年 ドバイでの『World Art Dubai』に出演
+2025年は大阪・関西万博にて、アリーナmatsuri、ポップアップステージ、インドパビリオンでも複数回パフィーマンス披露。",,,https://harica.jp/,,https://www.instagram.com/harica_naomi,https://www.youtube.com/@NaomiHarica/featured,
+,タンゴ・グレリオ,TANGO GRELIO,,,music,星野俊路（バンドネオン）と米阪隆広（ギター）が２０１０年に結成したアコースティック・デュオ。下町情緒あふれるノスタルジックなサウンドに定評があり、アルゼンチンタンゴの魅力を関西から全国へ発信している。「奈良タンゴ祭」などワールドミュージック系のイベントにも多数出演。アリエル・ピロッティ(Pf)、ミルタ・アルバレス(Gt)などアルゼンチン出身のタンゴの名手との共演も果たしている。CD収録曲のいくつかがテレビ東京『開運！なんでも鑑定団』のBGMに使用されたほか、CD「シルバンド」は『レコード芸術』誌の準特選盤に選定された。,,,https://tangogrelio.com/,,,,
+,朗読ユニットステラリーディング,RoudokuUnitStellaReading,,,theater,"朗読ユニット『ステラリーディング』は、星や天体、そして日々の暮らしの中に光る「きらめき」をテーマに、声と音で物語を紡ぐ表現ユニットです。
+夜空を見上げるように、耳をすませば広がる、どこか懐かしくて愛おしい世界。時にロマンチックに、時に心温まる日常を、確かな表現力でお届けします。
+「朗読」というシンプルな表現だからこそ、皆様お一人おひとりの想像の中で、自由な景色を描いていただければ幸いです。
+あなたの心にそっと寄り添い、明日が少しだけ愛おしくなるような、特別な「言葉の世界」へご案内いたします。",,,https://sites.google.com/view/star-note/home,,,,
+,mico,mico,,,music,"シンガーソングライターとして、兵庫県を中心に活動している、micoと申します。
+ギター弾き語りで、オリジナル曲、カバー曲を演奏しています。",,,,,https://www.instagram.com/mico.esperanza/,https://www.youtube.com/watch?v=KSK_pdC-b_k,
+,今木宏充,IMAKI HIROMITSU,,,music,同上,,,,,,https://youtu.be/97bcxIGHdBU,
+,阿波おどり南大阪連,awaodori minamioosakaren,,,dance,「関西阿波おどり協会、南大阪連」は本拠地、大阪市住之江区です。徳島出身者が中心となり平成３年に発足しました。今年で35周年を迎えました。年間を通し練習をし、徳島市おどりには毎年連続踊込みをしています。又、地元の堺まつりや、天神天満阿波踊り等、地域の各種イベントにも積極的に参加しています。2025年には台湾花蓮県阿波踊り公演、2018年は、日台交流サミット、2017年に、台湾公演「台中国際ダンスパレード＆フェスティバル」にも出演等、5回の台湾公演が実現しました。尚、新規メンバーも募集中です。正調阿波踊り南大阪連、どうぞ宜しくお願いします。,,,https://www.hiwasa.co.jp/awaodori/,,,,
+,田井中 成登,Shigeto Tainaka,,,music,シンガー・ソングライター,,,https://shigepisan.jimdofree.com,,https://www.instagram.com/shigepisan,https://youtube.com/@shigepisan,
+,英 諭花,Akira Yuuka,,,music,"亡き家族が立てなかったステージに立つために発足した大阪発の音楽アーティスト。メッセージが詰め込まれた楽曲が特徴。
+ジャンルレスで様々な楽曲を継続展開中。",,,,,https://www.instagram.com/akira.yuuka.since2024,,
+,The Boomerang Loops,The Boomerang Loops,,,music,"2026年結成、1MC(SAM STUDIO)1Singer(serena)の2人組男女ソウルヒップホップユニット。
+サンプラーを使い、自身で演奏、アレンジメント、ライブパフォーマンスができる、一見物珍しいユニット。
+大阪を拠点に関西近郊でライブ活動中。
+2026年8月中旬に1st albumリリース決定。",,,,,https://www.instagram.com/sam_studio_osaka,,
+,the ANGELSTAR$,the ANGELSTAR$,,,music,"the ANGELSTAR$（ジ・エンジェルスターズ）
+the ANGELSTAR$は、日本を拠点に世界へ向けて活動する3人組ボーカルユニットです。
+R&B、ソウル、ゴスペル、ポップスをルーツに、力強いハーモニーと感情豊かなパフォーマンスで、一人ひとりの「自分らしさ」を肯定する音楽を届けています。
+「違いは強さになる」というメッセージを軸に、ジェンダーや国籍、文化の枠を超え、誰もがありのままの自分で輝ける世界を目指しています。
+音楽だけでなく、ファッションやアート、ストーリーテリングも表現の一部とし、日本とニューヨークをつなぐ新しいカルチャーを発信するグローバルアーティストとして挑戦を続けています。",,,,,https://www.instagram.com/the_angelstars/,,
+,特定非営利活動法人 門真フィルムコミッション,KADOMA Film Commission,,,music,門真国際映画祭や日本コメディ映画祭などの映画祭事業や、バルセロナ国際映画祭外国語映画部門最優秀作品賞受賞作品「門真市ゾンビ人材センター」などの映画制作事業、ご当地キャラクター「ジェイキー と ずぼらちゃん」などを企画運営している特定非営利活動法人 門真フィルムコミッションです。,,,https://kadoma-film.com/,https://twitter.com/@Jakie_Zubora,https://www.instagram.com/jakie_zubora/,,
+,KishiTomo,KishiTomo,,,music,"ター・ボーカル ”Kishimoto”＆ベース・ボーカル ”Tomoko” のアコースティックデュオです。
+関西の音楽フェスやライブハウスで演奏しています。
+誰もが一度は聴いたことがあるジャズやブルースのスタンダードナンバーを楽しいトークを織り交ぜながらお届けします♪",,,https://ameblo.jp/kishitomo-duo,https://x.com/KishiTomo_duo,https://www.instagram.com/kishitomo_duo,https://www.youtube.com/@kishitomo,
+,zoguno,zoguno,,,music,"🌍 zoguno プレミアム・プロフィール
+—— 最小の編成で、最大の景色を描く ——
+溝口サチコ（ロン）と宇野維人（海）による、多重録音のような緻密さとライブの熱量を共存させる音楽ユニット。
+【Member】
+• Ron / 溝口サチコ (Piano, Synth, Accordion / Sound Design)
+空間を塗り替えるサウンドクリエイター。アンビエントな残響とヴィンテージな質感を自在に操り、その場所の空気を取り込んだ「音の風景」をリアルタイムで構築する。
+• Umi / 宇野維人(まさと) (Drums)
+精緻なビートを刻むリズムの構築者。最小限のドラムセットから生み出される、打ち込みと生演奏の境界を越えたダイナミックなグルーヴで、zogunoの重厚な低域を支える。
+【Performance Style】
+シーンや会場の響きに合わせ、対照的な2つの形態で音を紡ぐ。
+• ◆ ジャバドラ Ver. (Accordion & Minimal Drums)
+「蛇腹（アコーディオン）」と「最小限のドラムセット」による、究極にオーガニックで濃密なアンサンブル。カフェやストリート、ギャラリーなど、空気の震えが直接届く空間で、観客と呼吸を共にしながら幻想的な景色を描き出す。
+• ◆ ピアドラ Ver. (Piano/Synth & Full Drums)
+「ピアノ・シンセサイザー」と「フルドラムセット」による、ダイナミックで重層的なサウンド。ジャズフェスやライブハウスなどの広大なステージにおいて、ヴィンテージな音像と電子音、そして生楽器のエネルギーを融合させ、聴く者を圧倒的な音の深淵へと誘う。
+【Concept】
+ユニット名は互いの名「mizoguchi」と「uno」を融合させたもの。
+ジャズの即興性、エレクトロニカの緻密さ、そしてアコースティックの温もり。ジャンルという枠を超え、世界中のどんなシーンにも溶け込み、かつその場の空気を一変させる唯一無二のパフォーマンスを展開する。
+🌍 zoguno Global Profile
+—— Minimalist Ensemble, Cinematic Landscapes ——
+zoguno is a musical unit featuring Ron (Sachiko Mizoguchi) and Umi (Masato Uno), blending intricate studio-quality precision with the raw energy of live performance.
+【Members】
+• Ron / Sachiko Mizoguchi (Piano, Synth, Accordion / Sound Design)
+A sound creator who reshapes spaces. Using ambient reverberations and vintage textures, Ron constructs ""sonic landscapes"" in real-time, breathing the local atmosphere into every note.
+• Umi / Masato Uno (Drums)
+An architect of rhythm. Using a minimalist drum kit, Umi generates dynamic grooves that blur the line between organic drumming and digital precision, grounding zoguno with a powerful, deep low-end.
+【Performance Styles】
+zoguno adapts to each venue’s acoustics through two distinct, contrasting setups:
+• ◆ Java-Dra Ver. (Accordion & Minimal Drums)
+The ultimate organic ensemble. A dense, intimate dialogue between the ""bellows"" (Accordion) and a stripped-down drum kit. Perfect for cafes, galleries, and streets—where the vibration of the air touches the audience directly, creating a shared, breathing experience.
+•",,,,,https://www.instagram.com/zoguno________,,
+,The Decameron Project,The Decameron Project ippungeki,,,theater,"主宰マタムラは マタムラは、海外の舞台で通用するグローバルな俳優の育成を目指しています。「英語教育×演劇」を軸に、インプロ（即興劇）、シェイクスピア、そして1分間演劇までをトータルに指導するオールマイティーな活動を展開しています。
+アメリカの第一線で活躍する俳優、演出家、劇作家との深い交流ネットワークを強みに、常に国際基準のクリエイティブな作品を発信。今回の大阪フリンジでは、凝縮された「1分間演劇」のステージに乗せてお届けします！",,,https://www.amelody.org/,,https://www.instagram.com/kazmatamura/?hl=ja,https://www.youtube.com/live/uKfwahuKaZo,
+,マリーン3世,marine333ird,,,music,"大阪を拠点に活動するシンガーソングライター・マリーン3世と申します。
+恋愛や日常の感情をキャッチーなメロディーと親しみやすい歌詞で曲を表現しています。
+YouTubeでの楽曲発信に加え、オリジナル曲を9曲リリース。
+2025年秋・2026年春には万博ロハスフェスタへ出演し、ライブ活動の場を広げている。",,,,,https://www.instagram.com/marine333ird,https://youtube.com/@marine333ird,
+,Peeps leafs,Peeps leafs,,,music,"メンバーそれぞれがHIP HOPやゴスペル、レゲエ、ボサノバ、ジャズ等
+色々なジャンルで活動しているアーティスト達が集い表現の場として
+HIP HOPを主体とし結成されたBAND。
+ボーカルの声をはじめ
+見たひとは必ず圧倒されるほどの魂を感じるHIP HOPサウンド。
+唯一無二の存在「Peeps Leafs」",,,,,https://www.instagram.com/peeps.leafs?igsh=Z3E3ZmhqNXBtbHVm,,
+,TELAi,TELAi,,,music,ジャンルの境界を軽やかに越境する3ピースバンド。それぞれがセッションホストミュージシャン／講師／プレイヤーとして活動している実力派が集結し、シンプルな編成だからこそ際立つグルーヴを追求する。瞬間の音を楽しむ衝動を武器に、毎度に表情を変えるライブは必見。,,,,,◼︎TELAihttps://www.instagram.com/telai_2025?igsh=cHQ3dmg0ejh5MmF5&utm_source=qr◼︎北原典充https://www.instagram.com/yo.kitahara_bass?igsh=MWFqbTMzZTBhcmozYw%3D%3D&utm_source=qr,,
+,咲（えみ）（菱井 えり香）,Hishii Erika,,,music,"中国の伝統楽器、二胡を勉強しています。二胡を弾くことで、自分自身の更なるステップアップを目指しています。
+また、演奏を聴いていただくことで、癒しや希望を与えられるようになりたいと、練習に励んでいます。
+スゴい二胡は弾けませんが、楽しく笑顔になれる時間をと活動しています。",,,,,https://www.instagram.com/25emi2022,,
+,NicaFelt（タテミズ ホセイ）,NicaFelt,,,music,"Nicafelt（ ニカフェルト ）
+アンビエント・アーティスト／サウンドデザイナーTINÖRKSの代表兼キーボード担当、
+タテミズ ホセイのソロプロジェクト。
+「ニカフェルト」という名前は、電子音を意味
+する「ニカ」と、やわらかな質感をイメージする「フェルト」を組み合わせた造語。
+キーボード、サンプラー、セミモジュラーシンセ、エフェクター、カリンバ、メタロフォンなど
+多彩な楽器を用いて楽曲制作。メロディアスで
+心地よいアンビエントやエレクトロニカを軸に、
+即興や偶発的な要素を取り入れ、丸みを帯びた
+柔らかな質感のサウンドが特徴。
+日本の電子楽器メーカー株式会社SONICWARE（ ソニックウェア ）のAmbient Øなどの公式プリセット
+制作、音作りワークショップやライブイベントの企画・主催、電子楽器を使った曲作りガイドブックを執筆。
+ブログ「 note 」では楽曲制作のノウハウを公開。
+2015年には、ドイツ、ルクセンブルク、フランス（世界遺産スタニスラス広場の市庁舎）でライブ。
+音楽が少しでも世界を穏やかにできることを
+願いながら活動中。
+美術の印象派やシュルレアリスムに影響を受け、自然が豊かな場所やカフェ巡りが好き。
+大事にしていることは、「ぼーっ」とすることや
+お茶の時間。",,,公式サイトhttps://namimum.wixsite.com/nicafelt活動実績https://namimum.wixsite.com/nicafelt/achievementYouTube（ 楽曲のご視聴 ）note（ 音楽制作の記事を執筆 ）https://note.com/sasayakanarumonoXinstagramhttps://www.instagram.com/hosei_tatemizu/,,,https://www.youtube.com/@nicafelt,
+,マッシュ・パレード,Mash Parade,,,music,"マッシュ・パレード
+25年結成、バイオリン、歌、ピアノでミュージックショーを繰り広げるユニット。
+クラシック、ミュージカル、ポップスまで幅広いレパートリーを織り交ぜ、
+オリジナル脚本による音楽劇的要素や演出を取り入れた“ちょっと不思議”でユニークな世界をお届けしています。
+これまで、
+25年6月椿庵
+26年1月Sakura Studio
+26年6月東園田町総合会館
+にて開催。
+高崎真央（Vn）大阪音楽大学卒業。ドイツ留学後、ブラウンシュヴァイク州立管弦楽団に所属。現在明石フィルハーモニー管弦楽団客演コンサートマスター。
+播摩夏奈（Sop）大阪音楽大学短期大学、大阪スクールオブミュージック専門学校にて声楽、ポピュラー音楽を学ぶ。音楽劇の執筆、プロデュースにも力を注ぐ。
+齊藤まり子（Pf）大阪音楽大学音楽専攻科修了。第15回ベーテン音楽コンクール第1位など受賞。22年より自身のリサイタルシリーズを開催中。",,,,https://x.com/NicaFelt,https://www.instagram.com/mashparade,,
+,Square Motion Art,Square Motion Art,,,sexhibition,当初は万博限定の一回限りの企画と考えていましたが、会場の静かな空間で多くの観客、とりわけ日頃感情を抑えて生きる大人たちが静かに涙を流す光景に立ち会い、この場の持つ力を感じました。自身の内面と静かに向き合い、深く心を落ち着ける、そんな時間が今の日本社会にこそ必要だと確信しました。万博終了後も、教育、福祉、医療の現場から招致が重なったことで、この一度の体験から始まった活動を継続し、日本全国へ広げていく意義を強く実感し、活動を続けています。,,,https://ichigoichielive.com/,,https://www.instagram.com/squaremotionart_japan/,,
+,東 航平,AZUMA KOHEI,,,street,"ダウン症バトントワラーのKOHEIです。
+憧れのトワラーに刺激を受け独学で技術を習得。即興での演技を得意とし、観る人のこころに届くパフォーマンスを追求する表現者です。
+出演・受賞歴
+大阪府障がい者芸術文化コンテスト2025
+準グランプリ受賞
+Future Performance Contest2026
+バトントワリング個人の部
+第６位
+ハートウォーミング賞
+狭山池まつり2026
+龍神舞台
+その他パフォーマンスコンテスト、マルシェ等に出演中",,,,,https://www.instagram.com/kohei_baton/,,
+,紙芝居桃まる,momomaru,,,kamishibai,"街頭紙芝居をモチーフに商業施設
+地域イベント 寄席などで活動しています
+お笑いをモットーに参加型など楽しめる内容です",,,,,https://www.instagram.com/momomaru.kamisibai/,,
+,Osita★Maki,Osita Maki,,,music,"横山真姫は、弾き語りメインの歌手です。
+スペインのフラメンコギター、アラブの弦楽器ウード、トルコの擦弦楽器カバックケマーネを弾き語りします。
+歌う言語は、現在のところ11言語。南米からイベリア半島をへて、地中海、中東までの歌を歌っています。",,,,,,,
+,☆Starchains彡,☆Starchains彡,,,music,"はじめまして☆
+私たちは、職業・年齢関係なく純粋に歌が好き、音楽が好きな社会人&学生で構成された関西を中心に活動しているコーラスグループです。
+☆Starchains彡とは、一人一人がStarになって、輝いて歌うことにより、音楽の輪が広がり繋がっていくことをイメージして名付けました。
+​
+米ドラマgleeが大好き！ミュージカルが好き！歌うの好き！踊るの好き！人前で表現してみたい！
+​誰もが主役になれるSHOW CHOIR TEAM!!!
+２０１５年１０月に立ち上げてから、貸し切りレストランでのイベントやライブハウス、コンサートステージなどで歌い踊るチームとして多数出演。
+ジャンル、場所に限らず、積極的に幅広く活動しております。",,,https://starchainshosino5.wixsite.com/starchains/about,,,,
+,Livin’on Prayers,Livin’on Prayers,,,music,"日米男女混成ユニット 「Living on Prayers」。
+昭和後期のロックナンバーや歌謡曲を、
+英語と日本語を自在に行き来するアレンジで、
+会場を巻き込むエンタメ性の高いライブとして届けます。",,,https://www.facebook.com/share/19JZK6oq9C/?mibextid=wwXIfr,,,https://youtube.com/@kkingworld?si=mRfL7tcxEoa4N2lX,
+,大阪ハープカンパニー,OSAKA HARP COMPANY,,,music,関西では珍しいアイリッシュハープとコントラバスのアンサンブルユニットです。クラシックから映画音楽、ポピュラーまで幅広いジャンルをアレンジして演奏しています。,,,https://www.instagram.com/yokopiano05/,,,,
+,CMK gallery,CMK gallery,,,exhibition,"CMK galleryは大阪・アメリカ村にあるグラフィティアートを専門とするストリートアートギャラリー。
+個性豊かなアート作品の展示販売、建物内外を彩る大胆な壁画、唯一無二のデザイン作成、オリジナリティ溢れるアパレル・グッズ販売を提供し、ストリートカルチャーの魅力を多角的に発信しています。
+前身となる「山栄ART工房」より20年以上の実績を誇るアートとファッションの融合を体感できる空間です。
+各種ご依頼はお気軽にご相談ください。",,,https://www.cmkgallery.com/,,https://www.instagram.com/cmkgallery/,,
+,BumblebeeJazz,BannblubeeJazu,,,music,"BumblebeeJazz は結成13年目のSaxJazzQuartetです。sax.pf.ba.dr.の4人でオリジナル曲と共に皆さんの聞き覚えのあるJazzを演奏します。
+関西中心の活動ですが関東は荻窪、新宿、六本木でも演奏します。5月は奈良薬師寺じき堂でのファッションショーで演奏し300名の皆様と楽しく盛り上がりました。皆様と一体となる楽しく盛り上がる舞台をモットーに演奏しております。",,,,,https://www.instagram.com/bumblebeejazz8383/,,
+,KERU,KERU,,,music,"ユニットKERUです。⁡
+⁡ギター&ミニキーボード夫婦によるアコースティック演奏で昭和歌謡、フォーク、Jポップ、オリジナル曲等をしております。⁡
+⁡ツインヴォーカルと息の合ったハーモニーを持ち味に皆さんに楽しんで頂けるよう音楽活動しております。",,,,,https://www.instagram.com/noritama_hizz/,,
+,5％BERMUDA,5％BERMUDA,,,music,海外を飛び回るアーティスト,,,http://5BERMUDA.com,,,,
+,MJダンサー【U-key】,MJ dancer U-key,,,dance,"大阪を拠点に活動しているMJダンサーの【U-key】ユーキです。
+Michael Jacksonのダンススタイルで全国ストリートダンスコンテスト優勝や数々のステージに出演。
+また、TikTokではフォロワー45万人、YouTubeチャンネル登録者数11万人などインフルエンサーとしても活動。",,,,,,,YouTubehttps://youtube.com/@mjdanceru-key?si=veHOVX4VMgIU5UV7TikTokhttps://www.tiktok.com/@dancerukey?_r=1&_t=ZS-97SGOmCzNSLInstagramhttps://www.instagram.com/ukeymjstylehiphop
+,ポケティ,POCKETY,,,music,あにめていっくシンガー「ポケティ」は関西を中心に活動しています。昭和から令和まで様々なアニメソング中心にオリジナル曲も歌います。また、FMラヂオきしわだにて毎週金曜日夕方6時より「ポケティの金6アニ活放送部」のラジオパーソナリティとしても活動しています。,,,,http://x.com/poke_ty?,http://instagram.com/y_yp.oke?,,
+,チンドン華乃家,Chindon Hananoya,,,street,代表の華乃家ケイは大阪難波を拠点に日本全国から海外も廻って30年！メンバーはミュージシャン若手も参入して新旧時代を超えた音楽パフォーマンスを繰り広げている。,,,,,https://www.instagram.com/hananoyakei/,,
+,Atelier AL SAFAR,AL SAFAR & AL HAREEL,,,dance,大阪府アーティストバンク登録者・大阪市生涯教育インストラクターであり、オリエンタルダンス、トライバルフュージョンベリーダンスを踊る「ATIFA」と、キッズからママたちに人気のモダンなベリーダンスを踊る「まゆ」によるユニットです。,,,,,https://www.instagram.com/atifa0712/,,
+,笑羽亭平大,shobateiheidai,,,traditional,笑羽亭平大は小学三年生の時に私の息子が自身で考えた名前です。子ども落語大会や主催のイベントや寄席など積極的に活動中です。（父が記入）,,,,,https://www.instagram.com/shobateiheidai_rakugo/,https://youtube.com/channel/UCC5SZjTV9oige_SVSGYYraQ,
+,佐海ずう,saumizuu,,,exhibition,東京藝術大学出身、株式会社芳文社にて「死ぬより先に飯を食え」、株式会社Vスクロールコミックスにて「今日も母は繭の中」を連載中の大阪在住マンガ家。主に夜の街で働く女の子達を主人公に漫画を制作している。主な受賞歴ー2023年1月 -『性風俗で働くひとってどんなひと』で『マンガイチ』（小学館）佳作受賞。2025年4月 -『くちなしの花嫁』で『第6回トーチ漫画賞』今井哲也賞受賞。2025年10月 -『ひかげの朝ごはん』で『コミックトレイル漫画家オーディション2025』グランプリ受賞。2025年12月 -『今日も母は繭の中』で『Vコミ・エッセイ漫画大賞』優秀賞受賞。,,,,https://x.com/mohumohutikuwa,,,
+,水本諭,mizumoto satoshi,,,music,"水本諭 mizumoto satoshi
+山口県防府市出身のシンガー・ソングライター。
+１８才の時、アコースティックギターに魅了され路上パフォーマンスを始める。
+２００８年、シングル「月が笑う」でデビュー。
+２０１０年、代表曲「美しいひと」のPVが映像関係者の目に留まり、ダマー国際映画祭にて特別上映される。
+それに伴い、同楽曲が広島テレビ「進め！スポーツ元気丸」のエンディングテーマに採用される。
+２０１１年、映画「少女たちの羅針盤」にミュージシャン役として出演、楽曲も披露した。
+2014年、韓国ツアーを決行。 
+2014年10月よりネッツトヨタ山口のＣＭソングに「ネガイゴト」、2015年6月より「JENGA」、2015年12月より「世界を超えて」、2016年11月「ワーク・ソング」が採用される。
+2016年8月、レノファ山口認定ソング”Orange""をリリース、スタジアムでも披露した。
+2016〜2017年、自身初となる山口県内ホールワンマンツアーを開催。
+2018年、山口ゆめ花博応援アーティスト”ゆめ花クリエイターズ”に選ばれる。
+2022年、蒲鉾の老舗【白銀】のCMソングを担当。
+現在は大阪在住。
+大阪城ホールワンマンライブを目標に掲げ、
+2026年8月29日にはその一歩目となる初の大阪ホールワンマンライブを開催予定!!",,,https://www.mizumoto-satoshi.com/,,https://www.instagram.com/mizumoto_satosh,,
+,ジャグラーみぞん,jugglermizon,,,street,"キャッチコピー""大道芸界の若獅子""
+小柄ながらもパワフル。折り紙つきの技術力であらゆる物をジャグリングします！
+ジャグリング以外にも、獅子舞や皿回し等の和芸、バランス芸、マジック、イリュージョン、サイエンス、アートバルーン、アクロバット等、多種多様な技を持つマルチエンターテイナーです。
+中でも最も得意とするのが、見応えたっぷりのディアボロ（中国ゴマ）！
+大道芸界随一のスピードと自由自在に操るディアボロを初めて見る方はどこまで追い切ることができるでしょうか？！
+正に獅子の如くパワーと瞬発力を兼ね備えた、ダイナミックなジャグリングショーを目の前でお楽しみください。
+2003年 師匠との出会い ジャグリングの基本技を磨く
+2005年 京都府立南陽高等学校のマジック部に入部後、ジャグリング部門を新設し、部のジャグラーとして様々なイベント等に出演。個人としても活動を開始。
+2008年 大阪市立大学在学期間中に大阪パフォーマーライセンス取得 
+2010年 プロとしての活動を本格化
+2017年 韓国JAPANWEEK出演（海外公演）、自主ライブ第１回ビーストフォールプロジェクト主催
+2018年 韓国公演（海外公演）、自主ライブ第２回ビーストフォールプロジェクト主催
+2019年 韓国パフォーマンスコンテスト出場（海外公演）、自主ライブ第３回ビーストフォールプロジェクト主催
+2023年 FNS27時間テレビ出演
+2025年 COMICDOM CONアテネ(ギリシャ)出演（海外公演）
+～賞暦～
+第2回大阪フリンジフェスティバル 大阪観光局局長賞（2019/10/23）
+第4回アリオ鷲宮大道芸グランプリ夏大会 優勝（2016/8/20）
+第12回江ノ島大道芸コンテスト 優勝（2016/6/4）
+2015年度シークルパフォーマンスコンテスト 優勝（2015/9/22）
+2012年度シークルパフォーマンスコンテスト 優勝（2012/12/2）
+AQUA21ストリートパフォーマンスフェスティバルＶＯＬ2 準優勝（2006/03/26）
+ふくやま大道芸一発芸コンテスト 入賞（2016/05/14）
+THE 激練りパフォーマンスコンテスト 入賞（2006/03）
+鶴亀一座最優秀新人賞（2008/08）
+～ライセンス～
+大阪パフォーマーライセンス取得 (2008年)
+東京都公認ヘブンアーティスト取得 (2014年)
+江ノ島大道芸パフォーマーライセンス取得 (2016年)
+KOBEまちなかパフォーマンスライセンス取得 (2026年)
+天保山ストリートパフォーマンスライセンス取得 (2026年)",,,https://www.jugglermizon.com,,https://www.instagram.com/jugglermizon,,
+,ウクレレ夫婦ころっけさんど,Ukulele foofu korokke sand,,,music,"バツ2再婚同士のウクレレ夫婦⁡
+⁡ウクレレパフォーマンスコンテストHappy賞受賞",,,⁡https://iestcafe.shopinfo.jp/,,https://www.instagram.com/tokkolele/?__d=1%2F,,
+,SiB,SiB,,,music,"ソロでHR/HM中心の自作ギターインスト演ってます。たまに歌うことも。主な活動はLiveHouse/barで演奏。
+自作曲は各配信サイト、Amazonmusic、AppleMusic、Spotify、AWA、LINEMusicなどで視聴できます。",,,,,https://www.instagram.com/sib_guitarmus1c?igsh=MWJqaDNsNGV5eHZkcA==,,
+,下北姫菜,HINA SHIMOKITA,,,music,大阪はライブハウス以外に活動できる場所が少なく、大勢の方に知ってもらいたく応募させていただきました。,,,,,https://www.instagram.com/hina_shimokita/?hl=ja,https://youtube.com/@shimokita.hina.,
+,KishiTomo,KishiTomo,,,music,"ギター・ボーカル ”Kishimoto”＆ベース・ボーカル ”Tomoko” のアコースティックデュオです。
+関西の音楽フェスやライブハウスで演奏しています。
+誰もが一度は聴いたことがあるジャズやブルースのスタンダードナンバーを楽しいトークを織り交ぜながらお届けします♪",,,,https://x.com/KishiTomo_duo,https://www.facebook.com/KishiTomo.duo,https://www.youtube.com/@kishitomo,
+,萩原 智世,HAGIWARA TOMOYO,,,music,なし,,,,,https://www.instagram.com/tomo.2101/,,
+,酔韻,YO-ING,,,music,2020年大阪にて結成 様々なメンバーチェンジを経て今に至る。 2024年「酔韻 Yo-ing」に改名 Lo-Fi HipHopを基本ベースにJAZZ、SOUL、FUNK、CITYPOPをミックスしたサウンドを生演奏でアウトプット。日常の空気感や感情の揺らぎを、“酔うように響く音”で描き出す。 ライブではグルーヴ重視の演奏と即興性を武器に、ジャンルを越えて観客を巻き込む。 大阪梅田、心斎橋、難波を中心にストリートにて活動中。,,,,,https://www.instagram.com/yo_ing_band/?hl=ja,,
+,Kansai Comedy,Kansai Comedy,,,comedy,"Kansai Comedy (KC) is an English-language stand-up comedy community founded in Osaka. We run regular shows at Absinthe Underground (Osaka) and Ki Bar (Kyoto), and host open mics, workshops, and collaborative events for comedians at all levels. Co-founded by Australian comedian and Osaka local Dylan Lamb, KC is built on a community-first ethos — not a club, not a corporation. Website: kansaicomedy.com | Instagram: @kansaicomedy",,,https://www.kansaicomedy.com/,,https://www.instagram.com/kansaicomedy,,
+,Ras Tamano,Ras Tamano,,,music,ラスタファリの文化や伝統を羊毛フェルト人形を通して伝えています。,,,,,https://www.instagram.com/ras_tamano,,
+,AMBER,AMBER,,,dance,"例えば、コーヒーを飲むように、散歩をするように、映画を観るように、、私達の生活に溶け込んでいる隙間にこそ、時として忘れられないモノに出会ったり、思いもよらず想像を巡らす時間になる。身構えないからこその創造との出会い。
+私たちAMBERはダンスを通じて、そんな体験や空間を創りたいと願って日々活動しています。",,,,,https://www.instagram.com/amber_____2022,,
+,カラフルな天使たち,Colorful Angels,,,music,"【カラフルな天使たち】は、
+視覚障害者が中心のコーラスとピアノのグループです。生まれつき全盲でピアノなど習ったこともないメンバーの
+ドラミちゃんが、聞いた音楽を自由に
+楽しみ演奏し、昔バンド活動をしていた中途失明のリーダー ヒデの作詞に曲を
+つけて歌好きの仲間が集まって次々と
+オリジナルの〜幸運を呼ぶ魔法の歌シリーズ〜を生み出しています。
+最初は、大阪府の文化芸術コンテストで準グランプリを受賞。オリジナル曲の「ドンマイドンマイ」の歌が大好評でした。地元の大阪市福島区の社会福祉協議会とも強いタッグを組み、イベント活動やボランティア活動にも取り組んでいます。
+昨年は大阪・関西万博にも出演。
+圧巻のパフォーマンスで多くの観客を
+魅了し、大きな反響をいただきました。
+目指すは、ドリフターズのような
+皆から愛され親しまれるユニークな
+チーム。そして、将来1万人の【カラフルな天使たち】で、万博公園を孫と一緒に歌って踊って楽しんでもらえるイベントをすること。歌が下手でも声がイマイチでも大丈夫、音楽は宇宙からの贈り物。歌を楽しむことをモットーに、それぞれのカラフルな個性や音色をむしろ芸術的にとらえ、ここ大阪から垣根の無い世界への楽しいチャレンジです。",,,https://tenshitachi.jp/,,,,
+,HARU,HARU,,,street,"オブジェクトmanipulation（物体操作）を専門とするジャグリングパフォーマー兼エデュケーター。
+幼少期をグアムで過ごし、大学時代に本格的にジャグリングを開始。数々のステージ経験を経て、2026年4月に自身のソロプロジェクト「Midnight Kobe Automaton（ミッドナイト・コウベ・オートマタ）」をリブート（再始動）させる。
+唯一無二の魅力は、確立された「ドール（自動人形）」の世界観と、確かな技術力の融合。
+「バレエコア」と「原宿ファッション」を絶妙にミックスした漆黒の髪のハイブリッド・ドールになりきり、糸で操られているかのような精緻な動きから、観客の目を釘付けにするダイナミックなパフォーマンスへと展開する。
+【得意とする変幻自在の3大プロップ（道具）】
+8本リング：空間に幾何学的な模様を浮かび上がらせる錯視的なアプローチ
+・ポイ：流れるような美しい軌道で観客を幻想的な世界へと没入させる表現
+・ディアボロ：人形らしからぬ圧倒的な躍動感
+とスピード感で魅せる技術
+単なる技の披露にとどまらず、音楽と衣装、そして自身の身体表現すべてでひとつのストーリーを構築する、関西発の新進気鋭のパフォーマ一です。",,,https://lit.link/haru_juggling,,https://www.instagram.com/haru_0127_juggling,,
+,5＊ SEASON ringohan（鈴御はん）,Ringohan,,,exhibition,"奈良・ならまちの三畳の小さなギャラリー兼アトリエショップを拠点に、歌い、描き、物語を育てている。
+歌手として言葉とメロディを届けながら、イラストレーターとして独自のキャラクター世界「しくるちゃんフレンズ」を創作。
+白い鹿、やたがらす、身代わり申、猫、カエル——奈良の風景や文化、祈りや記憶の断片から、現代の民話のような存在たちを描いている。
+私にとってキャラクターは、消費される記号ではない。
+土地の空気をまとい、感情を持ち、物語の中で息をしている“住人”である。
+絵の中に現れる彼らは、かわいいだけの存在ではなく、
+恋をし、迷い、守り、見守り、空を旅する。
+日本の古い意匠や暮らしの中に、そうした新しい物語の住人をそっと住まわせることに惹かれている。
+歌も絵も、私にとっては同じ表現だ。
+目に見えない感情や祈りを、かたちを変えて届けているだけなのだと思う。
+ならまちの片隅から生まれた小さな世界が、
+見る人の中でそれぞれの物語として続いていくことを願っている。",,,,,https://www.instagram.com/shikuru_nara,,
+,KaRiNKaN-A,KaRiNKaN-A,,,music,"Japanese POPculture musicをコンセプトに
+楽曲を制作、パフォーマンスする
+ボーカルのKARINとDJabuの二人組ユニット",,,https://www.instagram.com/karinkan_a,,,,

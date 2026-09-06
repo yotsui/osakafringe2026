@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Venue, Performance } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import SafeImage from '@/components/common/SafeImage';
@@ -13,7 +14,8 @@ import {
   Navigation, 
   Sparkles,
   Building2,
-  Users
+  Users,
+  Eye
 } from 'lucide-react';
 import { InstagramIcon, TwitterIcon } from '@/components/common/SnsIcons';
 
@@ -24,21 +26,38 @@ interface VenuesClientProps {
 
 export default function VenuesClient({ venues, performances }: VenuesClientProps) {
   const { t, getText } = useLanguage();
+  const searchParams = useSearchParams();
   const [selectedPerformance, setSelectedPerformance] = useState<Performance | null>(null);
 
   // Group performances by venue
   const getPerformancesForVenue = (venueId: string) => {
     return performances.filter(
-      (p) => p.venueId === venueId || p.schedules.some((s) => s.venueId === venueId)
+      (p) => p.venueId === venueId || (p.schedules && p.schedules.some((s) => s.venueId === venueId))
     );
   };
+
+  // デモモード（?demo または ?demo=true/1 等）判定
+  const isDemoMode = searchParams.has('demo') && searchParams.get('demo') !== 'false';
+
+  // 公演が登録されている会場のみを抽出（デモモード時は全件）
+  const displayVenues = isDemoMode
+    ? venues
+    : venues.filter((v) => getPerformancesForVenue(v.id).length > 0);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
       {/* Header */}
       <div className="text-center space-y-3">
-        <div className="inline-block px-3 py-1 rounded-full bg-pink-50 border border-pink-200 text-[#E6007E] text-xs font-black uppercase tracking-wider">
-          <span>{t('venuesPageBadge')}</span>
+        <div className="flex items-center justify-center gap-2 flex-wrap">
+          <div className="inline-block px-3 py-1 rounded-full bg-pink-50 border border-pink-200 text-[#E6007E] text-xs font-black uppercase tracking-wider">
+            <span>{t('venuesPageBadge')}</span>
+          </div>
+          {isDemoMode && (
+            <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-100 border border-amber-300 text-amber-800 text-xs font-black tracking-wide shadow-xs">
+              <Eye className="w-3.5 h-3.5" />
+              <span>DEMO MODE（公演未登録会場を含む全件表示中）</span>
+            </div>
+          )}
         </div>
         <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
           {t('venuesPageTitle')}
@@ -51,7 +70,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
       {/* Interactive Map */}
       <div className="space-y-4">
         <FestivalMap
-          venues={venues}
+          venues={displayVenues}
           performances={performances}
           onSelectPerformance={(p) => setSelectedPerformance(p)}
         />
@@ -64,12 +83,15 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
             {t('allVenuesTitle')}
           </h2>
           <span className="text-xs font-bold text-slate-500">
-            {venues.length} {t('venuesCountUnit')}
+            {displayVenues.length} {t('venuesCountUnit')}
+            {!isDemoMode && venues.length > displayVenues.length && (
+              <span className="ml-1 text-slate-400 font-normal">（公演登録会場のみ）</span>
+            )}
           </span>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-          {venues.map((venue) => {
+          {displayVenues.map((venue) => {
             const venueName = getText(venue.name, venue.nameEn);
             const venueArea = getText(venue.area, venue.areaEn);
             const venueAddress = getText(venue.address, venue.addressEn);

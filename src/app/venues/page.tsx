@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { getVenues, getPerformances } from '@/lib/microcms';
 import VenuesClient from './VenuesClient';
 
@@ -13,5 +13,9 @@ export default async function VenuesPage() {
     getPerformances(),
   ]);
 
-  return <VenuesClient venues={venues} performances={performances} />;
+  return (
+    <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-16 text-center text-slate-400 font-bold">Loading venues...</div>}>
+      <VenuesClient venues={venues} performances={performances} />
+    </Suspense>
+  );
 }

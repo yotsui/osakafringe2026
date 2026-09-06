@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Artist, Performance, Venue } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import PerformanceModal from '@/components/audience/PerformanceModal';
@@ -15,7 +16,8 @@ import {
   Globe, 
   ExternalLink, 
   ArrowRight,
-  Theater
+  Theater,
+  Eye
 } from 'lucide-react';
 import { TwitterIcon, InstagramIcon, YoutubeIcon } from '@/components/common/SnsIcons';
 
@@ -27,6 +29,7 @@ interface ArtistsClientProps {
 
 export default function ArtistsClient({ artists, performances, venues }: ArtistsClientProps) {
   const { t, getText } = useLanguage();
+  const searchParams = useSearchParams();
   const [selectedPerformance, setSelectedPerformance] = useState<Performance | null>(null);
 
   // Helper to find performances by artist
@@ -36,13 +39,29 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
     );
   };
 
+  // デモモード（?demo または ?demo=true/1 等）判定
+  const isDemoMode = searchParams.has('demo') && searchParams.get('demo') !== 'false';
+
+  // 出演公演が登録されているアーティストのみを抽出（デモモード時は全件）
+  const displayArtists = isDemoMode
+    ? artists
+    : artists.filter((a) => getPerformancesForArtist(a.id, a.name).length > 0);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
       {/* Header */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-50 border border-pink-200 text-[#E6007E] text-xs font-black uppercase tracking-wider">
-          <Users className="w-3.5 h-3.5" />
-          <span>{t('artistsPageBadge')}</span>
+        <div className="flex items-center justify-center gap-2 flex-wrap">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-50 border border-pink-200 text-[#E6007E] text-xs font-black uppercase tracking-wider">
+            <Users className="w-3.5 h-3.5" />
+            <span>{t('artistsPageBadge')}</span>
+          </div>
+          {isDemoMode && (
+            <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-100 border border-amber-300 text-amber-800 text-xs font-black tracking-wide shadow-xs">
+              <Eye className="w-3.5 h-3.5" />
+              <span>DEMO MODE（出演公演未登録アーティストを含む全件表示中）</span>
+            </div>
+          )}
         </div>
         <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
           {t('artistsPageTitle')}
@@ -55,7 +74,10 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
       {/* Artists Count */}
       <div className="flex items-center justify-between border-b border-pink-100 pb-3">
         <h2 className="text-lg sm:text-xl font-black text-slate-900">
-          {artists.length} {t('artistsCountUnit')}
+          {displayArtists.length} {t('artistsCountUnit')}
+          {!isDemoMode && artists.length > displayArtists.length && (
+            <span className="ml-1 text-slate-400 font-normal">（出演公演登録アーティストのみ）</span>
+          )}
         </h2>
         <Link
           href="/audience"
@@ -68,7 +90,7 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
 
       {/* Grid of Artists */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {artists.map((artist) => {
+        {displayArtists.map((artist) => {
           const artistName = getText(artist.name, artist.nameEn);
           const origin = getText(artist.origin, artist.originEn);
           const profile = getText(artist.profile, artist.profileEn);
