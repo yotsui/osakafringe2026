@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import Link from 'next/link';
 import { Venue, Performance } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
-import { Navigation, ExternalLink, Calendar, Train } from 'lucide-react';
+import { Navigation, ExternalLink, Calendar, Train, ArrowRight, Building2 } from 'lucide-react';
 import SafeImage from '@/components/common/SafeImage';
 import { METRO_LINES_INFO } from '@/data/transitLinesInfo';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -149,6 +150,7 @@ export default function FestivalMap({
         const vArea = getText(v.area, v.areaEn);
         const vAccess = getText(v.access, v.accessEn);
         const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${v.location.lat},${v.location.lng}`;
+        const venuePageUrl = `/venues/${v.id}`;
 
         // DOMマーカーエレメントの生成
         const el = document.createElement('div');
@@ -188,17 +190,17 @@ export default function FestivalMap({
 
         // ポップアップが上下左右どの方向に出てもPIN本体を覆い隠さない方向別オフセット (28px確保)
         const popupOffsets: Record<string, [number, number]> = {
-          'top': [0, 28],          // ポップアップがピンの下に出る時：ピン下端先端よりさらに下に配置
+          'top': [0, 28],
           'top-left': [18, 28],
           'top-right': [-18, 28],
-          'bottom': [0, -28],      // ポップアップがピンの上に出る時：ピン上端よりさらに上に配置
+          'bottom': [0, -28],
           'bottom-left': [18, -28],
           'bottom-right': [-18, -28],
           'left': [28, 0],
           'right': [-28, 0],
         };
 
-        // POPUP 生成（closeOnClick: true で地図上クリック時に閉じる）
+        // POPUP 生成
         const popup = new maplibregl.Popup({
           offset: popupOffsets,
           closeButton: true,
@@ -207,24 +209,41 @@ export default function FestivalMap({
         }).setHTML(`
           <div style="font-family: sans-serif; color: #0f172a; padding: 2px 2px 4px 2px;">
             <div style="font-size: 11px; font-weight: 800; color: #E6007E; text-transform: uppercase; letter-spacing: 0.05em;">${vArea}</div>
-            <div style="font-size: 14px; font-weight: 900; margin: 3px 0 6px 0; line-height: 1.35;">${vName}</div>
+            <div style="font-size: 14px; font-weight: 900; margin: 3px 0 6px 0; line-height: 1.35;"><a href="${venuePageUrl}" style="color: inherit; text-decoration: none;">${vName}</a></div>
             <div style="font-size: 11px; color: #64748b; margin-bottom: 12px; line-height: 1.45;">${vAccess}</div>
-            <a href="${navUrl}" target="_blank" rel="noopener noreferrer" style="
-              display: inline-flex;
-              align-items: center;
-              gap: 5px;
-              background: #E6007E;
-              color: white;
-              padding: 6px 14px;
-              border-radius: 10px;
-              font-size: 11px;
-              font-weight: 800;
-              text-decoration: none;
-              box-shadow: 0 2px 6px rgba(230,0,126,0.3);
-            ">
-              <span>Google Maps でルート案内</span>
-              ↗
-            </a>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <a href="${venuePageUrl}" style="
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                background: #0f172a;
+                color: white;
+                padding: 6px 12px;
+                border-radius: 10px;
+                font-size: 11px;
+                font-weight: 800;
+                text-decoration: none;
+              ">
+                <span>会場詳細</span>
+                →
+              </a>
+              <a href="${navUrl}" target="_blank" rel="noopener noreferrer" style="
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                background: #E6007E;
+                color: white;
+                padding: 6px 12px;
+                border-radius: 10px;
+                font-size: 11px;
+                font-weight: 800;
+                text-decoration: none;
+                box-shadow: 0 2px 6px rgba(230,0,126,0.3);
+              ">
+                <span>案内</span>
+                ↗
+              </a>
+            </div>
           </div>
         `);
 
@@ -277,7 +296,6 @@ export default function FestivalMap({
           data: '/data/transit-lines.geojson',
         });
 
-        // 下地ホワイトグロー（視認性を向上させる半透明白ライン）
         map.addLayer({
           id: 'transit-lines-glow',
           type: 'line',
@@ -289,7 +307,6 @@ export default function FestivalMap({
           },
         });
 
-        // 路線カラーライン（Osaka Metroは公式色、JRは#333333、私鉄は#666666細線）
         map.addLayer({
           id: 'transit-lines-core',
           type: 'line',
@@ -309,7 +326,6 @@ export default function FestivalMap({
           data: '/data/transit-stations.geojson',
         });
 
-        // 1. 主要駅（ターミナル・乗換・会場最寄り）の丸印（ズーム11.5以上）
         map.addLayer({
           id: 'transit-station-points-major',
           type: 'circle',
@@ -325,7 +341,6 @@ export default function FestivalMap({
           },
         });
 
-        // 2. 主要駅の駅名テキストラベル（ズーム12以上）
         map.addLayer({
           id: 'transit-station-labels-major',
           type: 'symbol',
@@ -347,7 +362,6 @@ export default function FestivalMap({
           },
         });
 
-        // 3. 一般駅の丸印（ズーム13.5以上で全駅表示）
         map.addLayer({
           id: 'transit-station-points-minor',
           type: 'circle',
@@ -363,7 +377,6 @@ export default function FestivalMap({
           },
         });
 
-        // 4. 一般駅の駅名テキストラベル（ズーム14以上で全駅表示）
         map.addLayer({
           id: 'transit-station-labels-minor',
           type: 'symbol',
@@ -401,12 +414,10 @@ export default function FestivalMap({
 
       if (isCancelled || !mapContainerRef.current) return;
 
-      // WebWorker をローカルから配信設定
       if (typeof maplibregl.setWorkerUrl === 'function') {
         maplibregl.setWorkerUrl('/maplibre-gl-worker.mjs');
       }
 
-      // 既存インスタンス破棄
       if (mapInstanceRef.current?.map) {
         mapInstanceRef.current.map.remove();
         mapInstanceRef.current = null;
@@ -414,7 +425,6 @@ export default function FestivalMap({
 
       isMapReadyRef.current = false;
 
-      // CARTO Positron MVT ベクタータイルスタイルを直接適用
       const map = new maplibregl.Map({
         container: mapContainerRef.current,
         style: '/data/carto-positron-style.json',
@@ -428,7 +438,6 @@ export default function FestivalMap({
         'top-right'
       );
 
-      // 縮尺コントロール（メートル単位: m / km 表記）
       map.addControl(
         new maplibregl.ScaleControl({
           maxWidth: 100,
@@ -437,7 +446,6 @@ export default function FestivalMap({
         'bottom-left'
       );
 
-      // 全画面表示コントロール（右下）
       map.addControl(
         new maplibregl.FullscreenControl(),
         'bottom-right'
@@ -448,20 +456,15 @@ export default function FestivalMap({
         'bottom-right'
       );
 
-      // マップ準備完了ハンドラー
       const onReady = () => {
         if (isMapReadyRef.current || isCancelled) return;
         isMapReadyRef.current = true;
 
         map.resize();
 
-        // 1. 鉄道強調ベクターレイヤーを追加
         addTransitLayers(map);
-
-        // 2. 会場ピンを追加
         renderMarkers(map, maplibregl);
 
-        // 3. 全会場が収まる広域ZOOMに初期自動調整 (fitBounds)
         if (venues.length > 0) {
           const bounds = new maplibregl.LngLatBounds();
           venues.forEach((v) => {
@@ -474,7 +477,6 @@ export default function FestivalMap({
           });
         }
 
-        // 初期表示範囲内の会場リストを更新
         updateVisibleVenues(map);
       };
 
@@ -501,13 +503,11 @@ export default function FestivalMap({
     };
   }, [venues, updateVisibleVenues, addTransitLayers, renderMarkers]);
 
-  // 会場リスト選択時にピン色とPOPUPを連動（ZOOM・カメラ移動は行わない）
   const handleSelectVenueCard = (v: Venue) => {
     setActiveVenue(v);
     if (onSelectVenue) onSelectVenue(v.id);
     updateMarkerColors(v.id);
 
-    // 対応するマーカーのPOPUPを開く
     const item = markersRef.current.find((m) => m.venue.id === v.id);
     if (item?.marker) {
       if (!item.marker.getPopup().isOpen()) {
@@ -516,7 +516,6 @@ export default function FestivalMap({
     }
   };
 
-  // 選択された会場で上演される公演一覧
   const venuePerformances = activeVenue
     ? performances.filter((p) => {
         if (p.venueId === activeVenue.id) return true;
@@ -526,7 +525,6 @@ export default function FestivalMap({
 
   return (
     <div className="space-y-6 relative isolate z-0">
-      {/* POPUP & Close Button Custom Styles */}
       <style>{`
         .maplibregl-popup {
           z-index: 10 !important;
@@ -588,38 +586,6 @@ export default function FestivalMap({
         {/* Vector Map Container */}
         <div className="lg:col-span-8 relative rounded-2xl overflow-hidden min-h-[460px] lg:min-h-[600px] bg-slate-100 border border-slate-200 isolate">
           <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />
-
-          {/* Map Legend: Osaka Metro 9 Lines (将来表示用として保持・現在は非表示) */}
-          <div className="hidden absolute bottom-4 left-4 z-10 bg-white/95 backdrop-blur-md p-3 rounded-2xl border border-slate-200/90 shadow-lg flex-col gap-2 max-w-sm">
-            <div className="flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
-              <Train className="w-3.5 h-3.5 text-[#E6007E]" />
-              <span className="text-[11px] font-black text-slate-900">Osaka Metro 路線ネットワーク</span>
-            </div>
-            
-            {/* 添付画像アイコン準拠のライン＆シンボルバッジ一覧 */}
-            <div className="grid grid-cols-3 gap-x-2.5 gap-y-1.5 text-[10px] font-bold text-slate-700">
-              {METRO_LINES_INFO.map((line) => (
-                <div key={line.symbol} className="flex items-center gap-1.5 truncate">
-                  <span
-                    className="w-4 h-4 rounded-full flex items-center justify-center text-white text-[9px] font-black shrink-0 shadow-xs"
-                    style={{ backgroundColor: line.color }}
-                  >
-                    {line.symbol}
-                  </span>
-                  <span className="truncate">{line.name}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="pt-1 border-t border-slate-100 flex items-center gap-2 text-[9.5px] font-bold text-slate-500">
-              <span className="flex items-center gap-1">
-                <span className="w-2.5 h-1 rounded-full bg-[#333333]" /> JR線
-              </span>
-              <span className="flex items-center gap-1">
-                <span className="w-2.5 h-1 rounded-full bg-[#666666]" /> 私鉄各線
-              </span>
-            </div>
-          </div>
         </div>
 
         {/* Venue Info Side Panel */}
@@ -627,7 +593,10 @@ export default function FestivalMap({
           {activeVenue ? (
             <div className="space-y-4">
               {/* Venue Thumbnail Image */}
-              <div className="relative aspect-16/9 w-full rounded-2xl overflow-hidden bg-slate-900 shadow-xs">
+              <Link
+                href={`/venues/${activeVenue.id}`}
+                className="relative aspect-16/9 w-full rounded-2xl overflow-hidden bg-slate-900 shadow-xs block group"
+              >
                 <SafeImage
                   src={activeVenue.image || (activeVenue.images && activeVenue.images[0])}
                   alt={getText(activeVenue.name, activeVenue.nameEn)}
@@ -636,17 +605,19 @@ export default function FestivalMap({
                   quality={75}
                   fallbackType="venue"
                   fallbackText={getText(activeVenue.name, activeVenue.nameEn)}
-                  className="object-cover"
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full bg-[#E6007E] text-white font-black text-[11px] shadow-sm z-10">
                   {getText(activeVenue.area, activeVenue.areaEn)}
                 </div>
-              </div>
+              </Link>
 
               <div className="space-y-1.5 border-b border-pink-100 pb-3">
-                <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
-                  {getText(activeVenue.name, activeVenue.nameEn)}
-                </h3>
+                <Link href={`/venues/${activeVenue.id}`} className="group">
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-[#E6007E] transition-colors leading-tight">
+                    {getText(activeVenue.name, activeVenue.nameEn)}
+                  </h3>
+                </Link>
                 <p className="text-xs text-slate-500 font-medium leading-relaxed">
                   {getText(activeVenue.address, activeVenue.addressEn)}
                 </p>
@@ -668,12 +639,20 @@ export default function FestivalMap({
               </p>
 
               {/* Navigation Action */}
-              <div className="pt-2">
+              <div className="pt-2 flex flex-col gap-2">
+                <Link
+                  href={`/venues/${activeVenue.id}`}
+                  className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-black text-xs transition-colors"
+                >
+                  <Building2 className="w-4 h-4" />
+                  <span>会場詳細ページを見る</span>
+                </Link>
+
                 <a
                   href={`https://www.google.com/maps/dir/?api=1&destination=${activeVenue.location.lat},${activeVenue.location.lng}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#E6007E] hover:bg-[#c4006b] text-white font-black text-xs shadow-md transition-colors"
+                  className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#E6007E] hover:bg-[#c4006b] text-white font-black text-xs shadow-md transition-colors"
                 >
                   <Navigation className="w-4 h-4" />
                   <span>Google Maps でルート案内</span>
@@ -695,10 +674,10 @@ export default function FestivalMap({
               </div>
               <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
                 {venuePerformances.map((perf) => (
-                  <button
+                  <Link
                     key={perf.id}
-                    onClick={() => onSelectPerformance && onSelectPerformance(perf)}
-                    className="w-full text-left p-2.5 rounded-xl bg-pink-50/50 hover:bg-pink-100/70 border border-pink-100 text-slate-900 transition-colors flex items-center justify-between gap-2 group cursor-pointer"
+                    href={`/performances/${perf.id}`}
+                    className="w-full text-left p-2.5 rounded-xl bg-pink-50/50 hover:bg-pink-100/70 border border-pink-100 text-slate-900 transition-colors flex items-center justify-between gap-2 group block"
                   >
                     <div className="truncate">
                       <div className="text-xs font-black truncate group-hover:text-[#E6007E]">
@@ -708,8 +687,8 @@ export default function FestivalMap({
                         {getText(perf.artistName, perf.artistNameEn)}
                       </div>
                     </div>
-                    <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#E6007E] flex-shrink-0" />
-                  </button>
+                    <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#E6007E] flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
                 ))}
               </div>
             </div>
@@ -717,7 +696,7 @@ export default function FestivalMap({
         </div>
       </div>
 
-      {/* Venue List Selector Tabs (Filtered by Visible Viewport Bounds) */}
+      {/* Venue List Selector Tabs */}
       <div className="space-y-3">
         <div className="flex items-center justify-between px-1">
           <span className="text-xs font-bold text-slate-600">

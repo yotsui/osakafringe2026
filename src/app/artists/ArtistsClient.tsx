@@ -97,6 +97,7 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
           const origin = getText(artist.origin, artist.originEn);
           const profile = getText(artist.profile, artist.profileEn);
           const artistShows = getPerformancesForArtist(artist.id, artist.name);
+          const artistUrl = `/artists/${artist.id}`;
 
           return (
             <div
@@ -105,7 +106,10 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
             >
               <div>
                 {/* Large Profile Photo */}
-                <div className="relative aspect-4/3 w-full overflow-hidden bg-slate-900">
+                <Link
+                  href={artistUrl}
+                  className="relative aspect-4/3 w-full overflow-hidden bg-slate-900 block select-none group"
+                >
                   <SafeImage
                     src={artist.image}
                     alt={artistName}
@@ -115,7 +119,7 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent pointer-events-none" />
-                </div>
+                </Link>
 
                 {/* Editorial Flow: Genre/Origin -> Name -> Bio */}
                 <div className="p-6 space-y-4">
@@ -132,9 +136,11 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
                   </div>
 
                   {/* Artist Name */}
-                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
-                    {artistName}
-                  </h3>
+                  <Link href={artistUrl} className="block group">
+                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-[#E6007E] transition-colors leading-tight">
+                      {artistName}
+                    </h3>
+                  </Link>
 
                   {/* Profile Bio */}
                   {profile && (
@@ -207,17 +213,16 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
                       {artistShows.map((perf) => {
                         const showTitle = getText(perf.title, perf.titleEn);
                         return (
-                          <button
+                          <Link
                             key={perf.id}
-                            type="button"
-                            onClick={() => setSelectedPerformance(perf)}
-                            className="w-full text-left p-2.5 rounded-xl bg-slate-50 hover:bg-pink-50/80 border border-slate-100 hover:border-pink-200 cursor-pointer transition-all flex items-center justify-between gap-2 group"
+                            href={`/performances/${perf.id}`}
+                            className="w-full text-left p-2.5 rounded-xl bg-slate-50 hover:bg-pink-50/80 border border-slate-100 hover:border-pink-200 transition-all flex items-center justify-between gap-2 group"
                           >
                             <span className="text-xs font-bold text-slate-800 group-hover:text-[#E6007E] truncate">
                               {showTitle}
                             </span>
                             <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#E6007E] shrink-0 group-hover:translate-x-0.5 transition-transform" />
-                          </button>
+                          </Link>
                         );
                       })}
                     </div>
@@ -233,7 +238,7 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
         })}
       </div>
 
-      {/* Performance Modal */}
+      {/* Performance Modal (preserved for future Intercepting Routes) */}
       <PerformanceModal
         performance={selectedPerformance}
         onClose={() => setSelectedPerformance(null)}

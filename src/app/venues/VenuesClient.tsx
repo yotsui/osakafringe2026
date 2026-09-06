@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Venue, Performance } from '@/types';
 import dynamic from 'next/dynamic';
@@ -25,7 +26,8 @@ import {
   Sparkles,
   Building2,
   Users,
-  Eye
+  Eye,
+  ArrowRight
 } from 'lucide-react';
 import { InstagramIcon, TwitterIcon } from '@/components/common/SnsIcons';
 
@@ -109,9 +111,10 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
             const venueAccess = getText(venue.access, venue.accessEn);
             const venueDesc = getText(venue.description, venue.descriptionEn);
             const venueShows = getPerformancesForVenue(venue.id);
+            const venueUrl = `/venues/${venue.id}`;
 
             const mapQuery = venueAddress || venueName;
-            const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
+            const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery + ' Osaka')}`;
 
             const photoGallery: string[] = venue.images && venue.images.length > 0
               ? venue.images.filter(Boolean)
@@ -126,7 +129,10 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                 <div className="space-y-4">
                   {/* Venue Photo with Typographic Overlay */}
                   {hasPhotos && (
-                    <div className="relative aspect-16/9 w-full bg-slate-900 overflow-hidden">
+                    <Link
+                      href={venueUrl}
+                      className="relative aspect-16/9 w-full bg-slate-900 overflow-hidden block select-none group"
+                    >
                       <SafeImage
                         src={photoGallery[0]}
                         alt={venueName}
@@ -135,12 +141,12 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                         quality={75}
                         fallbackType="venue"
                         fallbackText={venueName}
-                        className="object-cover"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none" />
                       
                       {/* Area / Venue Type Typography */}
-                      <div className="absolute top-3 left-3 flex items-center gap-2 z-10">
+                      <div className="absolute top-3 left-3 flex items-center gap-2 z-10 pointer-events-none">
                         <span className="px-3 py-1 rounded bg-[#E6007E] text-white text-xs font-black tracking-wider uppercase shadow-xs">
                           {venueArea}
                         </span>
@@ -150,7 +156,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                           </span>
                         )}
                       </div>
-                    </div>
+                    </Link>
                   )}
 
                   <div className="p-6 space-y-4">
@@ -166,9 +172,11 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
 
                     <div className="space-y-1.5">
                       <div className="flex items-start justify-between gap-2">
-                        <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
-                          {venueName}
-                        </h3>
+                        <Link href={venueUrl} className="group">
+                          <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-[#E6007E] transition-colors leading-tight">
+                            {venueName}
+                          </h3>
+                        </Link>
                         {venue.capacity && (
                           <span className="text-[11px] font-bold text-slate-500 shrink-0 bg-slate-100 px-2.5 py-0.5 rounded">
                             {venue.capacity}席
@@ -233,7 +241,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                   </div>
                 </div>
 
-                {/* Shows at Venue & Google Maps Navigation */}
+                {/* Shows at Venue & Detail Link */}
                 <div className="p-6 pt-0 space-y-3">
                   <div className="pt-3 border-t border-slate-100 space-y-2">
                     <div className="flex items-center justify-between">
@@ -254,11 +262,10 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                     {venueShows.length > 0 ? (
                       <div className="space-y-1.5">
                         {venueShows.slice(0, 3).map((perf) => (
-                          <button
+                          <Link
                             key={perf.id}
-                            type="button"
-                            onClick={() => setSelectedPerformance(perf)}
-                            className="w-full text-left p-2.5 rounded-xl bg-slate-50 hover:bg-pink-50/80 border border-slate-100 hover:border-pink-200 cursor-pointer transition-all flex items-center justify-between gap-2 group"
+                            href={`/performances/${perf.id}`}
+                            className="w-full text-left p-2.5 rounded-xl bg-slate-50 hover:bg-pink-50/80 border border-slate-100 hover:border-pink-200 transition-all flex items-center justify-between gap-2 group"
                           >
                             <div className="truncate pr-2">
                               <p className="text-xs font-bold text-slate-900 group-hover:text-[#E6007E] truncate">
@@ -271,7 +278,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                             <span className="text-[11px] font-bold text-[#E6007E] shrink-0">
                               詳細 →
                             </span>
-                          </button>
+                          </Link>
                         ))}
                       </div>
                     ) : (
@@ -279,6 +286,16 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                         {t('noShowsScheduled')}
                       </p>
                     )}
+
+                    <div className="pt-2 flex justify-end">
+                      <Link
+                        href={venueUrl}
+                        className="inline-flex items-center gap-1 text-xs font-black text-[#E6007E] hover:underline"
+                      >
+                        <span>会場詳細を見る</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -287,7 +304,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
         </div>
       </div>
 
-      {/* Performance Modal */}
+      {/* Performance Modal (preserved for future Intercepting Routes) */}
       <PerformanceModal
         performance={selectedPerformance}
         onClose={() => setSelectedPerformance(null)}

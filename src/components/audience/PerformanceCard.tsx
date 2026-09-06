@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { Performance } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import SafeImage from '@/components/common/SafeImage';
@@ -42,12 +43,14 @@ export default function PerformanceCard({
     ? (getText(allSchedules[0].venueName, allSchedules[0].venueNameEn) || fallbackVenueName)
     : fallbackVenueName;
 
+  const performanceUrl = `/performances/${performance.id}`;
+
   return (
     <div className="group relative bg-white rounded-2xl overflow-hidden border border-slate-200/90 hover:border-[#E6007E] shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between">
       {/* Thumbnail */}
-      <div 
-        className="relative aspect-16/10 w-full overflow-hidden bg-slate-900 cursor-pointer select-none" 
-        onClick={() => onSelect?.(performance)}
+      <Link 
+        href={performanceUrl}
+        className="relative aspect-16/10 w-full overflow-hidden bg-slate-900 block select-none"
       >
         <SafeImage
           src={performance.image}
@@ -72,6 +75,7 @@ export default function PerformanceCard({
           <button
             type="button"
             onClick={(e) => {
+              e.preventDefault();
               e.stopPropagation();
               onToggleFavorite(performance.id);
             }}
@@ -94,23 +98,29 @@ export default function PerformanceCard({
             </span>
           </div>
         )}
-      </div>
+      </Link>
 
       {/* Card Content */}
       <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
         <div className="space-y-2">
-          {/* Artist Name (Above Title or with Subdued Style) */}
+          {/* Artist Name */}
           <p className="text-xs font-bold text-[#E6007E] truncate">
-            {artistName}
+            {performance.artist?.id ? (
+              <Link href={`/artists/${performance.artist.id}`} className="hover:underline">
+                {artistName}
+              </Link>
+            ) : (
+              artistName
+            )}
           </p>
 
           {/* Title - Priority #1 */}
-          <h3 
-            onClick={() => onSelect?.(performance)}
-            className="text-base sm:text-lg font-black text-slate-900 line-clamp-2 leading-snug group-hover:text-[#E6007E] transition-colors cursor-pointer"
+          <Link 
+            href={performanceUrl}
+            className="block text-base sm:text-lg font-black text-slate-900 line-clamp-2 leading-snug group-hover:text-[#E6007E] transition-colors"
           >
             {title}
-          </h3>
+          </Link>
           
           {/* Description */}
           {description && (
@@ -126,6 +136,7 @@ export default function PerformanceCard({
             <div className="space-y-1">
               {allSchedules.map((schedule, idx) => {
                 const sVenueName = getText(schedule.venueName, schedule.venueNameEn);
+                const sVenueId = schedule.venueId || schedule.venue?.id;
                 const formattedDate = formatScheduleCompact(schedule, language);
                 return (
                   <div key={idx} className="flex items-start gap-1.5 text-slate-600">
@@ -134,7 +145,13 @@ export default function PerformanceCard({
                       <span className="font-bold text-slate-800">{formattedDate}</span>
                       {isMultiVenues && sVenueName && (
                         <span className="text-slate-500 text-[11px] truncate">
-                          @{sVenueName}
+                          @{sVenueId ? (
+                            <Link href={`/venues/${sVenueId}`} className="hover:text-[#E6007E] hover:underline">
+                              {sVenueName}
+                            </Link>
+                          ) : (
+                            sVenueName
+                          )}
                         </span>
                       )}
                     </div>
@@ -148,7 +165,16 @@ export default function PerformanceCard({
           {!isMultiVenues && singleVenueName && (
             <div className="flex items-center gap-1.5 text-slate-600 pt-0.5">
               <MapPinIcon className="w-3.5 h-3.5 shrink-0 text-[#E6007E]" color="#E6007E" />
-              <span className="truncate font-medium">{singleVenueName}</span>
+              {performance.venue?.id || performance.venueId ? (
+                <Link
+                  href={`/venues/${performance.venue?.id || performance.venueId}`}
+                  className="truncate font-medium hover:text-[#E6007E] hover:underline"
+                >
+                  {singleVenueName}
+                </Link>
+              ) : (
+                <span className="truncate font-medium">{singleVenueName}</span>
+              )}
             </div>
           )}
         </div>
@@ -160,13 +186,13 @@ export default function PerformanceCard({
             <span>{priceDisplay}</span>
           </div>
 
-          <button
-            onClick={() => onSelect?.(performance)}
-            className="flex items-center gap-1 text-xs font-black text-[#E6007E] hover:underline group-hover:translate-x-0.5 transition-all cursor-pointer"
+          <Link
+            href={performanceUrl}
+            className="flex items-center gap-1 text-xs font-black text-[#E6007E] hover:underline group-hover:translate-x-0.5 transition-all"
           >
             <span>{t('cardDetails')}</span>
             <ArrowRightIcon className="w-3.5 h-3.5" />
-          </button>
+          </Link>
         </div>
       </div>
     </div>
