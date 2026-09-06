@@ -123,7 +123,7 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
                   <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
                     {artist.genre && (
                       <span className="px-3 py-1 rounded-full bg-[#E6007E] text-white text-[11px] font-black uppercase shadow-xs">
-                        {t(`genre_${artist.genre}`) || artist.genre}
+                        {artist.genre}
                       </span>
                     )}
                     {origin && (

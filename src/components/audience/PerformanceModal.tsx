@@ -19,6 +19,8 @@ import {
   Image as ImageIcon
 } from 'lucide-react';
 import { TwitterIcon, InstagramIcon, YoutubeIcon } from '@/components/common/SnsIcons';
+import { formatScheduleDate, sortSchedules, deduplicateSchedules } from '@/utils/dateFormat';
+import { formatTicketPrice } from '@/utils/priceFormat';
 
 interface PerformanceModalProps {
   performance: Performance | null;
@@ -33,7 +35,7 @@ export default function PerformanceModal({
   isFavorite,
   onToggleFavorite,
 }: PerformanceModalProps) {
-  const { t, getText } = useLanguage();
+  const { language, t, getText } = useLanguage();
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
 
   // Handle ESC key press to close modal
@@ -66,9 +68,11 @@ export default function PerformanceModal({
   );
   const artistOrigin = performance.artist ? getText(performance.artist.origin, performance.artist.originEn) : null;
   const artistProfile = performance.artist ? getText(performance.artist.profile, performance.artist.profileEn) : null;
-  const genreCustom = getText(performance.genreCustom, performance.genreCustomEn);
+  const genreCustom = language === 'en'
+    ? (performance.genreCustomEn || performance.genreCustom)
+    : (performance.genreCustom || performance.genreCustomEn);
   const description = getText(performance.description, performance.descriptionEn);
-  const ticketPrice = getText(performance.ticketPrice, performance.ticketPriceEn);
+  const priceDisplay = formatTicketPrice(performance.ticketPrice, performance.ticketPriceEn, language);
 
   const fallbackVenueName = performance.venue ? getText(performance.venue.name, performance.venue.nameEn) : null;
   const fallbackAddress = performance.venue ? getText(performance.venue.address, performance.venue.addressEn) : null;
@@ -86,6 +90,8 @@ export default function PerformanceModal({
   const snsInstagram = performance.artist?.snsInstagram;
   const snsYoutube = performance.artist?.snsYoutube;
 
+  const sortedSchedules = deduplicateSchedules(sortSchedules(performance.schedules || []));
+
   return (
     <div 
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 md:p-10 bg-slate-900/70 backdrop-blur-md animate-fadeIn"
@@ -99,7 +105,7 @@ export default function PerformanceModal({
         <div className="sticky top-0 z-40 flex items-center justify-between px-6 py-3.5 bg-white/90 backdrop-blur-md border-b border-pink-100/80 shadow-xs">
           <div className="flex items-center gap-2 overflow-hidden mr-3">
             <span className="px-2.5 py-0.5 rounded-full bg-pink-50 border border-pink-200 text-[#E6007E] text-[11px] font-black uppercase">
-              {t(`genre_${performance.genre}`) || performance.genre}
+              {performance.genre}
             </span>
             {genreCustom && (
               <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 text-[10px] font-bold">
@@ -321,9 +327,10 @@ export default function PerformanceModal({
               </h3>
 
               <div className="space-y-3">
-                {performance.schedules && performance.schedules.length > 0 ? (
-                  performance.schedules.map((schedule, idx) => {
+                {sortedSchedules.length > 0 ? (
+                  sortedSchedules.map((schedule, idx) => {
                     const sVenueName = getText(schedule.venueName, schedule.venueNameEn) || fallbackVenueName || 'Venue';
+                    const formattedDate = formatScheduleDate(schedule.date, schedule.startTime, schedule.endTime, language);
                     return (
                       <div
                         key={idx}
@@ -332,10 +339,7 @@ export default function PerformanceModal({
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
                             <span className="px-2.5 py-0.5 rounded-md bg-pink-100 text-pink-700 text-xs font-black">
-                              {schedule.date}
-                            </span>
-                            <span className="text-xs font-bold text-slate-800">
-                              {schedule.startTime} - {schedule.endTime}
+                              {formattedDate}
                             </span>
                           </div>
                           <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
@@ -374,7 +378,7 @@ export default function PerformanceModal({
                   {t('priceLabel')}
                 </span>
                 <p className="text-sm font-black text-slate-900">
-                  {ticketPrice || t('inquirePrice')}
+                  {priceDisplay}
                 </p>
               </div>
 

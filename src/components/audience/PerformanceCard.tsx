@@ -5,6 +5,8 @@ import { Performance } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import SafeImage from '@/components/common/SafeImage';
 import { CalendarIcon, MapPinIcon, TicketIcon, ArrowRightIcon } from '@/components/common/CustomIcons';
+import { formatScheduleDate, sortSchedules, deduplicateSchedules, hasMultipleVenues } from '@/utils/dateFormat';
+import { formatTicketPrice } from '@/utils/priceFormat';
 import { Heart } from 'lucide-react';
 
 interface PerformanceCardProps {
@@ -20,18 +22,25 @@ export default function PerformanceCard({
   isFavorite,
   onToggleFavorite,
 }: PerformanceCardProps) {
-  const { t, getText } = useLanguage();
+  const { language, t, getText } = useLanguage();
 
   const title = getText(performance.title, performance.titleEn);
   const artistName = getText(performance.artistName, performance.artistNameEn);
-  const genreCustom = getText(performance.genreCustom, performance.genreCustomEn);
+  const genreCustom = language === 'en'
+    ? (performance.genreCustomEn || performance.genreCustom)
+    : (performance.genreCustom || performance.genreCustomEn);
   const description = getText(performance.description, performance.descriptionEn);
-  const ticketPrice = getText(performance.ticketPrice, performance.ticketPriceEn);
+  const priceDisplay = formatTicketPrice(performance.ticketPrice, performance.ticketPriceEn, language);
 
-  const primarySchedule = performance.schedules && performance.schedules.length > 0 ? performance.schedules[0] : null;
-  const scheduleVenueName = primarySchedule ? getText(primarySchedule.venueName, primarySchedule.venueNameEn) : null;
+  // 全スケジュールのソート・重複排除
+  const allSchedules = deduplicateSchedules(sortSchedules(performance.schedules || []));
+  const isMultiVenues = hasMultipleVenues(allSchedules);
+
+  // 単一会場時のフォールバック会場名
   const fallbackVenueName = performance.venue ? getText(performance.venue.name, performance.venue.nameEn) : null;
-  const venueDisplayName = scheduleVenueName || fallbackVenueName;
+  const singleVenueName = allSchedules.length > 0
+    ? (getText(allSchedules[0].venueName, allSchedules[0].venueNameEn) || fallbackVenueName)
+    : fallbackVenueName;
 
   return (
     <div className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-slate-100 hover:border-pink-200 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
@@ -53,7 +62,7 @@ export default function PerformanceCard({
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
           <span className="px-2.5 py-1 rounded-lg bg-[#E6007E] text-white text-[11px] font-black uppercase shadow-xs">
-            {t(`genre_${performance.genre}`) || performance.genre}
+            {performance.genre}
           </span>
           {genreCustom && (
             <span className="px-2 py-1 rounded-lg bg-[#FFF100] text-black text-[11px] font-bold shadow-xs">
@@ -108,18 +117,35 @@ export default function PerformanceCard({
           )}
         </div>
 
-        {/* Schedule & Venue Meta */}
+        {/* Schedule & Venue Meta (全日程表示) */}
         <div className="space-y-1.5 text-xs font-medium pt-1">
-          {primarySchedule && (
-            <div className="flex items-center gap-2 text-slate-600">
-              <CalendarIcon className="w-3.5 h-3.5 shrink-0 text-[#E6007E]" />
-              <span className="truncate">{primarySchedule.date} {primarySchedule.startTime}〜</span>
+          {allSchedules.length > 0 ? (
+            <div className="space-y-1">
+              {allSchedules.map((schedule, idx) => {
+                const sVenueName = getText(schedule.venueName, schedule.venueNameEn);
+                const formattedDate = formatScheduleDate(schedule.date, schedule.startTime, schedule.endTime, language);
+                return (
+                  <div key={idx} className="flex items-start gap-1.5 text-slate-600">
+                    <CalendarIcon className="w-3.5 h-3.5 shrink-0 text-[#E6007E] mt-0.5" />
+                    <div className="min-w-0 flex-1 flex flex-wrap items-center gap-x-2">
+                      <span className="font-bold text-slate-800">{formattedDate}</span>
+                      {isMultiVenues && sVenueName && (
+                        <span className="text-slate-500 text-[11px] truncate">
+                          @{sVenueName}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          )}
-          {venueDisplayName && (
-            <div className="flex items-center gap-2 text-slate-600">
+          ) : null}
+
+          {/* 単一会場の場合は会場名を1回のみ下部に表示 */}
+          {!isMultiVenues && singleVenueName && (
+            <div className="flex items-center gap-1.5 text-slate-600 pt-0.5">
               <MapPinIcon className="w-3.5 h-3.5 shrink-0 text-[#0078D7]" color="#0078D7" />
-              <span className="truncate">{venueDisplayName}</span>
+              <span className="truncate">{singleVenueName}</span>
             </div>
           )}
         </div>
@@ -128,7 +154,7 @@ export default function PerformanceCard({
         <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900">
             <TicketIcon className="w-4 h-4 text-slate-500" />
-            <span>{ticketPrice || t('freePrice')}</span>
+            <span>{priceDisplay}</span>
           </div>
 
           <button

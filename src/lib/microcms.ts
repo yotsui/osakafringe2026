@@ -329,9 +329,13 @@ export const getPerformances = cache(async (): Promise<Performance[]> => {
       });
     }
 
-    // 6. 日英フォールバック
-    const rawGenre = perf.genre || perf.genreCustom || '';
-    const rawGenreEn = perf.genreEn || perf.genreCustomEn || rawGenre;
+    // 6. ジャンル・日英フォールバック
+    const ALLOWED_GENRES = ['street', 'dance', 'music', 'theater', 'traditional', 'kamishibai', 'exhibition', 'other'];
+    const artistGenre = resolvedArtist?.genre;
+    const mainGenre = (artistGenre && ALLOWED_GENRES.includes(artistGenre)) ? artistGenre : 'other';
+
+    const customGenre = perf.genre || '';
+    const customGenreEn = perf.genreEn || customGenre;
 
     const images = Array.isArray(perf.images) 
       ? perf.images.map(extractImageUrl).filter(Boolean) as string[]
@@ -342,14 +346,14 @@ export const getPerformances = cache(async (): Promise<Performance[]> => {
       id: perf.id,
       title: perf.title,
       titleEn: perf.titleEn || perf.title,
-      genre: perf.genre || 'theater',
-      genreEn: rawGenreEn,
-      genreCustom: rawGenre,
-      genreCustomEn: rawGenreEn,
+      genre: mainGenre,
+      genreEn: mainGenre,
+      genreCustom: customGenre,
+      genreCustomEn: customGenreEn,
       description: perf.description,
       descriptionEn: perf.descriptionEn || perf.description,
-      ticketPrice: perf.ticketPrice,
-      ticketPriceEn: perf.ticketPriceEn || perf.ticketPrice,
+      ticketPrice: perf.ticketPrice || '',
+      ticketPriceEn: perf.ticketPriceEn || perf.ticketPrice || '',
       ticketUrl: perf.ticketUrl,
       durationMinutes: durationMins,
       isFeatured: Boolean(perf.isFeatured),

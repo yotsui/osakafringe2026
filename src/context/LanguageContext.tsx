@@ -73,7 +73,9 @@ export const translations: Dictionary = {
   genre_other: { ja: 'その他', en: 'Other' },
   
   // Performance Card & Modal
+  cardDetails: { ja: '詳細を見る', en: 'View Details' },
   viewDetails: { ja: '詳細を見る', en: 'View Details' },
+  freePrice: { ja: '無料', en: 'Free' },
   directions: { ja: 'Google Mapでナビ', en: 'Directions (Google Maps)' },
   tickets: { ja: 'チケット・予約', en: 'Tickets & Info' },
   bookTickets: { ja: 'チケット予約・購入', en: 'Book / Reserve Tickets' },

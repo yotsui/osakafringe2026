@@ -174,14 +174,14 @@ export default function AudienceApp({
 
   const genres = [
     { id: 'all', label: t('allGenres') },
-    { id: 'street', label: t('genre_street') },
-    { id: 'dance', label: t('genre_dance') },
-    { id: 'music', label: t('genre_music') },
-    { id: 'theater', label: t('genre_theater') },
-    { id: 'traditional', label: t('genre_traditional') },
-    { id: 'kamishibai', label: t('genre_kamishibai') },
-    { id: 'exhibition', label: t('genre_exhibition') },
-    { id: 'other', label: t('genre_other') },
+    { id: 'street', label: 'street' },
+    { id: 'dance', label: 'dance' },
+    { id: 'music', label: 'music' },
+    { id: 'theater', label: 'theater' },
+    { id: 'traditional', label: 'traditional' },
+    { id: 'kamishibai', label: 'kamishibai' },
+    { id: 'exhibition', label: 'exhibition' },
+    { id: 'other', label: 'other' },
   ];
 
   return (

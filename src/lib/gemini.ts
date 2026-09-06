@@ -86,7 +86,7 @@ Respond ONLY with the translated English text, without markdown formatting, quot
 `;
 
     const response = await ai.models.generateContent({
-      model: process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite',
+      model: process.env.GEMINI_MODEL || 'gemini-flash-latest',
       contents: prompt,
     });
 
