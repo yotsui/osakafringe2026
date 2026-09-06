@@ -129,7 +129,6 @@ export const mockArtists: Artist[] = [
     websiteUrl: 'https://osakafringe.com',
     snsTwitter: 'https://twitter.com/osakafringe',
     snsInstagram: 'https://instagram.com/osakafringe',
-    isFeatured: true,
   },
   {
     id: 'alexei-and-maya',
@@ -147,7 +146,6 @@ export const mockArtists: Artist[] = [
     ],
     websiteUrl: 'https://osakafringe.com',
     snsInstagram: 'https://instagram.com/osakafringe',
-    isFeatured: true,
   },
   {
     id: 'kenji-comedy',
@@ -161,7 +159,6 @@ export const mockArtists: Artist[] = [
     image: 'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?auto=format&fit=crop&w=800&q=80',
     websiteUrl: 'https://osakafringe.com',
     snsYoutube: 'https://youtube.com/@osakafringe',
-    isFeatured: true,
   },
   {
     id: 'sakuya-dance',
@@ -175,7 +172,6 @@ export const mockArtists: Artist[] = [
     image: 'https://images.unsplash.com/photo-1528164344705-475426879c0d?auto=format&fit=crop&w=800&q=80',
     websiteUrl: 'https://osakafringe.com',
     snsTwitter: 'https://twitter.com/osakafringe',
-    isFeatured: false,
   },
   {
     id: 'naniwa-hyoshigi',
@@ -188,7 +184,6 @@ export const mockArtists: Artist[] = [
     profileEn: 'Interactive picture storytelling artists performing from vintage bicycle carts. Fun and nostalgic for all generations.',
     image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80',
     websiteUrl: 'https://osakafringe.com',
-    isFeatured: false,
   },
   {
     id: 'studio-ripple',
@@ -203,7 +198,6 @@ export const mockArtists: Artist[] = [
     websiteUrl: 'https://osakafringe.com',
     snsTwitter: 'https://twitter.com/osakafringe',
     snsInstagram: 'https://instagram.com/osakafringe',
-    isFeatured: false,
   },
 ];
 

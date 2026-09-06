@@ -71,6 +71,27 @@ export default function AudienceApp({
     return Array.from(set).sort();
   }, [initialPerformances]);
 
+  // パフォーマンス登録がある会場IDの一覧
+  const performanceVenueIds = useMemo(() => {
+    const ids = new Set<string>();
+    initialPerformances.forEach((p) => {
+      if (p.venueId) ids.add(p.venueId);
+      if (p.venue?.id) ids.add(p.venue.id);
+      if (Array.isArray(p.schedules)) {
+        p.schedules.forEach((s) => {
+          if (s.venueId) ids.add(s.venueId);
+          if (s.venue?.id) ids.add(s.venue.id);
+        });
+      }
+    });
+    return ids;
+  }, [initialPerformances]);
+
+  // パフォーマンス登録がある会場のみに絞り込んだ会場一覧
+  const activeVenues = useMemo(() => {
+    return venues.filter((v) => performanceVenueIds.has(v.id));
+  }, [venues, performanceVenueIds]);
+
   // Filter logic
   const filteredPerformances = useMemo(() => {
     return initialPerformances.filter((perf) => {
@@ -86,8 +107,8 @@ export default function AudienceApp({
 
       // Venue filter
       if (selectedVenueId !== 'all') {
-        const matchesDefaultVenue = perf.venueId === selectedVenueId;
-        const matchesScheduleVenue = perf.schedules.some((s) => s.venueId === selectedVenueId);
+        const matchesDefaultVenue = perf.venueId === selectedVenueId || perf.venue?.id === selectedVenueId;
+        const matchesScheduleVenue = perf.schedules.some((s) => s.venueId === selectedVenueId || s.venue?.id === selectedVenueId);
         if (!matchesDefaultVenue && !matchesScheduleVenue) {
           return false;
         }
@@ -214,7 +235,7 @@ export default function AudienceApp({
       {activeTab === 'map' ? (
         <div className="space-y-6">
           <FestivalMap
-            venues={venues}
+            venues={activeVenues}
             performances={initialPerformances}
             onSelectPerformance={(p) => setSelectedPerformance(p)}
           />
@@ -279,7 +300,7 @@ export default function AudienceApp({
                   className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-pink-500 shadow-2xs"
                 >
                   <option value="all">{t('allVenues')}</option>
-                  {venues.map((v) => (
+                  {activeVenues.map((v) => (
                     <option key={v.id} value={v.id}>
                       {getText(v.name, v.nameEn)}
                     </option>

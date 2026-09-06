@@ -58,7 +58,6 @@ export interface Artist {
   snsYoutube?: string;
   snsFacebook?: string;
   snsOther?: string;
-  isFeatured?: boolean;
 }
 
 export interface PerformanceSchedule {

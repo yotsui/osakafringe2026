@@ -286,8 +286,29 @@ export default function PerformanceModal({
                   <User className="w-4 h-4 text-[#E6007E]" />
                   <span>{t('aboutTheArtist')}（{artistName}）</span>
                 </h3>
-                <div className="p-5 rounded-2xl bg-pink-50/40 border border-pink-100 text-slate-700 text-xs sm:text-sm leading-relaxed font-medium whitespace-pre-line">
-                  {artistProfile}
+                <div className="p-5 rounded-2xl bg-pink-50/40 border border-pink-100 flex flex-col sm:flex-row gap-4 items-start">
+                  {(performance.artist?.image || (performance.artist?.images && performance.artist.images.length > 0)) && (
+                    <div className="relative w-24 h-24 sm:w-28 sm:h-28 shrink-0 rounded-2xl overflow-hidden border border-pink-200 shadow-xs bg-white">
+                      <SafeImage
+                        src={performance.artist?.image || performance.artist?.images?.[0]}
+                        alt={artistName}
+                        fill
+                        fallbackGenre={performance.genre}
+                        fallbackText={artistName}
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0 space-y-2">
+                    {artistOrigin && (
+                      <div className="inline-block px-2.5 py-0.5 rounded-full bg-pink-100 text-[#E6007E] text-[11px] font-black">
+                        {artistOrigin}
+                      </div>
+                    )}
+                    <p className="text-slate-700 text-xs sm:text-sm leading-relaxed font-medium whitespace-pre-line">
+                      {artistProfile}
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
