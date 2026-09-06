@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "translate:backfill": "node --experimental-strip-types scripts/backfillTranslations.ts",
-    "siteinfo:update": "node --experimental-strip-types scripts/updateSiteInfo.ts"
+    "translate:backfill": "node --experimental-strip-types scripts/backfillTranslations.ts"
   },
   "dependencies": {
     "@google/genai": "^2.19.0",
