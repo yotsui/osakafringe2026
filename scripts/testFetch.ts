@@ -31,21 +31,52 @@ const client = createClient({
   apiKey,
 });
 
-async function run() {
-  console.log('Testing site_info contentId...');
-  try {
-    const res = await client.getListDetail({ endpoint: 'site_info', contentId: 'site_info' });
-    console.log('getListDetail site_info ID "site_info":', JSON.stringify(res, null, 2));
-  } catch (e: any) {
-    console.log('getListDetail with id "site_info" error:', e?.message || e);
-  }
+async function verify() {
+  console.log('=== [1] microCMS 実API (Raw) GET 検証 ===');
+  const res: any = await client.getObject({ endpoint: 'site_info' });
+  const rawData = res.contents && Array.isArray(res.contents) ? res.contents[0] : res;
 
-  try {
-    const res = await client.getList({ endpoint: 'site_info', queries: { limit: 100 } });
-    console.log('getList site_info:', JSON.stringify(res, null, 2));
-  } catch (e: any) {
-    console.log('getList error:', e?.message || e);
-  }
+  console.log('1. rawData.donationStories 存在確認 & 長さ:', rawData.donationStories?.length);
+  console.log('2. rawData.donationImpacts 存在確認 & 長さ:', rawData.donationImpacts?.length);
+  console.log('3. rawData.donationStories sectionKey 一覧 (Raw):', 
+    rawData.donationStories?.map((s: any) => ({
+      sectionKey: s.sectionKey,
+      isArray: Array.isArray(s.sectionKey),
+      title: s.title
+    }))
+  );
+  console.log('4. rawData.donationImpacts labels:',
+    rawData.donationImpacts?.map((i: any) => ({ label: i.label, title: i.title }))
+  );
+
+  console.log('\n=== [2] アプリケーション正規化 (Normalized) 検証 ===');
+  const normalizeDonationStory = (raw: any) => {
+    let sectionKey = 'HISTORY';
+    if (Array.isArray(raw?.sectionKey) && raw.sectionKey.length > 0) {
+      sectionKey = raw.sectionKey[0];
+    } else if (typeof raw?.sectionKey === 'string' && raw.sectionKey) {
+      sectionKey = raw.sectionKey;
+    }
+    return {
+      sectionKey,
+      title: raw?.title || '',
+      titleEn: raw?.titleEn || raw?.title || '',
+      text: raw?.text || '',
+      textEn: raw?.textEn || raw?.text || '',
+    };
+  };
+
+  const normalizedStories = rawData.donationStories?.map(normalizeDonationStory);
+  console.log('正規化後の Stories (Scalar sectionKey):');
+  normalizedStories.forEach((s: any, idx: number) => {
+    console.log(` [${idx + 1}] sectionKey: "${s.sectionKey}" (type: ${typeof s.sectionKey}) | title: "${s.title.replace(/\n/g, ' ')}"`);
+  });
+
+  const allScalar = normalizedStories.every((s: any) => typeof s.sectionKey === 'string' && ['HISTORY', 'MESSAGE', 'ENVIRONMENT', 'PREFORM', 'CLOSING'].includes(s.sectionKey));
+  console.log('\n全5セクションの sectionKey が scalar string で正常:', allScalar ? '✅ PASS' : '❌ FAIL');
 }
 
-run();
+verify().catch((e) => {
+  console.error('検証エラー:', e);
+  process.exit(1);
+});

@@ -170,6 +170,15 @@ export type DonationStoryKey =
   | 'PREFORM'
   | 'CLOSING';
 
+export interface DonationStoryRaw {
+  fieldId?: string;
+  sectionKey: string[] | string;
+  title: string;
+  titleEn?: string;
+  text: string;
+  textEn?: string;
+}
+
 export interface DonationStory {
   fieldId?: 'donationstory';
   sectionKey: DonationStoryKey;

@@ -1,6 +1,6 @@
 import { cache } from 'react';
 import { createClient } from 'microcms-js-sdk';
-import { Venue, Artist, Performance, Banner, SiteInfo, PerformanceSchedule, Partner } from '@/types';
+import { Venue, Artist, Performance, Banner, SiteInfo, PerformanceSchedule, Partner, DonationStory, DonationImpact, DonationStoryKey } from '@/types';
 import { mockVenues, mockArtists, mockPerformances, mockBanners, mockSiteInfo, mockPartners } from './mockData';
 
 const REVALIDATE_TIME = 300; // 5分キャッシュ (ISR)
@@ -499,10 +499,42 @@ export const getBanners = cache(async (): Promise<Banner[]> => {
 });
 
 /**
+ * 寄付ストーリーの正規化 (microCMSのselect field配列 -> scalar DonationStoryKey)
+ */
+export const normalizeDonationStory = (raw: any): DonationStory => {
+  let sectionKey: DonationStoryKey = 'HISTORY';
+  if (Array.isArray(raw?.sectionKey) && raw.sectionKey.length > 0) {
+    sectionKey = raw.sectionKey[0] as DonationStoryKey;
+  } else if (typeof raw?.sectionKey === 'string' && raw.sectionKey) {
+    sectionKey = raw.sectionKey as DonationStoryKey;
+  }
+
+  return {
+    fieldId: 'donationstory',
+    sectionKey,
+    title: raw?.title || '',
+    titleEn: raw?.titleEn || raw?.title || '',
+    text: raw?.text || '',
+    textEn: raw?.textEn || raw?.text || '',
+  };
+};
+
+/**
+ * 寄付インパクトの正規化
+ */
+export const normalizeDonationImpact = (raw: any): DonationImpact => ({
+  fieldId: 'donationimpact',
+  label: raw?.label || '',
+  title: raw?.title || '',
+  titleEn: raw?.titleEn || raw?.title || '',
+  text: raw?.text || '',
+  textEn: raw?.textEn || raw?.text || '',
+});
+
+/**
  * サイト基本情報を取得 (React cache & ISR 300s)
  */
 export const getSiteInfo = cache(async (): Promise<SiteInfo> => {
-  let baseInfo = mockSiteInfo;
   if (client) {
     try {
       const data = await client.getObject<any>({
@@ -517,15 +549,29 @@ export const getSiteInfo = cache(async (): Promise<SiteInfo> => {
       }
 
       if (cmsData) {
-        baseInfo = {
-          ...mockSiteInfo,
+        const stories: DonationStory[] = Array.isArray(cmsData.donationStories)
+          ? cmsData.donationStories.map(normalizeDonationStory)
+          : [];
+        const impacts: DonationImpact[] = Array.isArray(cmsData.donationImpacts)
+          ? cmsData.donationImpacts.map(normalizeDonationImpact)
+          : [];
+
+        return {
           ...cmsData,
-          donationStories: (Array.isArray(cmsData.donationStories) && cmsData.donationStories.length > 0)
-            ? cmsData.donationStories
-            : mockSiteInfo.donationStories,
-          donationImpacts: (Array.isArray(cmsData.donationImpacts) && cmsData.donationImpacts.length > 0)
-            ? cmsData.donationImpacts
-            : mockSiteInfo.donationImpacts,
+          donationStories: stories,
+          donationImpacts: impacts,
+          siteTitleEn: cmsData.siteTitleEn || cmsData.siteTitle,
+          heroTaglineEn: cmsData.heroTaglineEn || cmsData.heroTagline,
+          heroSubtitleEn: cmsData.heroSubtitleEn || cmsData.heroSubtitle,
+          festivalPeriodEn: cmsData.festivalPeriodEn || cmsData.festivalPeriod,
+          locationSummaryEn: cmsData.locationSummaryEn || cmsData.locationSummary,
+          aboutTitleEn: cmsData.aboutTitleEn || cmsData.aboutTitle,
+          aboutTextEn: cmsData.aboutTextEn || cmsData.aboutText,
+          donationTitleEn: cmsData.donationTitleEn || cmsData.donationTitle,
+          donationTextEn: cmsData.donationTextEn || cmsData.donationText,
+          donationBankNoteEn: cmsData.donationBankNoteEn || cmsData.donationBankNote,
+          donationBankInfoEn: cmsData.donationBankInfoEn || cmsData.donationBankInfo,
+          newsNoticeEn: cmsData.newsNoticeEn || cmsData.newsNotice,
         };
       }
     } catch (error) {
@@ -533,19 +579,6 @@ export const getSiteInfo = cache(async (): Promise<SiteInfo> => {
     }
   }
 
-  return {
-    ...baseInfo,
-    siteTitleEn: baseInfo.siteTitleEn || baseInfo.siteTitle,
-    heroTaglineEn: baseInfo.heroTaglineEn || baseInfo.heroTagline,
-    heroSubtitleEn: baseInfo.heroSubtitleEn || baseInfo.heroSubtitle,
-    festivalPeriodEn: baseInfo.festivalPeriodEn || baseInfo.festivalPeriod,
-    locationSummaryEn: baseInfo.locationSummaryEn || baseInfo.locationSummary,
-    aboutTitleEn: baseInfo.aboutTitleEn || baseInfo.aboutTitle,
-    aboutTextEn: baseInfo.aboutTextEn || baseInfo.aboutText,
-    donationTitleEn: baseInfo.donationTitleEn || baseInfo.donationTitle,
-    donationTextEn: baseInfo.donationTextEn || baseInfo.donationText,
-    donationBankNoteEn: baseInfo.donationBankNoteEn || baseInfo.donationBankNote,
-    donationBankInfoEn: baseInfo.donationBankInfoEn || baseInfo.donationBankInfo,
-    newsNoticeEn: baseInfo.newsNoticeEn || baseInfo.newsNotice,
-  };
+  // Fallback only when microCMS fetch itself fails or client is not configured
+  return mockSiteInfo;
 });

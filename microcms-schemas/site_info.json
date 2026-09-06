@@ -121,6 +121,36 @@
       "required": false
     },
     {
+      "fieldId": "donationBankNote",
+      "name": "寄付口座補足・注記（日本語）",
+      "kind": "textArea",
+      "required": false
+    },
+    {
+      "fieldId": "donationBankNoteEn",
+      "name": "寄付口座補足・注記（英語）",
+      "kind": "textArea",
+      "required": false
+    },
+    {
+      "fieldId": "donationStories",
+      "name": "寄付ストーリー（文章セクション）",
+      "kind": "repeater",
+      "required": false,
+      "customFieldIds": [
+        "donationstory"
+      ]
+    },
+    {
+      "fieldId": "donationImpacts",
+      "name": "寄付の使途・インパクト（4項目）",
+      "kind": "repeater",
+      "required": false,
+      "customFieldIds": [
+        "donationimpact"
+      ]
+    },
+    {
       "fieldId": "officialInstagramUrl",
       "name": "公式Instagram URL",
       "kind": "text",
@@ -163,5 +193,85 @@
       "required": false
     }
   ],
-  "customFields": []
+  "customFields": [
+    {
+      "fieldId": "donationstory",
+      "name": "寄付ストーリー項目",
+      "fields": [
+        {
+          "fieldId": "sectionKey",
+          "name": "セクション識別子",
+          "kind": "select",
+          "required": true,
+          "selectItems": [
+            { "value": "HISTORY" },
+            { "value": "MESSAGE" },
+            { "value": "ENVIRONMENT" },
+            { "value": "PREFORM" },
+            { "value": "CLOSING" }
+          ]
+        },
+        {
+          "fieldId": "title",
+          "name": "セクション見出し（日本語）",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "fieldId": "titleEn",
+          "name": "セクション見出し（英語）",
+          "kind": "text",
+          "required": false
+        },
+        {
+          "fieldId": "text",
+          "name": "セクション本文（日本語）",
+          "kind": "textArea",
+          "required": true
+        },
+        {
+          "fieldId": "textEn",
+          "name": "セクション本文（英語）",
+          "kind": "textArea",
+          "required": false
+        }
+      ]
+    },
+    {
+      "fieldId": "donationimpact",
+      "name": "寄付インパクト項目",
+      "fields": [
+        {
+          "fieldId": "label",
+          "name": "ラベル（例: 01. EMERGING ARTISTS）",
+          "kind": "text",
+          "required": false
+        },
+        {
+          "fieldId": "title",
+          "name": "使途見出し（日本語）",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "fieldId": "titleEn",
+          "name": "使途見出し（英語）",
+          "kind": "text",
+          "required": false
+        },
+        {
+          "fieldId": "text",
+          "name": "使途説明（日本語）",
+          "kind": "textArea",
+          "required": true
+        },
+        {
+          "fieldId": "textEn",
+          "name": "使途説明（英語）",
+          "kind": "textArea",
+          "required": false
+        }
+      ]
+    }
+  ]
 }

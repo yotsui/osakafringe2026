@@ -194,95 +194,47 @@ async function main() {
     }
   };
 
-  // Try creating/updating base text fields first
+  // Step 6-1: Base text fields
   const textFieldsData = Object.fromEntries(
     Object.entries(payload).filter(([k]) => k !== 'donationStories' && k !== 'donationImpacts')
   );
 
-  console.log('\n[Step 6-1] 基本テキストフィールドの反映を試行します...');
+  console.log('\n[Step 6-1] 基本テキストフィールドの反映...');
   await sleep(1500);
   try {
-    try {
-      await doUpdate(textFieldsData);
-      console.log('✅ 基本テキストフィールド update 成功！');
-    } catch (updateErr: any) {
-      if (!targetContentId && (updateErr?.message?.includes('Content is not exists') || updateErr?.message?.includes('400'))) {
-        console.log('ℹ️ 初回作成を試行中 (create: textFieldsData)...');
-        const createRes: any = await writeClient.create({
-          endpoint: 'site_info',
-          content: textFieldsData,
-        });
-        targetContentId = createRes?.id;
-        console.log(`✅ 基本テキストフィールド create 成功！(新規ID: ${targetContentId})`);
-      } else {
-        throw updateErr;
-      }
-    }
+    await doUpdate(textFieldsData);
+    console.log('✅ 基本テキストフィールド update 成功！');
   } catch (err: any) {
     console.error('❌ 基本テキストフィールドの書き込みエラー:', err?.message || err);
+    process.exit(1);
   }
 
-  // Next, try updating donationImpacts
+  // Step 6-2: donationImpacts (confirmed fieldId: donationimpact)
   await sleep(1500);
-  console.log('\n[Step 6-2] donationImpacts の反映を試行します...');
-  const impactCandidates = [
-    { name: 'donationImpacts (fieldId: donationimpact)', data: { donationImpacts: payload.donationImpacts } },
-    { 
-      name: 'donationImpacts (fieldId: donationImpact)', 
-      data: { donationImpacts: payload.donationImpacts?.map((i: any) => ({ ...i, fieldId: 'donationImpact' })) } 
-    },
-    { 
-      name: 'donationImpacts (no fieldId)', 
-      data: { donationImpacts: payload.donationImpacts?.map(({ fieldId, ...i }: any) => i) } 
-    },
-  ];
-
-  for (const c of impactCandidates) {
-    await sleep(1500);
-    console.log(`試行中: ${c.name}...`);
-    try {
-      await doUpdate(c.data);
-      console.log(`✅ ${c.name} update 成功！`);
-      break;
-    } catch (err: any) {
-      console.warn(`⚠️ 失敗 (${c.name}):`, err?.message || err);
-    }
+  console.log('\n[Step 6-2] donationImpacts の反映 (fieldId: donationimpact)...');
+  try {
+    await doUpdate({ donationImpacts: payload.donationImpacts });
+    console.log('✅ donationImpacts update 成功！');
+  } catch (err: any) {
+    console.error('❌ donationImpacts の書き込みエラー:', err?.message || err);
+    process.exit(1);
   }
 
+  // Step 6-3: donationStories (confirmed fieldId: donationstory, sectionKey: string[])
   await sleep(1500);
-  console.log('\n[Step 6-3] donationStories の反映を試行します...');
-  const possibleFieldIds = [
-    'donationstory',
-    'donationStory',
-    'donation_story',
-    'story',
-    'stories',
-    'donationstories',
-    'donationStories',
-    'donation_stories',
-    'donationStoryField',
-    'customField',
-    'donation',
-    'item',
-  ];
+  console.log('\n[Step 6-3] donationStories の反映 (fieldId: donationstory, sectionKey: string[])...');
+  const storiesPayload = payload.donationStories.map((s: any) => ({
+    ...s,
+    fieldId: 'donationstory',
+    sectionKey: Array.isArray(s.sectionKey) ? s.sectionKey : [s.sectionKey],
+  }));
 
-  let storySucceeded = false;
-
-  for (const fid of possibleFieldIds) {
-    await sleep(1500);
-    const testItems = payload.donationStories.map((s: any) => ({
-      ...s,
-      fieldId: fid,
-    }));
-    console.log(`試行中: fieldId = "${fid}"...`);
-    try {
-      await doUpdate({ donationStories: testItems });
-      console.log(`🎉 成功！ fieldId は "${fid}" です！`);
-      storySucceeded = true;
-      break;
-    } catch (err: any) {
-      console.warn(`⚠️ 失敗 ("${fid}"):`, err?.message || err);
-    }
+  try {
+    await doUpdate({ donationStories: storiesPayload });
+    console.log('✅ donationStories update 成功！');
+  } catch (err: any) {
+    console.error('❌ donationStories の書き込みエラー:', err?.message || err);
+    process.exit(1);
   }
 
   // Step 8: Post-update verification
@@ -298,7 +250,7 @@ async function main() {
   }
 
   // Validate criteria
-  console.log('\n自動検証実行:');
+  console.log('\n--- 自動検証実行 (RAW データ) ---');
   const check1 = updatedSiteInfo.siteTitle === '大阪文化万博Osaka Fringe 2026';
   console.log(` 1. siteTitle === "大阪文化万博Osaka Fringe 2026": ${check1 ? '✅ PASS' : `❌ FAIL (${updatedSiteInfo.siteTitle})`}`);
 
@@ -313,14 +265,29 @@ async function main() {
   const check4 = impactLen === 4;
   console.log(` 4. donationImpacts.length === 4: ${check4 ? '✅ PASS' : `❌ FAIL (${impactLen})`}`);
 
-  const requiredStoryKeys = ['HISTORY', 'MESSAGE', 'ENVIRONMENT', 'PREFORM', 'CLOSING'];
-  const currentStoryKeys = Array.isArray(updatedSiteInfo.donationStories)
+  // Check sectionKey format in raw (should be string array like ["HISTORY"])
+  const rawSectionKeys = Array.isArray(updatedSiteInfo.donationStories)
     ? updatedSiteInfo.donationStories.map((s: any) => s.sectionKey)
     : [];
-  const check5 = requiredStoryKeys.every((k) => currentStoryKeys.includes(k));
-  console.log(` 5. Stories [HISTORY, MESSAGE, ENVIRONMENT, PREFORM, CLOSING] 全て存在: ${check5 ? '✅ PASS' : `❌ FAIL (${currentStoryKeys.join(', ')})`}`);
+  console.log(' • microCMS raw sectionKey 配列:', JSON.stringify(rawSectionKeys));
+  const check5 = rawSectionKeys.every((k: any) => Array.isArray(k) && k.length > 0);
+  console.log(` 5. raw sectionKey が各々 ["HISTORY"] 等の配列形式で返却: ${check5 ? '✅ PASS' : '❌ FAIL'}`);
 
-  if (!check1 || !check2 || !check4) {
+  // Test getSiteInfo() normalization logic
+  console.log('\n--- 正規化検証 (getSiteInfo による scalar 変換) ---');
+  const normalizedStories = Array.isArray(updatedSiteInfo.donationStories)
+    ? updatedSiteInfo.donationStories.map((s: any) => ({
+        ...s,
+        sectionKey: Array.isArray(s.sectionKey) ? s.sectionKey[0] : s.sectionKey,
+      }))
+    : [];
+  const normalizedSectionKeys = normalizedStories.map((s: any) => s.sectionKey);
+  console.log(' • 正規化後 sectionKey (scalar):', JSON.stringify(normalizedSectionKeys));
+  const expectedKeys = ['HISTORY', 'MESSAGE', 'ENVIRONMENT', 'PREFORM', 'CLOSING'];
+  const check6 = expectedKeys.every((k, idx) => normalizedSectionKeys[idx] === k);
+  console.log(` 6. 正規化後の sectionKey が全て期待通りの scalar 値: ${check6 ? '✅ PASS' : '❌ FAIL'}`);
+
+  if (!check1 || !check2 || !check3 || !check4 || !check5 || !check6) {
     console.error('❌ 検証項目に不一致があります！');
     process.exit(1);
   }
@@ -344,12 +311,7 @@ async function main() {
   }
 
   console.log('\n====================================================');
-  if (storySucceeded) {
-    console.log('🎉 site_info の全項目（donationStories含む）の更新および自動検証が正常に完了しました！');
-  } else {
-    console.log('🎉 site_info（基本テキスト・donationImpacts・銀行注記）の更新が正常に完了しました！');
-    console.log('ℹ️ donationStories はフロントエンド側でフォールバック（最新の公式文言5区分）が安全に稼働しています。');
-  }
+  console.log('🎉 site_info の全項目（基本テキスト・donationStories 5件・donationImpacts 4件・銀行注記）の更新および自動検証が全て正常に PASS しました！');
   console.log('====================================================');
 }
 

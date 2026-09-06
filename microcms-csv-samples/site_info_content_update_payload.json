@@ -20,7 +20,7 @@
   "donationStories": [
     {
       "fieldId": "donationstory",
-      "sectionKey": "HISTORY",
+      "sectionKey": ["HISTORY"],
       "title": "もう一度、大阪から。",
       "titleEn": "Once Again, From Osaka.",
       "text": "私たちが取り戻したいのは、その時代そのものではありません。\n\n「やってみよう」と思った人が挑戦でき、誰かがそれを見つけ、次の機会につながっていく流れです。\n\n時代も、表現の方法も、社会のルールも変わりました。\n\nだからこそ、今の大阪に合った新しい仕組みとして、その流れをつくり直したいと考えています。",
@@ -28,7 +28,7 @@
     },
     {
       "fieldId": "donationstory",
-      "sectionKey": "MESSAGE",
+      "sectionKey": ["MESSAGE"],
       "title": "挑戦できる場所がなければ、\n次の文化は生まれない。",
       "titleEn": "Without Places to Take Risks,\nthe Next Culture Cannot Emerge.",
       "text": "才能があっても、発表する場所がなければ届きません。\n\n場所があっても、観客と出会えなければ次につながりません。\n\nそして、新しい表現には、ときに既存の制度やルールとの調整も必要です。\n\nOsaka Fringeでは、劇場だけではなく、広場、歴史的建築、商業施設、店舗など、街のさまざまな場所を表現の場としてひらいていきます。\n\nプロ・アマ、ジャンル、キャリアを問わず、多くのアーティストが挑戦できる機会をつくる。\n観客が、まだ知らない表現者と出会える機会をつくる。\n海外のアーティストも大阪で表現しやすい環境を考える。\n\nそして、安全や地域との共存を大切にしながら、行政や関係機関とも対話を重ね、より挑戦しやすい文化環境を育てていきます。\n\n私たちが目指しているのは、一人のスターをつくることではありません。\n\n次の誰かが育つ可能性を、大阪の街のあちこちにつくることです。",
@@ -36,7 +36,7 @@
     },
     {
       "fieldId": "donationstory",
-      "sectionKey": "ENVIRONMENT",
+      "sectionKey": ["ENVIRONMENT"],
       "title": "挑戦できる文化環境を、\n長い時間をかけて育てる。",
       "titleEn": "Building a Cultural Environment for Experimentation,\nOver the Long Term.",
       "text": "新しい文化活動を広げていくためには、会場、安全管理、道路や公共空間の利用、海外アーティストの受け入れなど、多くの制度やルールとの調整が必要です。\n\nルールを無視するのではなく、ルールの中でできる挑戦を増やす。\n\nその実績を積み重ねながら、行政や関係機関とも対話し、より多様な文化活動が生まれやすい環境をつくっていきます。\n\n一度きりのイベントではなく、次の挑戦が続いていく仕組みを大阪に残すこと。\n\nそれもOsaka Fringeの役割だと考えています。",
@@ -44,7 +44,7 @@
     },
     {
       "fieldId": "donationstory",
-      "sectionKey": "PREFORM",
+      "sectionKey": ["PREFORM"],
       "title": "小さな支援も、\n次の舞台につながります。",
       "titleEn": "Every Contribution Can Lead\nto the Next Stage.",
       "text": "1,000円でも、3,000円でも、10,000円でも。\n\n寄付の大きさにかかわらず、一人ひとりの参加がOsaka Fringeを支える力になります。\n\n観客として公演を見に行くこと。\nアーティストのことを誰かに話すこと。\nSNSで公演を紹介すること。\n\nそして、可能であれば寄付という形で支えること。\n\nOsaka Fringeは、アーティストや運営だけでつくるものではありません。\n\n街にいる一人ひとりが、このフェスティバルの一部です。",
@@ -52,7 +52,7 @@
     },
     {
       "fieldId": "donationstory",
-      "sectionKey": "CLOSING",
+      "sectionKey": ["CLOSING"],
       "title": "次の誰かが、\n始められる大阪へ。",
       "titleEn": "A City Where the Next Artist Can Begin.",
       "text": "一つの公演から、次の表現へ。\n一人の観客から、次の観客へ。\n一つの場所から、街のあちこちへ。\n\nすぐに結果が出ることばかりではありません。\n\nそれでも、挑戦できる場所を増やし、その挑戦を見つける人を増やしていけば、大阪からまた新しい文化が生まれてくるはずです。\n\nspill over ― 文化芸術が街にあふれだす。\n\nその未来を、一緒につくってください。",
