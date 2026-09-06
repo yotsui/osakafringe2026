@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { SiteInfo } from '@/types';
+import { SiteInfo, DonationStoryKey, DonationStory } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import {
   CreditCard,
@@ -25,6 +25,28 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
   const title = getText(siteInfo.donationTitle, siteInfo.donationTitleEn);
   const text = getText(siteInfo.donationText, siteInfo.donationTextEn);
   const bankInfo = getText(siteInfo.donationBankInfo, siteInfo.donationBankInfoEn);
+  const bankNote = getText(siteInfo.donationBankNote, siteInfo.donationBankNoteEn);
+
+  // Story Map for dynamic CMS sections
+  const storyMap = new Map<string, DonationStory>(
+    (siteInfo.donationStories ?? []).map((story) => [story.sectionKey, story])
+  );
+
+  const getStory = (key: DonationStoryKey) => {
+    const s = storyMap.get(key);
+    if (!s) return { title: '', text: '' };
+    const storyTitle = language === 'en' ? (s.titleEn || s.title) : s.title;
+    const storyText = language === 'en' ? (s.textEn || s.text) : s.text;
+    return { title: storyTitle, text: storyText };
+  };
+
+  const historyStory = getStory('HISTORY');
+  const messageStory = getStory('MESSAGE');
+  const envStory = getStory('ENVIRONMENT');
+  const preformStory = getStory('PREFORM');
+  const closingStory = getStory('CLOSING');
+
+  const impacts = siteInfo.donationImpacts ?? [];
 
   // Form State
   const [selectedAmount, setSelectedAmount] = useState<number | 'custom'>(3000);
@@ -88,182 +110,167 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-16 sm:space-y-24 text-slate-900">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-14 sm:space-y-20 text-slate-900">
       
       {/* 1. Header & Lead */}
-      <section className="space-y-8">
-        <div className="border-l-4 border-[#E6007E] pl-4 sm:pl-6 space-y-3 py-1">
+      <section className="space-y-6">
+        <div className="border-l-4 border-[#E6007E] pl-4 sm:pl-6 space-y-2 py-1">
           <div className="text-xs font-black tracking-widest text-[#E6007E] uppercase">
             {t('donateSectionBadge')}
           </div>
           <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight whitespace-pre-line">
-            {title || t('donatePageTitle')}
+            {title || (language === 'en' ? 'Creating a City Where the Next Generation of Artists Can Grow.' : '次の表現者が、大阪から育つ土壌をつくる。')}
           </h1>
         </div>
 
-        <div className="bg-slate-50/60 border border-slate-200/80 rounded-2xl p-6 sm:p-10 space-y-4">
-          <p className="text-sm sm:text-base text-slate-700 leading-relaxed sm:leading-loose whitespace-pre-line font-medium">
-            {text || t('donatePageSubtitle')}
-          </p>
-        </div>
+        {text && (
+          <div className="bg-slate-50/70 border border-slate-200/80 rounded-2xl p-6 sm:p-8">
+            <p className="text-sm sm:text-base text-slate-700 leading-[1.7] whitespace-pre-line font-medium">
+              {text}
+            </p>
+          </div>
+        )}
       </section>
 
       {/* 2. History & Contemporary Reconstruction (1980s — 1990s) */}
-      <section className="border-t border-slate-200 pt-12 sm:pt-16">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          <div className="lg:col-span-4 space-y-2">
-            <div className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tighter">
-              {t('historyTypography')}
+      {(historyStory.title || historyStory.text) && (
+        <section className="border-t border-slate-200 pt-10 sm:pt-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+            <div className="lg:col-span-4 space-y-1.5">
+              <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tighter">
+                {t('historyTypography')}
+              </div>
+              <div className="h-1 w-10 bg-[#E6007E]" />
+              <p className="text-xs text-slate-500 font-bold tracking-widest uppercase pt-1">
+                {t('historyBadge')}
+              </p>
             </div>
-            <div className="h-1 w-12 bg-[#E6007E]" />
-            <p className="text-xs text-slate-500 font-bold tracking-widest uppercase pt-1">
-              OSAKA CULTURAL MEMORY
-            </p>
+            <div className="lg:col-span-8 space-y-4">
+              {historyStory.title && (
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                  {historyStory.title}
+                </h2>
+              )}
+              {historyStory.text && (
+                <p className="text-sm sm:text-base text-slate-700 leading-[1.7] whitespace-pre-line font-medium">
+                  {historyStory.text}
+                </p>
+              )}
+            </div>
           </div>
-          <div className="lg:col-span-8 space-y-4">
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900">
-              {t('historyTitle')}
-            </h2>
-            <p className="text-sm sm:text-base text-slate-700 leading-relaxed sm:leading-loose whitespace-pre-line font-medium">
-              {t('historyText')}
-            </p>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* 3. Message / Philosophy */}
-      <section className="border-t border-slate-200 pt-12 sm:pt-16 space-y-6">
-        <div className="space-y-2">
-          <div className="text-xs font-black tracking-widest text-[#E6007E] uppercase">
-            {t('messageBadge')}
+      {(messageStory.title || messageStory.text) && (
+        <section className="border-t border-slate-200 pt-10 sm:pt-12 space-y-4">
+          <div className="space-y-1.5">
+            <div className="text-xs font-black tracking-widest text-[#E6007E] uppercase">
+              {t('messageBadge')}
+            </div>
+            {messageStory.title && (
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-snug whitespace-pre-line">
+                {messageStory.title}
+              </h2>
+            )}
           </div>
-          <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight leading-snug whitespace-pre-line">
-            {t('donateMessageHeader')}
-          </h2>
-        </div>
-        <div className="prose max-w-none text-sm sm:text-base text-slate-700 leading-relaxed sm:leading-loose whitespace-pre-line font-medium">
-          {t('donateMessageBody')}
-        </div>
-      </section>
+          {messageStory.text && (
+            <div className="prose max-w-none text-sm sm:text-base text-slate-700 leading-[1.7] whitespace-pre-line font-medium">
+              {messageStory.text}
+            </div>
+          )}
+        </section>
+      )}
 
       {/* 4. Institutional Dialogue / Sustainable Environment */}
-      <section className="bg-slate-900 text-white rounded-2xl p-6 sm:p-10 space-y-6">
-        <div className="space-y-2">
-          <div className="text-xs font-black tracking-widest text-pink-400 uppercase">
-            {t('institutionBadge')}
+      {(envStory.title || envStory.text) && (
+        <section className="bg-slate-900 text-white rounded-2xl p-6 sm:p-8 space-y-4">
+          <div className="space-y-1.5">
+            <div className="text-xs font-black tracking-widest text-pink-400 uppercase">
+              {t('institutionBadge')}
+            </div>
+            {envStory.title && (
+              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-snug whitespace-pre-line">
+                {envStory.title}
+              </h2>
+            )}
           </div>
-          <h2 className="text-xl sm:text-3xl font-black text-white tracking-tight leading-snug whitespace-pre-line">
-            {t('institutionTitle')}
-          </h2>
-        </div>
-        <p className="text-sm sm:text-base text-slate-300 leading-relaxed sm:leading-loose whitespace-pre-line font-medium">
-          {t('institutionBody')}
-        </p>
-      </section>
+          {envStory.text && (
+            <p className="text-sm sm:text-base text-slate-300 leading-[1.7] whitespace-pre-line font-medium">
+              {envStory.text}
+            </p>
+          )}
+        </section>
+      )}
 
       {/* 5. 4 Core Support Impacts (01 - 04) */}
-      <section className="space-y-8 pt-4">
-        <div className="space-y-2 border-b border-slate-200 pb-4">
-          <div className="text-xs font-black tracking-widest text-[#E6007E] uppercase">
-            {t('donatePurposeBadge')}
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
-            {t('donatePurpose')}
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10">
-          
-          {/* 01 */}
-          <div className="border border-slate-200 rounded-xl p-6 sm:p-8 bg-white space-y-4">
-            <div className="flex items-baseline justify-between border-b border-slate-100 pb-3">
-              <span className="text-3xl sm:text-4xl font-black text-[#E6007E]">
-                {t('impact1Num')}
-              </span>
-              <span className="text-xs font-black text-slate-400 tracking-wider">
-                {t('impact1Eng')}
-              </span>
+      {impacts.length > 0 && (
+        <section className="space-y-6 pt-2">
+          <div className="space-y-1.5 border-b border-slate-200 pb-3">
+            <div className="text-xs font-black tracking-widest text-[#E6007E] uppercase">
+              {t('donatePurposeBadge')}
             </div>
-            <h3 className="text-base sm:text-lg font-black text-slate-900 leading-snug">
-              {t('impact1Title')}
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line font-medium">
-              {t('impact1Desc')}
-            </p>
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+              {t('donatePurpose')}
+            </h2>
           </div>
 
-          {/* 02 */}
-          <div className="border border-slate-200 rounded-xl p-6 sm:p-8 bg-white space-y-4">
-            <div className="flex items-baseline justify-between border-b border-slate-100 pb-3">
-              <span className="text-3xl sm:text-4xl font-black text-[#E6007E]">
-                {t('impact2Num')}
-              </span>
-              <span className="text-xs font-black text-slate-400 tracking-wider">
-                {t('impact2Eng')}
-              </span>
-            </div>
-            <h3 className="text-base sm:text-lg font-black text-slate-900 leading-snug">
-              {t('impact2Title')}
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line font-medium">
-              {t('impact2Desc')}
-            </p>
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            {impacts.map((impact, index) => {
+              const numStr = String(index + 1).padStart(2, '0');
+              const impactTitle = language === 'en' ? (impact.titleEn || impact.title) : impact.title;
+              const impactText = language === 'en' ? (impact.textEn || impact.text) : impact.text;
 
-          {/* 03 */}
-          <div className="border border-slate-200 rounded-xl p-6 sm:p-8 bg-white space-y-4">
-            <div className="flex items-baseline justify-between border-b border-slate-100 pb-3">
-              <span className="text-3xl sm:text-4xl font-black text-[#E6007E]">
-                {t('impact3Num')}
-              </span>
-              <span className="text-xs font-black text-slate-400 tracking-wider">
-                {t('impact3Eng')}
-              </span>
-            </div>
-            <h3 className="text-base sm:text-lg font-black text-slate-900 leading-snug">
-              {t('impact3Title')}
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line font-medium">
-              {t('impact3Desc')}
-            </p>
+              return (
+                <div key={impact.label || index} className="border border-slate-200 rounded-xl p-5 sm:p-7 bg-white space-y-3.5 shadow-2xs">
+                  <div className="flex items-baseline justify-between border-b border-slate-100 pb-2.5">
+                    <span className="text-2xl sm:text-3xl font-black text-[#E6007E]">
+                      {numStr}
+                    </span>
+                    {impact.label && (
+                      <span className="text-xs font-black text-slate-400 tracking-wider uppercase">
+                        {impact.label}
+                      </span>
+                    )}
+                  </div>
+                  {impactTitle && (
+                    <h3 className="text-base sm:text-lg font-black text-slate-900 leading-snug">
+                      {impactTitle}
+                    </h3>
+                  )}
+                  {impactText && (
+                    <p className="text-xs sm:text-sm text-slate-600 leading-[1.7] whitespace-pre-line font-medium">
+                      {impactText}
+                    </p>
+                  )}
+                </div>
+              );
+            })}
           </div>
-
-          {/* 04 */}
-          <div className="border border-slate-200 rounded-xl p-6 sm:p-8 bg-white space-y-4">
-            <div className="flex items-baseline justify-between border-b border-slate-100 pb-3">
-              <span className="text-3xl sm:text-4xl font-black text-[#E6007E]">
-                {t('impact4Num')}
-              </span>
-              <span className="text-xs font-black text-slate-400 tracking-wider">
-                {t('impact4Eng')}
-              </span>
-            </div>
-            <h3 className="text-base sm:text-lg font-black text-slate-900 leading-snug">
-              {t('impact4Title')}
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line font-medium">
-              {t('impact4Desc')}
-            </p>
-          </div>
-
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* 6. Pre-Form Message */}
-      <section className="border-t border-slate-200 pt-12 sm:pt-16 space-y-4">
-        <div className="text-xs font-black tracking-widest text-[#E6007E] uppercase">
-          {t('preFormBadge')}
-        </div>
-        <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight leading-snug whitespace-pre-line">
-          {t('preFormTitle')}
-        </h2>
-        <p className="text-sm sm:text-base text-slate-700 leading-relaxed sm:leading-loose whitespace-pre-line font-medium">
-          {t('preFormBody')}
-        </p>
-      </section>
+      {(preformStory.title || preformStory.text) && (
+        <section className="border-t border-slate-200 pt-10 sm:pt-12 space-y-4">
+          <div className="text-xs font-black tracking-widest text-[#E6007E] uppercase">
+            {t('preFormBadge')}
+          </div>
+          {preformStory.title && (
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-snug whitespace-pre-line">
+              {preformStory.title}
+            </h2>
+          )}
+          {preformStory.text && (
+            <p className="text-sm sm:text-base text-slate-700 leading-[1.7] whitespace-pre-line font-medium">
+              {preformStory.text}
+            </p>
+          )}
+        </section>
+      )}
 
       {/* 7. Online Donation Form via Stripe */}
-      <section className="bg-white border-2 border-slate-900 rounded-2xl p-6 sm:p-10 space-y-8">
+      <section className="bg-white border-2 border-slate-900 rounded-2xl p-6 sm:p-8 space-y-6 shadow-sm">
         <div className="space-y-1">
           <h3 className="text-xl sm:text-2xl font-black text-slate-900">
             {t('onlineDonationTitle')}
@@ -273,7 +280,7 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
           </p>
         </div>
 
-        <form onSubmit={handleCheckout} className="space-y-8">
+        <form onSubmit={handleCheckout} className="space-y-6">
           {/* Amount Selection */}
           <div className="space-y-3">
             <label className="block text-xs font-black text-slate-900 uppercase tracking-wider">
@@ -292,7 +299,7 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
                       setCustomAmount('');
                       setErrorMsg(null);
                     }}
-                    className={`relative flex items-center justify-center p-4 rounded-xl border-2 font-black transition-all text-base sm:text-lg cursor-pointer ${
+                    className={`relative flex items-center justify-center p-3.5 rounded-xl border-2 font-black transition-all text-base sm:text-lg cursor-pointer ${
                       isSelected
                         ? 'border-[#E6007E] bg-pink-50/60 text-[#E6007E]'
                         : 'border-slate-200 bg-white hover:border-slate-400 text-slate-800'
@@ -312,7 +319,7 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
                   setSelectedAmount('custom');
                   setErrorMsg(null);
                 }}
-                className={`relative flex items-center justify-center p-4 rounded-xl border-2 font-black transition-all text-sm sm:text-base cursor-pointer ${
+                className={`relative flex items-center justify-center p-3.5 rounded-xl border-2 font-black transition-all text-sm sm:text-base cursor-pointer ${
                   selectedAmount === 'custom'
                     ? 'border-[#E6007E] bg-pink-50/60 text-[#E6007E]'
                     : 'border-slate-200 bg-white hover:border-slate-400 text-slate-800'
@@ -455,7 +462,7 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
       </section>
 
       {/* 8. Bank Transfer Section */}
-      <section className="bg-slate-50 border border-slate-200 rounded-2xl p-6 sm:p-10 space-y-6">
+      <section className="bg-slate-50 border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-5">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-xs">
             <Landmark className="w-5 h-5" />
@@ -470,32 +477,38 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
           </div>
         </div>
 
-        <div className="p-6 rounded-xl bg-white border border-slate-200 space-y-3">
+        <div className="p-5 sm:p-6 rounded-xl bg-white border border-slate-200 space-y-3">
           <pre className="text-xs sm:text-sm font-bold text-slate-800 whitespace-pre-wrap font-mono leading-relaxed">
             {bankInfo || `金融機関名：大阪シティ信用金庫\n支店名：阿倍野支店\n口座種別：普通預金\n口座番号：8173108\n口座名義：オオサカブンカフリンジキコウセツリツジュンビシツ\n（大阪文化フリンジ機構設立準備室）`}
           </pre>
         </div>
 
-        <p className="text-xs text-slate-500 font-medium leading-relaxed whitespace-pre-line">
-          {t('bankTransferNotice')}
+        <p className="text-xs text-slate-500 font-medium leading-[1.7] whitespace-pre-line">
+          {bankNote || t('bankTransferNotice')}
         </p>
       </section>
 
       {/* 9. Page Closing Statement */}
-      <section className="border-t border-slate-200 pt-12 sm:pt-16 pb-8 space-y-6 text-center max-w-2xl mx-auto">
-        <div className="text-xs font-black tracking-widest text-[#E6007E] uppercase">
-          {t('closingBadge')}
-        </div>
-        <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight leading-snug whitespace-pre-line">
-          {t('closingTitle')}
-        </h2>
-        <p className="text-sm sm:text-base text-slate-600 leading-relaxed sm:leading-loose whitespace-pre-line font-medium text-left sm:text-center">
-          {t('closingBody')}
-        </p>
-        <div className="pt-4 text-xs font-black tracking-widest text-slate-400 uppercase">
-          {t('closingSign')}
-        </div>
-      </section>
+      {(closingStory.title || closingStory.text) && (
+        <section className="border-t border-slate-200 pt-10 sm:pt-12 pb-6 space-y-5 text-center max-w-2xl mx-auto">
+          <div className="text-xs font-black tracking-widest text-[#E6007E] uppercase">
+            {t('closingBadge')}
+          </div>
+          {closingStory.title && (
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-snug whitespace-pre-line">
+              {closingStory.title}
+            </h2>
+          )}
+          {closingStory.text && (
+            <p className="text-sm sm:text-base text-slate-600 leading-[1.7] whitespace-pre-line font-medium text-left sm:text-center">
+              {closingStory.text}
+            </p>
+          )}
+          <div className="pt-2 text-xs font-black tracking-widest text-slate-400 uppercase">
+            {t('closingSign')}
+          </div>
+        </section>
+      )}
 
     </div>
   );

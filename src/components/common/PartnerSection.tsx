@@ -10,22 +10,22 @@ interface PartnerSectionProps {
   partners: Partner[];
 }
 
-const CATEGORY_ORDER: Array<{ key: string; label: string; desc: string }> = [
-  { key: '組織（後援・協力）', label: '後援・協力団体', desc: 'Osaka Fringe 2026 を支援・推進する公的機関および文化芸術団体' },
-  { key: '連携イベント・フェス', label: '連携イベント・フェスティバル', desc: '同時期に大阪・関西各地で開催される連携カルチャーフェスティバル' },
-  { key: '会場協力', label: '会場協力', desc: '舞台・空間を提供しフェスティバルを共創する会場パートナー' },
-  { key: 'スポンサー', label: 'オフィシャルスポンサー', desc: 'フェスティバルの挑戦と発展を支える協賛企業・団体' },
+const CATEGORY_CONFIG: Array<{ key: string; labelKey: string; descKey: string }> = [
+  { key: '組織（後援・協力）', labelKey: 'partnerCategoryOrg', descKey: 'partnerCategoryOrgDesc' },
+  { key: '連携イベント・フェス', labelKey: 'partnerCategoryFest', descKey: 'partnerCategoryFestDesc' },
+  { key: '会場協力', labelKey: 'partnerCategoryVenueLabel', descKey: 'partnerCategoryVenueDesc' },
+  { key: 'スポンサー', labelKey: 'partnerCategorySponsorLabel', descKey: 'partnerCategorySponsorDesc' },
 ];
 
 export default function PartnerSection({ partners = [] }: PartnerSectionProps) {
-  const { getText } = useLanguage();
+  const { t, getText } = useLanguage();
 
   const safePartners = Array.isArray(partners) ? partners : [];
 
   // カテゴリごとにグループ化（未分類や未知のカテゴリも漏れなく救済）
-  const knownKeys = new Set(CATEGORY_ORDER.map((c) => c.key));
+  const knownKeys = new Set(CATEGORY_CONFIG.map((c) => c.key));
   
-  const groupedPartners = CATEGORY_ORDER.map((cat) => {
+  const groupedPartners = CATEGORY_CONFIG.map((cat) => {
     const list = safePartners.filter((p) => {
       if (!p.category || !knownKeys.has(p.category)) {
         // 未設定・未知カテゴリは「組織（後援・協力）」へフォールバック
@@ -33,7 +33,7 @@ export default function PartnerSection({ partners = [] }: PartnerSectionProps) {
       }
       return p.category === cat.key;
     });
-    return { ...cat, list };
+    return { ...cat, label: t(cat.labelKey), desc: t(cat.descKey), list };
   }).filter((group) => group.list.length > 0);
 
   const hasAnyPartner = groupedPartners.length > 0;
@@ -43,14 +43,14 @@ export default function PartnerSection({ partners = [] }: PartnerSectionProps) {
       {/* Editorial Header */}
       <div className="space-y-3">
         <div className="text-[#E6007E] font-black text-xs tracking-widest uppercase">
-          PARTNERS & SUPPORTERS
+          {t('partnerSectionBadge')}
         </div>
         <div className="w-12 h-1 bg-[#E6007E]" />
         <h3 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-          パートナー・後援・連携イベント
+          {t('partnerSectionTitle')}
         </h3>
         <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-2xl leading-relaxed">
-          Osaka Fringe 2026 を共に創り、街にあふれだす文化芸術を支える皆さまです。
+          {t('partnerSectionSubtitle')}
         </p>
       </div>
 
@@ -136,8 +136,8 @@ export default function PartnerSection({ partners = [] }: PartnerSectionProps) {
         </div>
       ) : (
         <div className="p-8 sm:p-12 text-center rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
-          <p className="text-sm font-bold text-slate-600">掲載準備中</p>
-          <p className="text-xs text-slate-400">パートナー・後援情報は順次公開いたします。</p>
+          <p className="text-sm font-bold text-slate-600">{t('partnerSectionEmptyTitle')}</p>
+          <p className="text-xs text-slate-400">{t('partnerSectionEmptyDesc')}</p>
         </div>
       )}
     </section>

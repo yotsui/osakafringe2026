@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
             product_data: {
               name: isEn
                 ? 'Osaka Fringe 2026 - Donation & Support'
-                : '大阪文化万博 Osaka Fringe 2026 応援寄付',
+                : '大阪文化万博Osaka Fringe 2026 応援寄付',
               description: isEn
                 ? 'Empowering emerging artists and street performing arts across Osaka.'
                 : '若手アーティスト支援・多言語環境整備・フェスティバル運営支援へのご寄付',

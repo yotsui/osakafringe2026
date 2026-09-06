@@ -509,8 +509,24 @@ export const getSiteInfo = cache(async (): Promise<SiteInfo> => {
         endpoint: 'site_info',
         customRequestInit: { next: { revalidate: REVALIDATE_TIME } },
       });
+      let cmsData: any = null;
       if (data && data.siteTitle) {
-        baseInfo = { ...mockSiteInfo, ...data };
+        cmsData = data;
+      } else if (data && Array.isArray(data.contents) && data.contents.length > 0) {
+        cmsData = data.contents[0];
+      }
+
+      if (cmsData) {
+        baseInfo = {
+          ...mockSiteInfo,
+          ...cmsData,
+          donationStories: (Array.isArray(cmsData.donationStories) && cmsData.donationStories.length > 0)
+            ? cmsData.donationStories
+            : mockSiteInfo.donationStories,
+          donationImpacts: (Array.isArray(cmsData.donationImpacts) && cmsData.donationImpacts.length > 0)
+            ? cmsData.donationImpacts
+            : mockSiteInfo.donationImpacts,
+        };
       }
     } catch (error) {
       console.warn('[MicroCMS] Failed to fetch site_info, using mock data:', error);
@@ -528,6 +544,7 @@ export const getSiteInfo = cache(async (): Promise<SiteInfo> => {
     aboutTextEn: baseInfo.aboutTextEn || baseInfo.aboutText,
     donationTitleEn: baseInfo.donationTitleEn || baseInfo.donationTitle,
     donationTextEn: baseInfo.donationTextEn || baseInfo.donationText,
+    donationBankNoteEn: baseInfo.donationBankNoteEn || baseInfo.donationBankNote,
     donationBankInfoEn: baseInfo.donationBankInfoEn || baseInfo.donationBankInfo,
     newsNoticeEn: baseInfo.newsNoticeEn || baseInfo.newsNotice,
   };

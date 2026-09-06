@@ -163,6 +163,31 @@ export interface Banner {
   position?: 'top' | 'middle' | 'bottom' | 'sidebar';
 }
 
+export type DonationStoryKey =
+  | 'HISTORY'
+  | 'MESSAGE'
+  | 'ENVIRONMENT'
+  | 'PREFORM'
+  | 'CLOSING';
+
+export interface DonationStory {
+  fieldId?: 'donationstory';
+  sectionKey: DonationStoryKey;
+  title: string;
+  titleEn?: string;
+  text: string;
+  textEn?: string;
+}
+
+export interface DonationImpact {
+  fieldId?: 'donationimpact';
+  label?: string;
+  title: string;
+  titleEn?: string;
+  text: string;
+  textEn?: string;
+}
+
 export interface SiteInfo {
   siteTitle?: string;
   siteTitleEn?: string;
@@ -186,6 +211,10 @@ export interface SiteInfo {
   donationTitleEn?: string;
   donationText?: string;
   donationTextEn?: string;
+  donationStories?: DonationStory[];
+  donationImpacts?: DonationImpact[];
+  donationBankNote?: string;
+  donationBankNoteEn?: string;
   donationBankInfo?: string;
   donationBankInfoEn?: string;
   newsNotice?: string;

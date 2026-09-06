@@ -12,8 +12,9 @@ interface AboutClientProps {
 }
 
 export default function AboutClient({ siteInfo, partners = [] }: AboutClientProps) {
-  const { t, getText } = useLanguage();
+  const { t, getText, language } = useLanguage();
 
+  const siteTitle = getText(siteInfo.siteTitle, siteInfo.siteTitleEn) || (language === 'en' ? 'Osaka Fringe 2026' : '大阪文化万博Osaka Fringe 2026');
   const aboutTitle = getText(siteInfo.aboutTitle, siteInfo.aboutTitleEn);
   const aboutText = getText(siteInfo.aboutText, siteInfo.aboutTextEn);
   const tagline = getText(siteInfo.heroTagline, siteInfo.heroTaglineEn);
@@ -26,7 +27,7 @@ export default function AboutClient({ siteInfo, partners = [] }: AboutClientProp
           ABOUT OSAKA FRINGE
         </div>
         <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
-          大阪文化万博 Osaka Fringe 2026
+          {siteTitle}
         </h1>
         <p className="text-base sm:text-lg font-bold text-[#E6007E]">
           spill over 文化芸術が街にあふれだす
@@ -41,11 +42,11 @@ export default function AboutClient({ siteInfo, partners = [] }: AboutClientProp
               PHILOSOPHY
             </div>
             <h2 className="text-2xl sm:text-4xl font-black leading-tight tracking-tight">
-              {aboutTitle || '大阪の街じゅうが、舞台になる。'}
+              {aboutTitle || (language === 'en' ? 'The Entire City of Osaka Becomes a Stage.' : '大阪の街じゅうが、舞台になる。')}
             </h2>
             <div className="w-16 h-1 bg-[#E6007E]" />
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed whitespace-pre-line font-medium">
-              {aboutText || '劇場だけでなく街中のあらゆる場所を舞台に。プロ・アマ問わずアーティストが自由に参加するオープンアクセス型芸術祭。2026年秋、大阪の街に多彩な文化芸術があふれだします。'}
+              {aboutText || (language === 'en' ? 'Transforming the entire city into open stages—not just inside traditional theaters, but across plazas, historical landmarks, cafes, and neighborhoods. Artists of all backgrounds and genres participate in an open-access arts festival. In Autumn 2026, diverse performing arts will spill over into the streets of Osaka.' : '劇場だけでなく街中のあらゆる場所を舞台に。プロ・アマ問わずアーティストが自由に参加するオープンアクセス型芸術祭。2026年秋、大阪の街に多彩な文化芸術があふれだします。')}
             </p>
           </div>
 
