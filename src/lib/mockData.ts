@@ -490,7 +490,7 @@ export const mockPartners: Partner[] = [
     url: 'https://osaka-info.jp',
     description: '水都大阪の魅力を世界へ発信する大阪観光局。大阪フリンジの観光・インバウンド連携パートナー。',
     descriptionEn: 'Official tourism board promoting Osaka worldwide as an international cultural hub.',
-    category: 'tourism',
+    category: '組織（後援・協力）',
   },
   {
     id: 'partner-tomofes',
@@ -500,7 +500,7 @@ export const mockPartners: Partner[] = [
     url: 'https://osakafringe.com',
     description: '大阪を舞台に人と街がつながる都市型カルチャーフェスティバル。連携企画を実施。',
     descriptionEn: 'Urban cultural festival connecting people and community in Osaka.',
-    category: 'partner_event',
+    category: '連携イベント・フェス',
   },
   {
     id: 'partner-minami',
@@ -510,6 +510,6 @@ export const mockPartners: Partner[] = [
     url: 'https://osakafringe.com',
     description: '心斎橋・道頓堀・アメリカ村を舞台にしたミナミエリア連携アートフェス。',
     descriptionEn: 'Minami area collaborative art and performance festival.',
-    category: 'partner_event',
+    category: '連携イベント・フェス',
   },
 ];

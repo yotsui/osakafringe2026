@@ -19,107 +19,169 @@ export default function AboutClient({ siteInfo, partners = [] }: AboutClientProp
   const tagline = getText(siteInfo.heroTagline, siteInfo.heroTaglineEn);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
-      {/* Header */}
-      <div className="border-l-4 border-[#E6007E] pl-4 sm:pl-6 space-y-2">
-        <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-20">
+      {/* 3-Step Editorial Header */}
+      <div className="border-l-4 border-[#E6007E] pl-4 sm:pl-6 space-y-2 py-2">
+        <div className="text-xs font-black tracking-widest text-[#E6007E] uppercase">
+          ABOUT OSAKA FRINGE
+        </div>
+        <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
           大阪文化万博 Osaka Fringe 2026
         </h1>
-        <p className="text-sm sm:text-base font-bold text-[#E6007E]">
+        <p className="text-base sm:text-lg font-bold text-[#E6007E]">
           spill over 文化芸術が街にあふれだす
         </p>
       </div>
 
-      {/* Main Philosophy Card */}
-      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#E6007E] via-[#d60075] to-[#7928ca] p-8 sm:p-12 text-white shadow-xl shadow-pink-500/15 space-y-6">
-        <div className="flex flex-col md:flex-row items-center gap-8">
-          <div className="flex-1 space-y-4">
-            <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-black uppercase tracking-wider">
+      {/* Philosophy Editorial Hero */}
+      <div className="bg-slate-900 rounded-3xl p-8 sm:p-14 text-white space-y-6 relative overflow-hidden shadow-lg">
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+          <div className="space-y-4 max-w-3xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#E6007E] text-white text-xs font-black tracking-wider uppercase">
               PHILOSOPHY
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-black leading-tight">
+            </div>
+            <h2 className="text-2xl sm:text-4xl font-black leading-tight tracking-tight">
               {aboutTitle || '大阪の街じゅうが、舞台になる。'}
             </h2>
-            <p className="text-sm sm:text-base text-pink-100 leading-relaxed whitespace-pre-line font-medium">
+            <div className="w-16 h-1 bg-[#E6007E]" />
+            <p className="text-sm sm:text-base text-slate-300 leading-relaxed whitespace-pre-line font-medium">
               {aboutText || '劇場だけでなく街中のあらゆる場所を舞台に。プロ・アマ問わずアーティストが自由に参加するオープンアクセス型芸術祭。2026年秋、大阪の街に多彩な文化芸術があふれだします。'}
             </p>
           </div>
 
-          <div className="relative w-52 h-32 bg-white/10 rounded-3xl backdrop-blur-md p-5 flex items-center justify-center border border-white/20 flex-shrink-0">
+          <div className="relative w-48 h-28 bg-white/10 rounded-2xl backdrop-blur-md p-4 flex items-center justify-center border border-white/20 shrink-0">
             <BrandLogo variant="stacked" linkToHome={false} className="w-full h-auto drop-shadow-md brightness-0 invert" />
           </div>
         </div>
       </div>
 
-      {/* 3 Core Features */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="bg-white border border-pink-100 rounded-3xl p-8 space-y-3 shadow-xs">
-          <div className="text-[#E6007E] font-black text-xs uppercase tracking-widest">
-            01 / OPEN ACCESS
+      {/* 3 Core Features: Large Editorial Format */}
+      <div className="space-y-8">
+        <div className="border-b border-slate-200/80 pb-4">
+          <div className="text-xs font-black text-[#E6007E] uppercase tracking-widest">
+            3 CORE VALUES
           </div>
-          <h3 className="text-lg font-black text-slate-900">{t('feature1Title')}</h3>
-          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
-            {t('feature1Desc')}
-          </p>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-1">
+            フェスティバル 3つの特徴
+          </h2>
         </div>
 
-        <div className="bg-white border border-rose-100 rounded-3xl p-8 space-y-3 shadow-xs">
-          <div className="text-rose-600 font-black text-xs uppercase tracking-widest">
-            02 / THE CITY IS THE STAGE
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
+          {/* Feature 01 */}
+          <div className="space-y-4 group">
+            <div className="flex items-baseline justify-between border-b-2 border-slate-900 pb-3">
+              <span className="text-3xl sm:text-4xl font-black text-[#E6007E]">
+                01
+              </span>
+              <span className="text-xs font-black tracking-widest text-slate-400 uppercase">
+                OPEN ACCESS
+              </span>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-snug">
+              {t('feature1Title')}
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+              {t('feature1Desc')}
+            </p>
           </div>
-          <h3 className="text-lg font-black text-slate-900">{t('feature2Title')}</h3>
-          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
-            {t('feature2Desc')}
-          </p>
-        </div>
 
-        <div className="bg-white border border-purple-100 rounded-3xl p-8 space-y-3 shadow-xs">
-          <div className="text-purple-600 font-black text-xs uppercase tracking-widest">
-            03 / OSAKA MEETS THE WORLD
+          {/* Feature 02 */}
+          <div className="space-y-4 group">
+            <div className="flex items-baseline justify-between border-b-2 border-slate-900 pb-3">
+              <span className="text-3xl sm:text-4xl font-black text-[#E6007E]">
+                02
+              </span>
+              <span className="text-xs font-black tracking-widest text-slate-400 uppercase">
+                THE CITY IS THE STAGE
+              </span>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-snug">
+              {t('feature2Title')}
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+              {t('feature2Desc')}
+            </p>
           </div>
-          <h3 className="text-lg font-black text-slate-900">{t('feature3Title')}</h3>
-          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
-            {t('feature3Desc')}
-          </p>
+
+          {/* Feature 03 */}
+          <div className="space-y-4 group">
+            <div className="flex items-baseline justify-between border-b-2 border-slate-900 pb-3">
+              <span className="text-3xl sm:text-4xl font-black text-[#E6007E]">
+                03
+              </span>
+              <span className="text-xs font-black tracking-widest text-slate-400 uppercase">
+                OSAKA MEETS THE WORLD
+              </span>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-snug">
+              {t('feature3Title')}
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+              {t('feature3Desc')}
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Venue Types Section */}
-      <div className="bg-slate-50 border border-pink-100 rounded-3xl p-8 sm:p-12 space-y-8">
-        <div className="text-center space-y-2">
-          <h2 className="text-2xl font-black text-slate-900">{t('aboutVenueTypesTitle')}</h2>
+      {/* Venue Types Section: 3-Column Clean Border Layout */}
+      <div className="bg-white border border-slate-200/90 rounded-3xl p-8 sm:p-14 space-y-10 shadow-xs">
+        <div className="space-y-2 border-b border-slate-200/80 pb-4">
+          <div className="text-xs font-black text-[#E6007E] uppercase tracking-widest">
+            VENUE CATEGORIES
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            {t('aboutVenueTypesTitle')}
+          </h2>
           <p className="text-xs sm:text-sm text-slate-600 font-medium">
             {t('aboutVenueTypesDesc')}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 rounded-2xl bg-white border border-slate-200/80 space-y-2">
-            <span className="px-2.5 py-0.5 rounded-md bg-blue-100 text-blue-700 text-xs font-black">
-              CORE
-            </span>
-            <h4 className="text-base font-black text-slate-900">{t('venueTypeCoreTitle')}</h4>
-            <p className="text-xs text-slate-600 leading-relaxed">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x divide-slate-200">
+          {/* CORE */}
+          <div className="space-y-3 pt-6 md:pt-0 md:pr-6">
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded bg-blue-50 border border-blue-200 text-blue-700 text-xs font-black tracking-wider">
+                CORE
+              </span>
+            </div>
+            <h3 className="text-lg font-black text-slate-900">
+              {t('venueTypeCoreTitle')}
+            </h3>
+            <div className="w-8 h-0.5 bg-[#E6007E]" />
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
               {t('venueTypeCoreDesc')}
             </p>
           </div>
 
-          <div className="p-6 rounded-2xl bg-white border border-slate-200/80 space-y-2">
-            <span className="px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-800 text-xs font-black">
-              HISTORICAL
-            </span>
-            <h4 className="text-base font-black text-slate-900">{t('venueTypeHistoricalTitle')}</h4>
-            <p className="text-xs text-slate-600 leading-relaxed">
+          {/* HISTORICAL */}
+          <div className="space-y-3 pt-6 md:pt-0 md:px-6">
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-800 text-xs font-black tracking-wider">
+                HISTORICAL
+              </span>
+            </div>
+            <h3 className="text-lg font-black text-slate-900">
+              {t('venueTypeHistoricalTitle')}
+            </h3>
+            <div className="w-8 h-0.5 bg-[#E6007E]" />
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
               {t('venueTypeHistoricalDesc')}
             </p>
           </div>
 
-          <div className="p-6 rounded-2xl bg-white border border-slate-200/80 space-y-2">
-            <span className="px-2.5 py-0.5 rounded-md bg-pink-100 text-pink-700 text-xs font-black">
-              LOCAL
-            </span>
-            <h4 className="text-base font-black text-slate-900">{t('venueTypeLocalTitle')}</h4>
-            <p className="text-xs text-slate-600 leading-relaxed">
+          {/* LOCAL */}
+          <div className="space-y-3 pt-6 md:pt-0 md:pl-6">
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded bg-pink-50 border border-pink-200 text-[#E6007E] text-xs font-black tracking-wider">
+                LOCAL
+              </span>
+            </div>
+            <h3 className="text-lg font-black text-slate-900">
+              {t('venueTypeLocalTitle')}
+            </h3>
+            <div className="w-8 h-0.5 bg-[#E6007E]" />
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
               {t('venueTypeLocalDesc')}
             </p>
           </div>
@@ -127,11 +189,9 @@ export default function AboutClient({ siteInfo, partners = [] }: AboutClientProp
       </div>
 
       {/* Partners Section */}
-      {partners && partners.length > 0 && (
-        <div className="pt-4">
-          <PartnerSection partners={partners} />
-        </div>
-      )}
+      <div className="pt-4">
+        <PartnerSection partners={partners} />
+      </div>
     </div>
   );
 }

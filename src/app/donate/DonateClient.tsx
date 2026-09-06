@@ -91,12 +91,15 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
-      {/* Header */}
-      <div className="border-l-4 border-[#E6007E] pl-4 sm:pl-6 space-y-2">
-        <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+      {/* 3-Step Editorial Header */}
+      <div className="border-l-4 border-[#E6007E] pl-4 sm:pl-6 space-y-2 py-2">
+        <div className="text-xs font-black tracking-widest text-[#E6007E] uppercase">
+          SUPPORT & DONATE
+        </div>
+        <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
           {title || t('donatePageTitle')}
         </h1>
-        <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-2xl">
+        <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-2xl leading-relaxed">
           {t('donatePageSubtitle')}
         </p>
       </div>

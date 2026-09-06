@@ -147,11 +147,9 @@ export default function HomeClient({
       </section>
 
       {/* Partners & Collaborations Section */}
-      {partners && partners.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <PartnerSection partners={partners} />
-        </section>
-      )}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <PartnerSection partners={partners} />
+      </section>
 
       {/* Performance Modal Window */}
       <PerformanceModal

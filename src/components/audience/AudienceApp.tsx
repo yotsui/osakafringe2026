@@ -194,13 +194,16 @@ export default function AudienceApp({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* App Header */}
-      <div className="border-l-4 border-[#E6007E] pl-4 sm:pl-6 space-y-2">
-        <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-          {t('audienceTitle')}
+      {/* 3-Step Editorial Header */}
+      <div className="border-l-4 border-[#E6007E] pl-4 sm:pl-6 space-y-2 py-2">
+        <div className="text-xs font-black tracking-widest text-[#E6007E] uppercase">
+          SHOWS
+        </div>
+        <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
+          公演を探す
         </h1>
-        <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-2xl">
-          {t('audienceSubtitle')}
+        <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-2xl leading-relaxed">
+          WHAT 何を見る？ / WHERE どこで見る？ / WHEN いつ見る？ 街を歩いて楽しむフェスティバルガイド。
         </p>
       </div>
 

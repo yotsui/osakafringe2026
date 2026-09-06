@@ -92,10 +92,15 @@ export default function ContactClient({ siteInfo }: ContactClientProps) {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
-      {/* Header */}
-      <div className="border-l-4 border-[#E6007E] pl-4 sm:pl-6 space-y-2">
-        <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">{t('contactPageTitle')}</h1>
-        <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-2xl">
+      {/* 3-Step Editorial Header */}
+      <div className="border-l-4 border-[#E6007E] pl-4 sm:pl-6 space-y-2 py-2">
+        <div className="text-xs font-black tracking-widest text-[#E6007E] uppercase">
+          CONTACT
+        </div>
+        <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
+          {t('contactPageTitle')}
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-2xl leading-relaxed">
           {t('contactPageSubtitle')}
         </p>
       </div>

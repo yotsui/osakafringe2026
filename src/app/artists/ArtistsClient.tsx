@@ -54,12 +54,15 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
-      {/* Header */}
-      <div className="border-l-4 border-[#E6007E] pl-4 sm:pl-6 space-y-2">
-        <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+      {/* 3-Step Editorial Header */}
+      <div className="border-l-4 border-[#E6007E] pl-4 sm:pl-6 space-y-2 py-2">
+        <div className="text-xs font-black tracking-widest text-[#E6007E] uppercase">
+          ARTISTS
+        </div>
+        <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
           {t('artistsPageTitle')}
         </h1>
-        <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-2xl">
+        <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-2xl leading-relaxed">
           {t('artistsPageSubtitle')}
         </p>
         {isDemoMode && (
@@ -71,24 +74,24 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
       </div>
 
       {/* Artists Count */}
-      <div className="flex items-center justify-between border-b border-pink-100 pb-3">
-        <h2 className="text-lg sm:text-xl font-black text-slate-900">
-          {displayArtists.length} {t('artistsCountUnit')}
+      <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
+        <h2 className="text-base sm:text-lg font-bold text-slate-900">
+          <span className="text-[#E6007E] font-black">{displayArtists.length}</span> {t('artistsCountUnit')}
           {!isDemoMode && artists.length > displayArtists.length && (
-            <span className="ml-1 text-slate-400 font-normal">（出演公演登録アーティストのみ）</span>
+            <span className="ml-1.5 text-xs text-slate-400 font-normal">（出演公演登録アーティストのみ）</span>
           )}
         </h2>
         <Link
           href="/audience"
-          className="inline-flex items-center gap-1 text-xs font-bold text-[#E6007E] hover:underline"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#E6007E] hover:underline"
         >
           <span>{t('viewAllAudience')}</span>
           <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>
 
-      {/* Grid of Artists */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {/* Editorial Catalog Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
         {displayArtists.map((artist) => {
           const artistName = getText(artist.name, artist.nameEn);
           const origin = getText(artist.origin, artist.originEn);
@@ -98,53 +101,47 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
           return (
             <div
               key={artist.id}
-              className="bg-white border border-pink-100/80 hover:border-pink-300 rounded-3xl overflow-hidden shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+              className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden hover:border-[#E6007E] transition-all duration-300 flex flex-col justify-between shadow-2xs hover:shadow-md"
             >
               <div>
-                {/* Profile Photo */}
-                <div className="relative aspect-16/10 w-full overflow-hidden bg-slate-100">
+                {/* Large Profile Photo */}
+                <div className="relative aspect-4/3 w-full overflow-hidden bg-slate-900">
                   <SafeImage
                     src={artist.image}
                     alt={artistName}
                     fill
                     fallbackGenre={artist.genre || 'theater'}
                     fallbackText={artistName}
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent pointer-events-none" />
+                </div>
 
-                  {/* Badges: Genre & Origin */}
-                  <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
-                    {artist.genre && (
-                      <span className="px-3 py-1 rounded-full bg-[#E6007E] text-white text-[11px] font-black uppercase shadow-xs">
-                        {artist.genre}
-                      </span>
-                    )}
+                {/* Editorial Flow: Genre/Origin -> Name -> Bio */}
+                <div className="p-6 space-y-4">
+                  {/* Genre & Origin Typography */}
+                  <div className="flex items-center justify-between text-xs font-black tracking-wider uppercase">
+                    <span className="text-[#E6007E]">
+                      {artist.genre || 'performance'}
+                    </span>
                     {origin && (
-                      <span className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-bold shadow-xs">
+                      <span className="text-slate-400 font-bold text-[11px]">
                         {origin}
                       </span>
                     )}
                   </div>
 
-                  <div className="absolute bottom-3 left-4 right-4">
-                    <h3 className="text-xl font-black text-white leading-tight drop-shadow-md">
-                      {artistName}
-                    </h3>
-                  </div>
-                </div>
+                  {/* Artist Name */}
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
+                    {artistName}
+                  </h3>
 
-                {/* Profile & Info */}
-                <div className="p-6 space-y-4">
-                  {/* Bio */}
-                  <div className="space-y-1.5">
-                    <p className="text-[11px] font-black text-pink-600 uppercase tracking-wider">
-                      {t('artistProfileTitle')}
-                    </p>
-                    <p className="text-xs text-slate-600 leading-relaxed font-medium line-clamp-4 whitespace-pre-line">
+                  {/* Profile Bio */}
+                  {profile && (
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium line-clamp-3 whitespace-pre-line">
                       {profile}
                     </p>
-                  </div>
+                  )}
 
                   {/* Social Links */}
                   {(artist.websiteUrl || artist.snsTwitter || artist.snsInstagram || artist.snsYoutube) && (
@@ -154,7 +151,7 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
                           href={artist.websiteUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 rounded-lg bg-slate-100 hover:bg-pink-100 text-slate-700 hover:text-pink-600 transition-colors"
+                          className="p-1.5 rounded-lg bg-slate-50 hover:bg-pink-50 text-slate-600 hover:text-[#E6007E] transition-colors"
                           title="Official Website"
                         >
                           <Globe className="w-3.5 h-3.5" />
@@ -165,7 +162,7 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
                           href={artist.snsTwitter}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 rounded-lg bg-slate-100 hover:bg-pink-100 text-slate-700 hover:text-pink-600 transition-colors"
+                          className="p-1.5 rounded-lg bg-slate-50 hover:bg-pink-50 text-slate-600 hover:text-[#E6007E] transition-colors"
                           title="X / Twitter"
                         >
                           <TwitterIcon className="w-3.5 h-3.5" />
@@ -176,7 +173,7 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
                           href={artist.snsInstagram}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 rounded-lg bg-slate-100 hover:bg-pink-100 text-slate-700 hover:text-pink-600 transition-colors"
+                          className="p-1.5 rounded-lg bg-slate-50 hover:bg-pink-50 text-slate-600 hover:text-[#E6007E] transition-colors"
                           title="Instagram"
                         >
                           <InstagramIcon className="w-3.5 h-3.5" />
@@ -187,7 +184,7 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
                           href={artist.snsYoutube}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 rounded-lg bg-slate-100 hover:bg-pink-100 text-slate-700 hover:text-pink-600 transition-colors"
+                          className="p-1.5 rounded-lg bg-slate-50 hover:bg-pink-50 text-slate-600 hover:text-[#E6007E] transition-colors"
                           title="YouTube"
                         >
                           <YoutubeIcon className="w-3.5 h-3.5" />
@@ -199,36 +196,28 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
               </div>
 
               {/* Performances by this Artist */}
-              <div className="p-6 pt-0 space-y-3">
+              <div className="p-6 pt-0 space-y-2">
                 <div className="pt-3 border-t border-slate-100 space-y-2">
-                  <p className="text-[11px] font-black text-slate-700 uppercase tracking-wide flex items-center gap-1.5">
-                    <Theater className="w-3.5 h-3.5 text-pink-600" />
-                    <span>{t('artistShowsTitle')}</span>
-                  </p>
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                    {t('artistShowsTitle')}
+                  </span>
 
                   {artistShows.length > 0 ? (
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       {artistShows.map((perf) => {
                         const showTitle = getText(perf.title, perf.titleEn);
                         return (
-                          <div
+                          <button
                             key={perf.id}
+                            type="button"
                             onClick={() => setSelectedPerformance(perf)}
-                            className="p-3 rounded-2xl bg-pink-50/50 hover:bg-pink-100/80 border border-pink-100 cursor-pointer transition-all flex items-center justify-between gap-2"
+                            className="w-full text-left p-2.5 rounded-xl bg-slate-50 hover:bg-pink-50/80 border border-slate-100 hover:border-pink-200 cursor-pointer transition-all flex items-center justify-between gap-2 group"
                           >
-                            <div className="min-w-0 flex-1">
-                              <h4 className="text-xs font-black text-slate-900 truncate hover:text-pink-600">
-                                {showTitle}
-                              </h4>
-                              <p className="text-[11px] text-slate-500 font-bold flex items-center gap-1 mt-0.5">
-                                <Calendar className="w-3 h-3 text-pink-600" />
-                                <span>{perf.schedules.length}公演</span>
-                              </p>
-                            </div>
-                            <span className="px-2.5 py-1 rounded-xl bg-white text-pink-600 text-[10px] font-black shadow-xs flex-shrink-0">
-                              {t('viewDetails')}
+                            <span className="text-xs font-bold text-slate-800 group-hover:text-[#E6007E] truncate">
+                              {showTitle}
                             </span>
-                          </div>
+                            <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#E6007E] shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                          </button>
                         );
                       })}
                     </div>

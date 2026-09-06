@@ -427,30 +427,51 @@ export const getPerformanceById = cache(async (id: string): Promise<Performance 
 /**
  * パートナー/連携団体一覧を取得 (React cache & ISR 300s)
  */
+/**
+ * パートナー/連携団体一覧を取得 (React cache & ISR 300s)
+ */
 export const getPartners = cache(async (): Promise<Partner[]> => {
   const normalizePartner = (p: any): Partner => {
+    let rawCat = p.category;
+    if (Array.isArray(rawCat)) {
+      rawCat = rawCat[0];
+    }
     return {
       ...p,
       nameEn: p.nameEn || p.name,
       descriptionEn: p.descriptionEn || p.description,
       image: extractImageUrl(p.image) || p.image || '',
-      url: p.url || p.linkUrl || '#',
+      url: p.websiteUrl || p.url || p.linkUrl || '#',
+      category: rawCat || '組織（後援・協力）',
     };
   };
 
   let rawList: any[] = mockPartners;
   if (client) {
     try {
+      // 1. まず 'partner' エンドポイントを試行
       const data = await client.getList<any>({
         endpoint: 'partner',
-        queries: { limit: 50 },
+        queries: { limit: 100 },
         customRequestInit: { next: { revalidate: REVALIDATE_TIME } },
       });
-      if (data.contents && data.contents.length > 0) {
+      if (data && Array.isArray(data.contents)) {
         rawList = data.contents;
       }
     } catch (error) {
-      console.warn('[MicroCMS] Failed to fetch partners, using mock data:', error);
+      // 2. 失敗時は 'partners' エンドポイントも試行
+      try {
+        const dataFallback = await client.getList<any>({
+          endpoint: 'partners',
+          queries: { limit: 100 },
+          customRequestInit: { next: { revalidate: REVALIDATE_TIME } },
+        });
+        if (dataFallback && Array.isArray(dataFallback.contents)) {
+          rawList = dataFallback.contents;
+        }
+      } catch (err2) {
+        console.warn('[MicroCMS] Failed to fetch partners from both "partner" and "partners" endpoints, using mock data:', { error, err2 });
+      }
     }
   }
 

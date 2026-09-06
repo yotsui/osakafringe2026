@@ -43,7 +43,7 @@ export default function PerformanceCard({
     : fallbackVenueName;
 
   return (
-    <div className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-slate-100 hover:border-pink-200 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+    <div className="group relative bg-white rounded-2xl overflow-hidden border border-slate-200/90 hover:border-[#E6007E] shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between">
       {/* Thumbnail */}
       <div 
         className="relative aspect-16/10 w-full overflow-hidden bg-slate-900 cursor-pointer select-none" 
@@ -57,18 +57,14 @@ export default function PerformanceCard({
           fallbackText={title}
           className="object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none" />
 
-        {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
-          <span className="px-2.5 py-1 rounded-md bg-[#E6007E] text-white text-[11px] font-black uppercase shadow-xs">
+        {/* Small 1-Line Genre Badge */}
+        <div className="absolute top-3 left-3 z-10 pointer-events-none">
+          <span className="px-2.5 py-0.5 rounded bg-black/75 backdrop-blur-xs text-white text-[10px] font-bold tracking-wider uppercase border border-white/10">
             {performance.genre}
+            {genreCustom && ` / ${genreCustom}`}
           </span>
-          {genreCustom && (
-            <span className="px-2 py-1 rounded-md bg-white/90 text-slate-800 text-[11px] font-bold shadow-xs">
-              {genreCustom}
-            </span>
-          )}
         </div>
 
         {/* Favorite Button */}
@@ -90,23 +86,25 @@ export default function PerformanceCard({
           </button>
         )}
 
-        {/* Artist Name & Partner Event Overlay */}
-        <div className="absolute bottom-2.5 left-3 right-3 z-10 pointer-events-none flex items-center justify-between gap-2">
-          <p className="text-xs font-bold text-pink-200 truncate">
-            {artistName}
-          </p>
-          {performance.partner && typeof performance.partner === 'object' && performance.partner.category === '連携イベント・フェス' && (
-            <span className="text-[10px] font-black text-[#FFF100] bg-black/60 px-2 py-0.5 rounded shrink-0">
-              with {getText(performance.partner.name, performance.partner.nameEn)}
+        {/* Partner Event Overlay (if any) */}
+        {performance.partner && typeof performance.partner === 'object' && performance.partner.category === '連携イベント・フェス' && (
+          <div className="absolute bottom-2.5 right-3 z-10 pointer-events-none">
+            <span className="text-[10px] font-bold text-white bg-[#E6007E]/90 px-2 py-0.5 rounded tracking-wide">
+              {getText(performance.partner.name, performance.partner.nameEn)} × Osaka Fringe
             </span>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Card Content */}
       <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
         <div className="space-y-2">
-          {/* Title */}
+          {/* Artist Name (Above Title or with Subdued Style) */}
+          <p className="text-xs font-bold text-[#E6007E] truncate">
+            {artistName}
+          </p>
+
+          {/* Title - Priority #1 */}
           <h3 
             onClick={() => onSelect?.(performance)}
             className="text-base sm:text-lg font-black text-slate-900 line-clamp-2 leading-snug group-hover:text-[#E6007E] transition-colors cursor-pointer"
@@ -116,7 +114,7 @@ export default function PerformanceCard({
           
           {/* Description */}
           {description && (
-            <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+            <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed font-medium">
               {description}
             </p>
           )}
@@ -149,8 +147,8 @@ export default function PerformanceCard({
           {/* 単一会場の場合は会場名を1回のみ下部に表示 */}
           {!isMultiVenues && singleVenueName && (
             <div className="flex items-center gap-1.5 text-slate-600 pt-0.5">
-              <MapPinIcon className="w-3.5 h-3.5 shrink-0 text-[#0078D7]" color="#0078D7" />
-              <span className="truncate">{singleVenueName}</span>
+              <MapPinIcon className="w-3.5 h-3.5 shrink-0 text-[#E6007E]" color="#E6007E" />
+              <span className="truncate font-medium">{singleVenueName}</span>
             </div>
           )}
         </div>
@@ -158,13 +156,13 @@ export default function PerformanceCard({
         {/* Price & Action Footer */}
         <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900">
-            <TicketIcon className="w-4 h-4 text-slate-500" />
+            <TicketIcon className="w-4 h-4 text-slate-400" />
             <span>{priceDisplay}</span>
           </div>
 
           <button
             onClick={() => onSelect?.(performance)}
-            className="flex items-center gap-1 text-xs font-black text-[#E6007E] hover:text-[#c4006b] group-hover:translate-x-0.5 transition-all cursor-pointer"
+            className="flex items-center gap-1 text-xs font-black text-[#E6007E] hover:underline group-hover:translate-x-0.5 transition-all cursor-pointer"
           >
             <span>{t('cardDetails')}</span>
             <ArrowRightIcon className="w-3.5 h-3.5" />
