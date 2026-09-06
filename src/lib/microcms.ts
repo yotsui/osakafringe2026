@@ -217,7 +217,6 @@ export const getPerformances = cache(async (): Promise<Performance[]> => {
     const venueNameEn = mainVenue?.nameEn || perf.venueNameEn || venueName;
 
     // 5. 公演日程（dates リピーターまたは schedules 配列）の展開と解決
-    const durationMins = typeof perf.durationMinutes === 'number' && perf.durationMinutes > 0 ? perf.durationMinutes : 60;
     let rawDateItems: any[] = [];
 
     if (Array.isArray(perf.dates) && perf.dates.length > 0) {
@@ -231,6 +230,24 @@ export const getPerformances = cache(async (): Promise<Performance[]> => {
         console.warn(`[MicroCMS] Failed to parse dates JSON for ${perf.id}:`, e);
       }
     }
+
+    const formatJST = (d: Date) => {
+      const dateStr = new Intl.DateTimeFormat('ja-JP', {
+        timeZone: 'Asia/Tokyo',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).format(d).replace(/\//g, '-');
+
+      const timeStr = new Intl.DateTimeFormat('ja-JP', {
+        timeZone: 'Asia/Tokyo',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      }).format(d);
+
+      return { dateStr, timeStr };
+    };
 
     const enrichedSchedules: PerformanceSchedule[] = [];
 
@@ -254,60 +271,59 @@ export const getPerformances = cache(async (): Promise<Performance[]> => {
         const sVenueName = scheduleVenue?.name || item.venueName || venueName;
         const sVenueNameEn = scheduleVenue?.nameEn || item.venueNameEn || venueNameEn;
 
-        // 日時・開演時刻・終演時刻のパース
-        let dateStr = '2026-10-08';
-        let startTimeStr = '18:00';
-        let endTimeStr = '19:00';
+        // 日時・開演時刻・終演時刻のパース (JST Asia/Tokyo 統一)
+        let dateStr: string | null = null;
+        let startTimeStr: string | null = null;
+        let endDateStr: string | undefined = undefined;
+        let endTimeStr: string | undefined = undefined;
 
         if (item.date && typeof item.date === 'string') {
           const rawDateStr = item.date.trim();
-          if (rawDateStr.includes('T')) {
-            // ISO 8601 日時文字列 (例: "2026-10-08T19:00:00+09:00")
-            const d = new Date(rawDateStr);
-            if (!isNaN(d.getTime())) {
-              // JST で日付と時刻をフォーマット
-              const jstDate = new Intl.DateTimeFormat('ja-JP', {
-                timeZone: 'Asia/Tokyo',
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-              }).format(d).replace(/\//g, '-');
+          const startDate = new Date(rawDateStr);
+          if (!isNaN(startDate.getTime())) {
+            const startJst = formatJST(startDate);
+            dateStr = startJst.dateStr;
+            startTimeStr = startJst.timeStr;
 
-              const jstTime = new Intl.DateTimeFormat('ja-JP', {
-                timeZone: 'Asia/Tokyo',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false,
-              }).format(d);
+            // 終了日時の優先順位: 1. date_end > 2. durationMinutes > 3. なし
+            let endDateObj: Date | null = null;
+            if (item.date_end && typeof item.date_end === 'string' && item.date_end.trim()) {
+              const dEnd = new Date(item.date_end.trim());
+              if (!isNaN(dEnd.getTime())) {
+                if (dEnd.getTime() < startDate.getTime()) {
+                  console.warn(`[MicroCMS] Invalid date_end (before start date) for performance ${perf.id}: date=${rawDateStr}, date_end=${item.date_end}`);
+                  endDateObj = null;
+                } else {
+                  endDateObj = dEnd;
+                }
+              }
+            } else if (typeof perf.durationMinutes === 'number' && perf.durationMinutes > 0) {
+              endDateObj = new Date(startDate.getTime() + perf.durationMinutes * 60 * 1000);
+            }
 
-              dateStr = jstDate;
-              startTimeStr = jstTime;
-
-              const endTimestamp = d.getTime() + durationMins * 60 * 1000;
-              const endDate = new Date(endTimestamp);
-              endTimeStr = new Intl.DateTimeFormat('ja-JP', {
-                timeZone: 'Asia/Tokyo',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false,
-              }).format(endDate);
+            if (endDateObj) {
+              const endJst = formatJST(endDateObj);
+              endDateStr = endJst.dateStr;
+              endTimeStr = endJst.timeStr;
             }
           } else {
-            dateStr = rawDateStr;
-            if (item.startTime) startTimeStr = String(item.startTime).trim();
-            if (item.endTime) endTimeStr = String(item.endTime).trim();
+            console.warn(`[MicroCMS] Invalid date string for performance ${perf.id}: ${item.date}`);
           }
         } else {
-          if (item.date) dateStr = String(item.date).trim();
-          if (item.startTime) startTimeStr = String(item.startTime).trim();
-          if (item.endTime) endTimeStr = String(item.endTime).trim();
+          console.warn(`[MicroCMS] Missing required date for performance ${perf.id}`);
+        }
+
+        if (!dateStr || !startTimeStr) {
+          continue;
         }
 
         enrichedSchedules.push({
           date: dateStr,
           startTime: startTimeStr,
+          endDate: endDateStr,
           endTime: endTimeStr,
           rawDate: typeof item.date === 'string' ? item.date : undefined,
+          rawEndDate: typeof item.date_end === 'string' ? item.date_end : undefined,
           venueId: sVenueId,
           venueName: sVenueName,
           venueNameEn: sVenueNameEn,
@@ -315,18 +331,6 @@ export const getPerformances = cache(async (): Promise<Performance[]> => {
           note: item.note ? String(item.note).trim() : undefined,
         });
       }
-    }
-
-    if (enrichedSchedules.length === 0) {
-      enrichedSchedules.push({
-        date: '2026-10-08',
-        startTime: '18:00',
-        endTime: '19:00',
-        venueId: mainVenueId,
-        venueName,
-        venueNameEn,
-        venue: mainVenue,
-      });
     }
 
     // 6. ジャンル・日英フォールバック
@@ -355,7 +359,7 @@ export const getPerformances = cache(async (): Promise<Performance[]> => {
       ticketPrice: perf.ticketPrice || '',
       ticketPriceEn: perf.ticketPriceEn || perf.ticketPrice || '',
       ticketUrl: perf.ticketUrl,
-      durationMinutes: durationMins,
+      durationMinutes: typeof perf.durationMinutes === 'number' && perf.durationMinutes > 0 ? perf.durationMinutes : undefined,
       isFeatured: Boolean(perf.isFeatured),
       artists: resolvedArtist || resolvedArtistId,
       artistId: resolvedArtistId,

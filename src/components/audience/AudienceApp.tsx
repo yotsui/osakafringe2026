@@ -76,7 +76,11 @@ export default function AudienceApp({
   const festivalDates = useMemo(() => {
     const set = new Set<string>();
     initialPerformances.forEach((p) => {
-      p.schedules.forEach((s) => set.add(s.date));
+      if (Array.isArray(p.schedules)) {
+        p.schedules.forEach((s) => {
+          if (s.date) set.add(s.date);
+        });
+      }
     });
     return Array.from(set).sort();
   }, [initialPerformances]);
@@ -126,7 +130,11 @@ export default function AudienceApp({
 
       // Date filter
       if (selectedDate !== 'all') {
-        const matchesDate = perf.schedules.some((s) => s.date === selectedDate);
+        const matchesDate = perf.schedules.some((s) => {
+          if (s.date === selectedDate) return true;
+          if (s.endDate && selectedDate >= s.date && selectedDate <= s.endDate) return true;
+          return false;
+        });
         if (!matchesDate) {
           return false;
         }

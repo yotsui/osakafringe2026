@@ -19,7 +19,7 @@ import {
   Image as ImageIcon
 } from 'lucide-react';
 import { TwitterIcon, InstagramIcon, YoutubeIcon } from '@/components/common/SnsIcons';
-import { formatScheduleDate, sortSchedules, deduplicateSchedules } from '@/utils/dateFormat';
+import { formatScheduleDetailed, sortSchedules, deduplicateSchedules } from '@/utils/dateFormat';
 import { formatTicketPrice } from '@/utils/priceFormat';
 
 interface PerformanceModalProps {
@@ -330,7 +330,7 @@ export default function PerformanceModal({
                 {sortedSchedules.length > 0 ? (
                   sortedSchedules.map((schedule, idx) => {
                     const sVenueName = getText(schedule.venueName, schedule.venueNameEn) || fallbackVenueName || 'Venue';
-                    const formattedDate = formatScheduleDate(schedule.date, schedule.startTime, schedule.endTime, language);
+                    const formattedDate = formatScheduleDetailed(schedule, language);
                     return (
                       <div
                         key={idx}

@@ -61,10 +61,12 @@ export interface Artist {
 }
 
 export interface PerformanceSchedule {
-  date: string; // YYYY-MM-DD
-  startTime: string; // HH:mm
-  endTime: string; // HH:mm
+  date: string; // YYYY-MM-DD (Asia/Tokyo)
+  startTime: string; // HH:mm (Asia/Tokyo)
+  endDate?: string; // YYYY-MM-DD (Asia/Tokyo) - 終了日
+  endTime?: string; // HH:mm (Asia/Tokyo) - 終了時刻
   rawDate?: string; // microCMSの日時型（ISO 8601）
+  rawEndDate?: string; // microCMSの終了日時型（ISO 8601）
   venueId?: string; // 日程別会場ID（未指定の場合はメイン会場）
   venueName?: string;
   venueNameEn?: string;
@@ -74,8 +76,10 @@ export interface PerformanceSchedule {
 
 export interface PerformanceDateCustomField {
   fieldId?: string;
-  date?: string; // ISO 8601 日時文字列
+  date?: string; // ISO 8601 開始日時文字列
+  date_end?: string; // ISO 8601 終了日時文字列
   venue?: Venue | string; // 会場参照（未指定時は null/undefined）
+  note?: string;
 }
 
 export interface Performance {

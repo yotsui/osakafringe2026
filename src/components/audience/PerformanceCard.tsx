@@ -5,7 +5,7 @@ import { Performance } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import SafeImage from '@/components/common/SafeImage';
 import { CalendarIcon, MapPinIcon, TicketIcon, ArrowRightIcon } from '@/components/common/CustomIcons';
-import { formatScheduleDate, sortSchedules, deduplicateSchedules, hasMultipleVenues } from '@/utils/dateFormat';
+import { formatScheduleCompact, sortSchedules, deduplicateSchedules, hasMultipleVenues } from '@/utils/dateFormat';
 import { formatTicketPrice } from '@/utils/priceFormat';
 import { Heart } from 'lucide-react';
 
@@ -123,7 +123,7 @@ export default function PerformanceCard({
             <div className="space-y-1">
               {allSchedules.map((schedule, idx) => {
                 const sVenueName = getText(schedule.venueName, schedule.venueNameEn);
-                const formattedDate = formatScheduleDate(schedule.date, schedule.startTime, schedule.endTime, language);
+                const formattedDate = formatScheduleCompact(schedule, language);
                 return (
                   <div key={idx} className="flex items-start gap-1.5 text-slate-600">
                     <CalendarIcon className="w-3.5 h-3.5 shrink-0 text-[#E6007E] mt-0.5" />
