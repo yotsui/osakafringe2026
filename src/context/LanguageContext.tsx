@@ -152,40 +152,117 @@ export const translations: Dictionary = {
   viewOnAudienceApp: { ja: '公演の詳細を見る', en: 'View Show Details' },
   noShowsForArtist: { ja: '現在登録されている公演はありません', en: 'No performances currently listed' },
   
-  // Donate Page
-  donatePageTitle: { ja: '大阪文化万博 Osaka Fringe 2026 を育てる寄付・サポーター募集', en: 'Support Osaka Fringe: Donations & Partnership' },
-  donatePageSubtitle: { ja: '自由な舞台芸術の発展と、大阪の文化を世界へ発信するためのご支援をお願いいたします。', en: 'Join us in empowering independent artists and sharing Osaka’s vibrant culture with the world.' },
-  donateMessageHeader: { ja: '街とアーティストの未来を共に創るパートナーへ', en: 'Partnering to Build the Future of the City and Artists' },
-  donatePurpose: { ja: '寄付の目的と活用方法', en: 'Purpose & Impact of Your Support' },
-  donatePurposeSub: { ja: 'いただいたご支援の使途', en: 'How Your Contributions Make a Difference' },
-  impact1Title: { ja: '若手・実験的アーティスト支援', en: 'Emerging & Experimental Artist Grants' },
-  impact1Desc: { ja: '参加費用の軽減や会場設備サポート', en: 'Reducing participation costs and providing technical equipment support' },
-  impact2Title: { ja: '多言語・アクセシビリティ環境整備', en: 'Multilingual & Accessibility Initiatives' },
-  impact2Desc: { ja: '海外からの観客・パフォーマー対応の強化', en: 'Enhancing multilingual guides and accessible venue environments' },
-  donateMethods: { ja: 'ご支援の方法', en: 'Ways to Support' },
-  donateMethodsSub: { ja: 'ご都合に合わせた支援方法をお選びいただけます', en: 'Choose the method of support that best fits you' },
-  onlineDonationTitle: { ja: 'オンライン寄付（クレジットカード / スマホ決済）', en: 'Online Donation (Card & Mobile Pay)' },
-  onlineDonationSub: { ja: 'Stripeによる安全な即時決済（Visa / Master / JCB / Amex / Apple Pay / Google Pay）', en: 'Secure instant checkout via Stripe (Visa, Mastercard, JCB, Amex, Apple Pay, Google Pay)' },
+  // Donate Page (Redesigned Story & Editorial Structure)
+  donateSectionBadge: { ja: 'SUPPORT OSAKA FRINGE', en: 'SUPPORT OSAKA FRINGE' },
+  donatePageTitle: { ja: '次の表現者が、大阪から育つ土壌をつくる。', en: 'Creating a City Where the Next Generation of Artists Can Grow.' },
+  donatePageSubtitle: { 
+    ja: '大阪には、街の中から新しい表現が生まれてきた歴史があります。\n\n1980年代から1990年代にかけて、大阪では小劇場文化が大きく花開きました。劇場やライブハウスだけでなく、公園やストリートにも表現の場があり、まだ広く知られていない表現者が観客と出会い、次の舞台へ進んでいく流れがありました。\n\n大きな舞台に立つ前に、小さな舞台がある。\n名前を知られる前に、誰かに見つけてもらえる場所がある。\n完成された表現だけでなく、まだ形になりきっていない挑戦にも観客がいる。\n\nそんな環境を、もう一度大阪につくりたい。\n\n大阪文化万博 Osaka Fringe 2026 は、そのための土壌をつくるプロジェクトです。',
+    en: 'Osaka has a rich history of new creative expression rising directly from the city streets.\n\nDuring the 1980s and 1990s, independent theater and live music flourished across Osaka. Stages existed not only in established venues, but in public parks, small clubs, and street corners—where undiscovered artists met audiences and found their next opportunities.\n\nBefore standing on a grand stage, there is a small stage.\nBefore becoming known, there is a place to be discovered.\nAnd even for unpolished, daring experiments, there is an audience.\n\nWe want to create that environment in Osaka once again.\n\nOsaka Fringe 2026 is a project to build that foundation.'
+  },
+  
+  // History & Contemporary Reconstruction
+  historyTypography: { ja: '1980s — 1990s', en: '1980s — 1990s' },
+  historyTitle: { ja: 'もう一度、大阪から。', en: 'Rebuilding the Cycle from Osaka.' },
+  historyText: {
+    ja: '私たちが取り戻したいのは、その時代そのものではありません。\n\n「やってみよう」と思った人が挑戦でき、誰かがそれを見つけ、次の機会につながっていく流れです。\n\n時代も、表現の方法も、社会のルールも変わりました。\n\nだからこそ、今の大阪に合った新しい仕組みとして、その流れをつくり直したいと考えています。',
+    en: 'What we want to bring back is not the past itself.\n\nIt is the vital cycle: where anyone with an idea can take a risk, where someone discovers them, and where it leads to the next opportunity.\n\nTimes, artistic mediums, and societal rules have evolved.\n\nThat is precisely why we want to rebuild this flow as a modern system tailored to today’s Osaka.'
+  },
+
+  // Message / Philosophy
+  messageBadge: { ja: 'MAKE SPACE FOR THE NEXT', en: 'MAKE SPACE FOR THE NEXT' },
+  donateMessageHeader: { ja: '挑戦できる場所がなければ、次の文化は生まれない。', en: 'Without places to take risks, the next culture cannot emerge.' },
+  donateMessageBody: {
+    ja: '才能があっても、発表する場所がなければ届きません。\n\n場所があっても、観客と出会えなければ次につながりません。\n\nそして、新しい表現には、ときに既存の制度やルールとの調整も必要です。\n\nOsaka Fringeでは、劇場だけではなく、広場、歴史的建築、商業施設、店舗など、街のさまざまな場所を表現の場としてひらいていきます。\n\nプロ・アマ、ジャンル、キャリアを問わず、多くのアーティストが挑戦できる機会をつくる。\n\n観客が、まだ知らない表現者と出会える機会をつくる。\n\n海外のアーティストも大阪で表現しやすい環境を考える。\n\nそして、安全や地域との共存を大切にしながら、行政や関係機関とも対話を重ね、より挑戦しやすい文化環境を育てていきます。\n\n私たちが目指しているのは、一人のスターをつくることではありません。\n\n次の誰かが育つ可能性を、大阪の街のあちこちにつくることです。',
+    en: 'Even with undeniable talent, without a place to perform, voices remain unheard.\n\nEven with a venue, without meeting an audience, there is no next step.\n\nAnd groundbreaking expression often requires dialogue with existing systems and regulations.\n\nOsaka Fringe opens up diverse locations across the city—plazas, heritage buildings, commercial spaces, and local cafes—into stages.\n\nCreating opportunities for artists of all backgrounds, genres, and career stages.\n\nGiving audiences the thrill of discovering undiscovered talent.\n\nFostering a welcoming environment for international performers in Osaka.\n\nAnd while prioritizing safety and community harmony, we engage in constructive dialogue with authorities to cultivate a culture where taking creative risks is welcomed.\n\nOur goal is not to manufacture a single star.\n\nIt is to plant seeds across Osaka where the next generation can grow.'
+  },
+
+  // Institutional Dialogue / Regulatory Environment
+  institutionBadge: { ja: 'SUSTAINABLE CULTURE', en: 'SUSTAINABLE CULTURE' },
+  institutionTitle: { ja: '挑戦できる文化環境を、長い時間をかけて育てる。', en: 'Cultivating a Supportive Cultural Ecosystem Over Time.' },
+  institutionBody: {
+    ja: '新しい文化活動を広げていくためには、会場、安全管理、道路や公共空間の利用、海外アーティストの受け入れ環境など、多くの制度やルールとの調整が必要です。\n\nルールを無視するのではなく、ルールの中でできる挑戦を増やす。\n\nその実績を積み重ねながら、行政や関係機関とも対話し、より多様な文化活動が生まれやすい環境をつくっていきます。\n\n一度きりのイベントではなく、次の挑戦が続いていく仕組みを大阪に残すこと。\n\nそれもOsaka Fringeの役割だと考えています。',
+    en: 'Expanding innovative cultural activities requires working closely with systems regarding venues, safety management, public space permits, and hosting international artists.\n\nRather than disregarding rules, we expand what is possible within them.\n\nBy accumulating solid track records and engaging in ongoing dialogue with public institutions, we foster an environment where diverse artistic endeavors thrive.\n\nLeaving behind a lasting framework where creative endeavors continue beyond a single festival—that is the mission of Osaka Fringe.'
+  },
+
+  // 4 Core Support Impacts (WHAT YOUR SUPPORT MAKES POSSIBLE)
+  donatePurposeBadge: { ja: 'WHAT YOUR SUPPORT MAKES POSSIBLE', en: 'WHAT YOUR SUPPORT MAKES POSSIBLE' },
+  donatePurpose: { ja: '寄付が支えるOsaka Fringeの取り組み', en: 'What Your Support Makes Possible' },
+  
+  impact1Num: { ja: '01', en: '01' },
+  impact1Eng: { ja: 'CREATE OPPORTUNITIES', en: 'CREATE OPPORTUNITIES' },
+  impact1Title: { ja: 'アーティストが挑戦できる機会を増やす', en: 'More chances for artists to take the next step.' },
+  impact1Desc: { 
+    ja: '若手だけではありません。\n\n初めて舞台に立つ人、活動を続けてきた人、新しいジャンルに挑戦する人。\n\nキャリアに関係なく、表現したい人が次の一歩を踏み出せる機会を増やします。\n\n会場との出会い、発表機会、情報発信、必要な環境整備などを通じて、挑戦そのものを支えます。',
+    en: 'Not only for emerging creators.\n\nFirst-time performers, seasoned practitioners, and creators exploring uncharted genres.\n\nRegardless of career stage, we expand opportunities for anyone who wants to express themselves to take their next step.\n\nThrough venue matching, performance slots, promotion, and essential production support, we stand behind the act of trying.'
+  },
+
+  impact2Num: { ja: '02', en: '02' },
+  impact2Eng: { ja: 'OPEN THE CITY', en: 'OPEN THE CITY' },
+  impact2Title: { ja: '街の中に、もっと表現の場所をひらく', en: 'More places across Osaka where expression can happen.' },
+  impact2Desc: { 
+    ja: '文化は、劇場の中だけで生まれるものではありません。\n\n広場、歴史ある建物、商業施設、カフェ、店舗など、普段は舞台ではない場所にも表現の機会をつくります。\n\n街を歩いていたら音楽が聞こえてきた。いつもの場所でダンスや演劇に出会った。\n\nそんな偶然が、大阪の日常の中に増えていくことを目指します。',
+    en: 'Culture is not born solely inside dedicated theaters.\n\nWe open up public plazas, historic landmarks, shopping hubs, cafes, and local stores as creative platforms.\n\nWalking down the street and hearing music; encountering dance or theater in an unexpected corner.\n\nWe aim to weave such spontaneous artistic encounters into the daily fabric of Osaka.'
+  },
+
+  impact3Num: { ja: '03', en: '03' },
+  impact3Eng: { ja: 'FIND THE NEXT', en: 'FIND THE NEXT' },
+  impact3Title: { ja: 'まだ知られていない表現者と、観客をつなぐ', en: 'Connecting audiences with artists they have not discovered yet.' },
+  impact3Desc: { 
+    ja: 'アーティストが育つためには、舞台だけでなく観客が必要です。\n\n公演情報を探しやすくすること。街を巡りながら次の公演に出会えること。初めて見るジャンルにも気軽に足を運べること。\n\nOsaka Fringeは、表現する側だけではなく、新しい表現を見つける観客の文化も育てていきます。',
+    en: 'For artists to flourish, they need engaged audiences alongside open stages.\n\nMaking show info effortless to find. Discovering the next performance while wandering the neighborhood. Stepping into unfamiliar genres with ease.\n\nOsaka Fringe nurtures not only performers, but an audience culture passionate about discovering new talent.'
+  },
+
+  impact4Num: { ja: '04', en: '04' },
+  impact4Eng: { ja: 'BUILD THE FUTURE', en: 'BUILD THE FUTURE' },
+  impact4Title: { ja: '次の挑戦が続く環境をつくる', en: 'Building an environment where the next challenge can continue.' },
+  impact4Desc: { 
+    ja: '一度公演を開催して終わりではなく、次の挑戦につながる環境を大阪に残していきます。\n\n会場や地域、行政、企業、文化団体など、さまざまな人たちと関係をつくりながら、新しい表現が生まれ続ける土壌を育てます。\n\n大阪から次の文化が生まれる流れを、長い時間をかけてつくっていきます。',
+    en: 'Rather than concluding with a single festival edition, we build lasting environments that fuel ongoing creative endeavors.\n\nBuilding partnerships with venue hosts, local communities, public sectors, businesses, and cultural organizations to enrich the soil for continuous expression.\n\nWe dedicate ourselves to sustaining this creative current from Osaka over the long run.'
+  },
+
+  // Pre-Form Message
+  preFormBadge: { ja: 'SUPPORT THE NEXT', en: 'SUPPORT THE NEXT' },
+  preFormTitle: { ja: '小さな支援も、次の舞台につながります。', en: 'Every contribution can lead to the next stage.' },
+  preFormBody: {
+    ja: '1,000円でも、3,000円でも、10,000円でも。\n\n寄付の大きさにかかわらず、一人ひとりの参加がOsaka Fringeを支える力になります。\n\n観客として公演を見に行くこと。アーティストのことを誰かに話すこと。SNSで公演を紹介すること。\n\nそして、可能であれば寄付という形で支えること。\n\nOsaka Fringeは、アーティストや運営だけでつくるものではありません。\n\n街にいる一人ひとりが、このフェスティバルの一部です。',
+    en: 'Whether it is ¥1,000, ¥3,000, or ¥10,000.\n\nRegardless of the amount, every individual participation fuels the vitality of Osaka Fringe.\n\nAttending a performance as an audience member. Telling a friend about an artist you discovered. Sharing a show on social media.\n\nAnd if possible, contributing directly through a donation.\n\nOsaka Fringe is not built by organizers and artists alone.\n\nEvery person in the city is an integral part of this festival.'
+  },
+
+  // Donation Form UI
+  onlineDonationTitle: { ja: 'オンラインで寄付する', en: 'Donate Online' },
+  onlineDonationSub: { ja: '500円から、任意の金額でご支援いただけます。クレジットカード等で安全にお手続きいただけます。', en: 'Support from ¥500 with any amount. Processed securely via credit card and mobile pay.' },
   selectAmount: { ja: '寄付金額を選択', en: 'Select Donation Amount' },
   customAmount: { ja: '自由金額（カスタム）', en: 'Custom Amount' },
   customAmountPlaceholder: { ja: '金額を入力（500円以上）', en: 'Enter amount (min. ¥500)' },
   customAmountMinError: { ja: '寄付金額は500円以上を入力してください。', en: 'Please enter an amount of ¥500 or more.' },
-  donorName: { ja: 'お名前・ニックネーム（任意）', en: 'Your Name or Nickname (Optional)' },
-  donorNamePlaceholder: { ja: '例: フリンジ応援団 / Osaka Art Fan', en: 'e.g. Osaka Art Supporter' },
-  donorEmail: { ja: 'メールアドレス（任意 / 決済確認メール送信用）', en: 'Email Address (Optional / for receipt)' },
+  donorName: { ja: 'お名前・ニックネーム（任意）', en: 'Name / Nickname (Optional)' },
+  donorNameHint: { ja: '※ 匿名でのご寄付も可能です。', en: '* Anonymous donations are welcome.' },
+  donorNamePlaceholder: { ja: '例: 大阪 フリンジ太郎 / Osaka Supporter', en: 'e.g. Osaka Art Supporter' },
+  donorEmail: { ja: 'メールアドレス（任意）', en: 'Email Address (Optional)' },
+  donorEmailHint: { ja: '※ 決済確認・受領に関するご連絡に使用します。', en: '* Used solely to send payment receipts.' },
   donorEmailPlaceholder: { ja: 'example@domain.com', en: 'example@domain.com' },
-  donorMessage: { ja: '応援メッセージ（任意）', en: 'Message of Support (Optional)' },
-  donorMessagePlaceholder: { ja: 'アーティストやフェスティバルへのメッセージがあればご記入ください', en: 'Leave a message of encouragement for the artists & festival' },
-  proceedToPayment: { ja: '決済画面へ進む', en: 'Proceed to Secure Checkout' },
+  donorMessage: { ja: 'Osaka Fringeへのメッセージ（任意）', en: 'Message to Osaka Fringe (Optional)' },
+  donorMessagePlaceholder: { ja: 'アーティストやフェスティバルへの応援メッセージをお寄せください。', en: 'Leave a message of encouragement for the artists & festival.' },
+  proceedToPayment: { ja: 'この金額でOsaka Fringeを支える', en: 'Support Osaka Fringe' },
   processing: { ja: '処理中...', en: 'Processing...' },
-  securePaymentNotice: { ja: '※ Stripeの高度な暗号化通信により、安全に決済処理が行われます。クレジットカード番号が当フェスティバルサーバーに保存されることはありません。', en: '* Payments are encrypted and securely processed by Stripe. Your card information is never stored on our servers.' },
-  bankTransferTitle: { ja: '銀行振込でのご寄付', en: 'Direct Bank Transfer' },
-  bankTransferSub: { ja: '直接口座へのお振込み', en: 'Direct bank account transfer' },
-  bankTransferNotice: { ja: '※お振込名義の前に「フリンジ」とご記載いただけますと幸いです。受領証をご希望の方はお問い合わせフォームよりご連絡ください。', en: '* Please include "Fringe" in the transfer description if possible. For donation receipts, please reach out via our contact form.' },
-  crowdfundingTitle: { ja: 'クラウドファンディングで応援', en: 'Support via Crowdfunding' },
-  crowdfundingSub: { ja: 'リワード付き応援', en: 'Support with Rewards & Perks' },
-  crowdfundingDesc: { ja: '限定グッズやリワード付きのプロジェクトを実施しています。', en: 'Support ongoing campaigns with exclusive festival merchandise and rewards.' },
-  viewProject: { ja: 'プロジェクトを見る', en: 'View Campaign' },
+  securePaymentNotice: { ja: 'Stripeの高度な暗号化通信により、安全に決済処理が行われます。クレジットカード情報が当サーバーに保存されることはありません。', en: 'Encrypted and securely processed by Stripe. Card details are never stored on our servers.' },
+
+  // Bank Transfer
+  bankTransferTitle: { ja: '銀行振込で支援する', en: 'Donate via Bank Transfer' },
+  bankTransferSub: { ja: 'クレジットカード以外に、銀行振込でもご寄付いただけます。', en: 'Direct domestic bank transfers are also gratefully accepted.' },
+  bankTransferNotice: { 
+    ja: 'お振込名義の前に「フリンジ」とご記載いただけると、確認がスムーズです。\n受領証等が必要な場合は、お問い合わせフォームよりご連絡ください。', 
+    en: 'Please include "Fringe" before your transfer name if possible.\nFor formal donation receipts or certificates, please reach out via our contact form.' 
+  },
+
+  // Closing Statement
+  closingBadge: { ja: 'CULTURE SPILLS OVER', en: 'CULTURE SPILLS OVER' },
+  closingTitle: { ja: '次の誰かが、始められる大阪へ。', en: 'A city where the next artist can begin.' },
+  closingBody: {
+    ja: '一つの公演から、次の表現へ。\n一人の観客から、次の観客へ。\n一つの場所から、街のあちこちへ。\n\nすぐに結果が出ることばかりではありません。\n\nそれでも、挑戦できる場所を増やし、その挑戦を見つける人を増やしていけば、大阪からまた新しい文化が生まれてくるはずです。\n\nspill over ― 文化芸術が街にあふれだす。\n\nその未来を、一緒につくってください。',
+    en: 'From one performance to the next expression.\nFrom one audience member to the next.\nFrom one corner to across the city.\n\nNot everything produces instant results.\n\nYet, by creating more places to take risks and gathering more people to discover them, new culture will undoubtedly rise from Osaka.\n\nspill over — arts and culture spilling into the city.\n\nPlease join us in building that future together.'
+  },
+  closingSign: { ja: '大阪文化万博 Osaka Fringe 2026', en: 'Osaka Fringe 2026' },
   closeModal: { ja: '閉じる', en: 'Close' },
   pressEscToClose: { ja: 'ESCで閉じる', en: 'Press ESC to close' },
   

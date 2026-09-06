@@ -40,7 +40,7 @@ export const mockVenues: Venue[] = [
     addressEn: 'B1F, 1-10-8 Nishi-Shinsaibashi, Chuo-ku, Osaka',
     access: 'Osaka Metro 御堂筋線・長堀鶴見緑地線「心斎橋駅」7番出口すぐ',
     accessEn: 'Directly outside Exit 7 of Shinsaibashi Station',
-    description: '【LOCAL】アメリカ村の中心にある地下ライブスペース。街の隙間をハックし、アーティストと観客が密に交わる熱気あふれる空間。',
+    description: '【LOCAL】アメリカ村の中心にある地下ライブスペース。街の場所をひらき、アーティストと観客が密に交わる熱気あふれる空間。',
     descriptionEn: '[LOCAL] An energetic underground venue in America-mura, where artists and audience collide in an intimate atmosphere.',
     lat: 34.6722,
     lng: 135.4983,
@@ -456,14 +456,30 @@ export const mockSiteInfo: SiteInfo = {
 From historic registered cultural properties to lively cafes, warehouse rooftops, and public plazas, diverse spaces become intimate performance fields.
 
 Artists and audiences collide directly, igniting unpredictable creativity and shared excitement under the theme of "SPILL OVER".`,
-  donationTitle: '大阪フリンジを育てる寄付・サポーター募集',
-  donationTitleEn: 'Support Osaka Fringe: Donations & Partnership',
-  donationText: `大阪文化万博 Osaka Fringe 2026 は、街の隙間をハックし、自由な舞台芸術の発展と大阪の文化を世界へ発信するための非営利アートプロジェクトです。
+  donationTitle: '次の表現者が、大阪から育つ土壌をつくる。',
+  donationTitleEn: 'Creating a City Where the Next Generation of Artists Can Grow.',
+  donationText: `大阪には、街の中から新しい表現が生まれてきた歴史があります。
 
-いただいたご寄付は、若手アーティストの参加支援、会場設営費、多言語アクセシビリティ環境の向上に大切に活用させていただきます。`,
-  donationTextEn: `The Osaka Fringe Festival is a non-profit initiative dedicated to empowering emerging creators and making performing arts accessible to everyone worldwide.
+1980年代から1990年代にかけて、大阪では小劇場文化が大きく花開きました。劇場やライブハウスだけでなく、公園やストリートにも表現の場があり、まだ広く知られていない表現者が観客と出会い、次の舞台へ進んでいく流れがありました。
 
-Your generous contributions directly support artist subsidies, venue technical setups, and multilingual visitor infrastructure.`,
+大きな舞台に立つ前に、小さな舞台がある。
+名前を知られる前に、誰かに見つけてもらえる場所がある。
+完成された表現だけでなく、まだ形になりきっていない挑戦にも観客がいる。
+
+そんな環境を、もう一度大阪につくりたい。
+
+大阪文化万博 Osaka Fringe 2026 は、そのための土壌をつくるプロジェクトです。`,
+  donationTextEn: `Osaka has a rich history of new creative expression rising directly from the city streets.
+
+During the 1980s and 1990s, independent theater and live music flourished across Osaka. Stages existed not only in established venues, but in public parks, small clubs, and street corners—where undiscovered artists met audiences and found their next opportunities.
+
+Before standing on a grand stage, there is a small stage.
+Before becoming known, there is a place to be discovered.
+And even for unpolished, daring experiments, there is an audience.
+
+We want to create that environment in Osaka once again.
+
+Osaka Fringe 2026 is a project to build that foundation.`,
   donationBankInfo: `金融機関名：大阪シティ信用金庫
 支店名：阿倍野支店
 口座種別：普通預金
