@@ -1,4 +1,4 @@
-﻿# 大阪フリンジフェスティバル 公式ウェブサイト & Audience App
+# 大阪フリンジフェスティバル 公式ウェブサイト & Audience App
 
 大阪フリンジ（Osaka Fringe Festival）の公式ポータルサイトおよび観客向けウェブアプリ（Audience App）です。
 Next.js (App Router)、Tailwind CSS、MicroCMS、Google Gemini API（自動翻訳）により構築されています。
@@ -13,7 +13,7 @@ Next.js (App Router)、Tailwind CSS、MicroCMS、Google Gemini API（自動翻�
   - キーワード・アーティスト名リアルタイム検索
 - **WHERE (どこで見る？)**:
   - 会場・エリア別絞り込み
-  - **インタラクティブ地図表示 (Leaflet)**: 会場ピンをタップして詳細確認
+  - **インタラクティブ地図表示 (MapLibre GL)**: 会場ピンをタップして詳細確認
   - **Google Maps 経路ナビ直結**: ワンタップで現在地から会場への道順をGoogle Mapsで起動
 - **WHEN (いつ見る？)**:
   - **「🔥 本日の公演 (Today's Shows)」ワンタップフィルター**
