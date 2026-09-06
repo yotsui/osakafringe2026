@@ -65,7 +65,7 @@ export interface PerformanceSchedule {
   date: string; // YYYY-MM-DD
   startTime: string; // HH:mm
   endTime: string; // HH:mm
-  venueId?: string; // 公演日時に会場が紐づく
+  venueId?: string; // 会場IDまたは名前
   venueName?: string;
   venueNameEn?: string;
   note?: string;
@@ -75,18 +75,47 @@ export interface Performance {
   id: string;
   title: string;
   titleEn?: string;
-  artistId: string;
-  artist?: Artist;
-  artistName?: string; // フォールバック・互換用 (artist.name)
-  artistNameEn?: string;
   genre: PerformanceGenre;
   genreCustom?: string;
   genreCustomEn?: string;
   description: string;
   descriptionEn?: string;
-  venueId?: string; // デフォルト会場（または主要会場）
-  venue?: Venue;
-  schedules: PerformanceSchedule[]; // 各スケジュールに venueId が紐づく
+
+  // アーティスト直接記入情報
+  artistId?: string;
+  artistName: string;
+  artistNameEn?: string;
+  artistOrigin?: string;
+  artistOriginEn?: string;
+  artistProfile?: string;
+  artistProfileEn?: string;
+  artistWebsite?: string;
+  artistTwitter?: string;
+  artistInstagram?: string;
+  artistYoutube?: string;
+  artist?: Artist; // 内部合成・互換用
+
+  // 会場直接記入情報
+  venueId?: string;
+  venueName: string;
+  venueNameEn?: string;
+  venueArea?: string;
+  venueAreaEn?: string;
+  venueAddress?: string;
+  venueAddressEn?: string;
+  venueAccess?: string;
+  venueAccessEn?: string;
+  venueLat?: number;
+  venueLng?: number;
+  venue?: Venue; // 内部合成・互換用
+
+  // 日程・スケジュール情報
+  scheduleDates?: string;
+  scheduleDatesEn?: string;
+  scheduleDetails?: string;
+  schedules: PerformanceSchedule[]; // タイムライン/カレンダー用パース済み配列
+
+  // チケット・メディア
   ticketPrice?: string;
   ticketPriceEn?: string;
   ticketUrl?: string; // 空の場合は非表示
@@ -100,51 +129,75 @@ export interface Partner {
   id: string;
   name: string;
   nameEn?: string;
-  image: string;
-  url: string;
+  category: 'platinum' | 'gold' | 'silver' | 'bronze' | 'media' | 'supporter' | 'tourism' | 'partner_event';
+  logoUrl?: string;
+  image?: string;
+  url?: string;
+  websiteUrl?: string;
   description?: string;
   descriptionEn?: string;
-  category?: string;
 }
 
 export interface Banner {
   id: string;
   title: string;
   titleEn?: string;
-  imageUrl: string;
-  linkUrl: string;
-  type: 'instagram' | 'tourism_osaka' | 'sponsor' | 'partner';
-  alt: string;
   description?: string;
   descriptionEn?: string;
+  imageUrl?: string;
+  image?: string;
+  alt?: string;
+  url?: string;
+  linkUrl?: string;
+  type?: string;
+  target?: '_blank' | '_self';
+  position?: 'top' | 'middle' | 'bottom' | 'sidebar';
 }
 
 export interface SiteInfo {
-  siteTitle: string;
+  siteTitle?: string;
   siteTitleEn?: string;
-  heroTagline: string;
+  festivalName?: string;
+  festivalNameEn?: string;
+  theme?: string;
+  themeEn?: string;
+  heroTagline?: string;
   heroTaglineEn?: string;
-  heroSubtitle: string;
+  heroSubtitle?: string;
   heroSubtitleEn?: string;
-  festivalPeriod: string;
+  festivalPeriod?: string;
   festivalPeriodEn?: string;
-  locationSummary: string;
+  locationSummary?: string;
   locationSummaryEn?: string;
-  aboutTitle: string;
+  aboutTitle?: string;
   aboutTitleEn?: string;
-  aboutText: string;
+  aboutText?: string;
   aboutTextEn?: string;
-  donationTitle: string;
+  donationTitle?: string;
   donationTitleEn?: string;
-  donationText: string;
+  donationText?: string;
   donationTextEn?: string;
   donationBankInfo?: string;
   donationBankInfoEn?: string;
   newsNotice?: string;
   newsNoticeEn?: string;
-  newsNoticeUrl?: string;
+  startDate?: string;
+  endDate?: string;
+  contactEmail?: string;
+  officialWebsiteUrl?: string;
   officialInstagramUrl?: string;
   officialXUrl?: string;
-  officialWebsiteUrl?: string;
-  contactEmail?: string;
+  donationAccount?: {
+    bankName: string;
+    branchName: string;
+    accountType: string;
+    accountNumber: string;
+    accountHolder: string;
+  };
+  socialLinks?: {
+    twitter?: string;
+    instagram?: string;
+    youtube?: string;
+    facebook?: string;
+  };
 }
