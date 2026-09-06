@@ -32,7 +32,10 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
   // Group performances by venue
   const getPerformancesForVenue = (venueId: string) => {
     return performances.filter(
-      (p) => p.venueId === venueId || (p.schedules && p.schedules.some((s) => s.venueId === venueId))
+      (p) => 
+        p.venueId === venueId || 
+        p.venue?.id === venueId ||
+        (p.schedules && p.schedules.some((s) => s.venueId === venueId || s.venue?.id === venueId))
     );
   };
 

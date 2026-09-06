@@ -35,7 +35,12 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
   // Helper to find performances by artist
   const getPerformancesForArtist = (artistId: string, artistName: string) => {
     return performances.filter(
-      (p) => p.artistId === artistId || p.artistName === artistName || p.artist?.id === artistId
+      (p) => 
+        p.artistId === artistId || 
+        p.artistName === artistName || 
+        p.artist?.id === artistId ||
+        (typeof p.artists === 'object' && p.artists?.id === artistId) ||
+        p.artists === artistId
     );
   };
 

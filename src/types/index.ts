@@ -65,62 +65,56 @@ export interface PerformanceSchedule {
   date: string; // YYYY-MM-DD
   startTime: string; // HH:mm
   endTime: string; // HH:mm
-  venueId?: string; // 会場IDまたは名前
+  rawDate?: string; // microCMSの日時型（ISO 8601）
+  venueId?: string; // 日程別会場ID（未指定の場合はメイン会場）
   venueName?: string;
   venueNameEn?: string;
+  venue?: Venue;
   note?: string;
+}
+
+export interface PerformanceDateCustomField {
+  fieldId?: string;
+  date?: string; // ISO 8601 日時文字列
+  venue?: Venue | string; // 会場参照（未指定時は null/undefined）
 }
 
 export interface Performance {
   id: string;
   title: string;
   titleEn?: string;
-  genre: PerformanceGenre;
+  
+  // アーティスト参照
+  artists?: Artist | string;
+  artistId?: string;
+  artist?: Artist;
+  artistName?: string;
+  artistNameEn?: string;
+
+  // メイン会場参照
+  venue?: Venue;
+  venueId?: string;
+  venueName?: string;
+  venueNameEn?: string;
+
+  // 公演日程リピーター
+  dates?: PerformanceDateCustomField[];
+  schedules: PerformanceSchedule[]; // タイムライン/カレンダー用パース済み配列
+
+  // ジャンル・説明
+  genre: PerformanceGenre | string;
+  genreEn?: string;
   genreCustom?: string;
   genreCustomEn?: string;
   description: string;
   descriptionEn?: string;
 
-  // アーティスト直接記入情報
-  artistId?: string;
-  artistName: string;
-  artistNameEn?: string;
-  artistOrigin?: string;
-  artistOriginEn?: string;
-  artistProfile?: string;
-  artistProfileEn?: string;
-  artistWebsite?: string;
-  artistTwitter?: string;
-  artistInstagram?: string;
-  artistYoutube?: string;
-  artist?: Artist; // 内部合成・互換用
-
-  // 会場直接記入情報
-  venueId?: string;
-  venueName: string;
-  venueNameEn?: string;
-  venueArea?: string;
-  venueAreaEn?: string;
-  venueAddress?: string;
-  venueAddressEn?: string;
-  venueAccess?: string;
-  venueAccessEn?: string;
-  venueLat?: number;
-  venueLng?: number;
-  venue?: Venue; // 内部合成・互換用
-
-  // 日程・スケジュール情報
-  scheduleDates?: string;
-  scheduleDatesEn?: string;
-  scheduleDetails?: string;
-  schedules: PerformanceSchedule[]; // タイムライン/カレンダー用パース済み配列
-
-  // チケット・メディア
+  // チケット・メディア・その他
   ticketPrice?: string;
   ticketPriceEn?: string;
-  ticketUrl?: string; // 空の場合は非表示
-  image: string;      // メインビジュアル
-  images?: string[];  // 追加ギャラリー写真
+  ticketUrl?: string;
+  image?: string;
+  images?: string[];
   isFeatured?: boolean;
   durationMinutes?: number;
 }

@@ -189,109 +189,173 @@ export async function getPerformances(): Promise<Performance[]> {
       }
     }
 
-    // 2. アーティスト情報の解決＆直接記入からの合成
-    const artistName = perf.artistName || (perf.artist?.name) || '出演アーティスト';
-    const artistNameEn = perf.artistNameEn || (perf.artist?.nameEn);
-    const artistOrigin = perf.artistOrigin || (perf.artist?.origin);
-    const artistOriginEn = perf.artistOriginEn || (perf.artist?.originEn);
-    const artistProfile = perf.artistProfile || (perf.artist?.profile) || '';
-    const artistProfileEn = perf.artistProfileEn || (perf.artist?.profileEn);
+    // 2. アーティスト参照の解決
+    let resolvedArtist: Artist | undefined = undefined;
+    let resolvedArtistId = '';
+    
+    if (perf.artists && typeof perf.artists === 'object' && perf.artists.id) {
+      resolvedArtist = artistMap.get(perf.artists.id) || perf.artists;
+      resolvedArtistId = perf.artists.id;
+    } else if (typeof perf.artists === 'string' && perf.artists.trim()) {
+      resolvedArtist = artistMap.get(perf.artists.trim());
+      resolvedArtistId = perf.artists.trim();
+    } else if (perf.artist && typeof perf.artist === 'object' && perf.artist.id) {
+      resolvedArtist = artistMap.get(perf.artist.id) || perf.artist;
+      resolvedArtistId = perf.artist.id;
+    } else if (typeof perf.artistId === 'string' && perf.artistId.trim()) {
+      resolvedArtist = artistMap.get(perf.artistId.trim());
+      resolvedArtistId = perf.artistId.trim();
+    }
 
-    // 3. 会場情報の解決＆直接記入からの合成
-    const venueName = perf.venueName || (perf.venue?.name) || '特設会場';
-    const venueNameEn = perf.venueNameEn || (perf.venue?.nameEn);
-    const venueArea = perf.venueArea || (perf.venue?.area) || '大阪エリア';
-    const venueAreaEn = perf.venueAreaEn || (perf.venue?.areaEn);
-    const venueAddress = perf.venueAddress || (perf.venue?.address) || '';
-    const venueAddressEn = perf.venueAddressEn || (perf.venue?.addressEn);
-    const venueAccess = perf.venueAccess || (perf.venue?.access) || '';
-    const venueAccessEn = perf.venueAccessEn || (perf.venue?.accessEn);
-    const venueLat = perf.venueLat != null ? Number(perf.venueLat) : (perf.venue?.location?.lat ?? 34.6937);
-    const venueLng = perf.venueLng != null ? Number(perf.venueLng) : (perf.venue?.location?.lng ?? 135.5023);
+    const artistName = resolvedArtist?.name || perf.artistName || '出演アーティスト';
+    const artistNameEn = resolvedArtist?.nameEn || perf.artistNameEn;
 
-    // 4. schedulesのパース（配列、または scheduleDates からの自動補完）
-    let enrichedSchedules: PerformanceSchedule[] = [];
-    if (Array.isArray(perf.schedules) && perf.schedules.length > 0) {
-      enrichedSchedules = perf.schedules.map((s: any) => ({
-        date: String(s.date || '2026-10-08').trim(),
-        startTime: String(s.startTime || '18:00').trim(),
-        endTime: String(s.endTime || '19:00').trim(),
-        venueId: s.venueId || perf.venueId || perf.id,
-        venueName: s.venueName || venueName,
-        venueNameEn: s.venueNameEn || venueNameEn,
-        note: s.note ? String(s.note).trim() : undefined,
-      }));
-    } else {
-      // scheduleDates 文字列からの簡易パースまたはフォールバック
-      enrichedSchedules = [
-        {
-          date: '2026-10-08',
-          startTime: '18:00',
-          endTime: '19:00',
-          venueId: perf.venueId || perf.id,
-          venueName,
-          venueNameEn,
-          note: perf.scheduleDates || undefined,
+    // 3. メイン会場参照の解決
+    let mainVenue: Venue | undefined = undefined;
+    let mainVenueId = '';
+
+    if (perf.venue && typeof perf.venue === 'object' && perf.venue.id) {
+      mainVenue = venueMap.get(perf.venue.id) || perf.venue;
+      mainVenueId = perf.venue.id;
+    } else if (typeof perf.venue === 'string' && perf.venue.trim()) {
+      mainVenue = venueMap.get(perf.venue.trim());
+      mainVenueId = perf.venue.trim();
+    } else if (typeof perf.venueId === 'string' && perf.venueId.trim()) {
+      mainVenue = venueMap.get(perf.venueId.trim());
+      mainVenueId = perf.venueId.trim();
+    }
+
+    const venueName = mainVenue?.name || perf.venueName || '特設会場';
+    const venueNameEn = mainVenue?.nameEn || perf.venueNameEn;
+
+    // 4. 公演日程（dates リピーターまたは schedules 配列）の展開と解決
+    const durationMins = typeof perf.durationMinutes === 'number' && perf.durationMinutes > 0 ? perf.durationMinutes : 60;
+    let rawDateItems: any[] = [];
+
+    if (Array.isArray(perf.dates) && perf.dates.length > 0) {
+      rawDateItems = perf.dates;
+    } else if (Array.isArray(perf.schedules) && perf.schedules.length > 0) {
+      rawDateItems = perf.schedules;
+    } else if (typeof perf.dates === 'string' && perf.dates.trim()) {
+      try {
+        rawDateItems = JSON.parse(perf.dates);
+      } catch (e) {
+        console.warn(`[MicroCMS] Failed to parse dates JSON for ${perf.id}:`, e);
+      }
+    }
+
+    const enrichedSchedules: PerformanceSchedule[] = [];
+
+    if (Array.isArray(rawDateItems) && rawDateItems.length > 0) {
+      for (const item of rawDateItems) {
+        if (!item) continue;
+
+        // 会場の解決: item.venue が未指定の場合はメイン会場 mainVenue を参照
+        let scheduleVenue: Venue | undefined = mainVenue;
+        let sVenueId = mainVenueId;
+
+        const rawItemVenue = item.venue || item.venueId;
+        if (rawItemVenue && typeof rawItemVenue === 'object' && rawItemVenue.id) {
+          scheduleVenue = venueMap.get(rawItemVenue.id) || rawItemVenue;
+          sVenueId = rawItemVenue.id;
+        } else if (typeof rawItemVenue === 'string' && rawItemVenue.trim()) {
+          scheduleVenue = venueMap.get(rawItemVenue.trim()) || mainVenue;
+          sVenueId = rawItemVenue.trim();
         }
-      ];
+
+        const sVenueName = scheduleVenue?.name || item.venueName || venueName;
+        const sVenueNameEn = scheduleVenue?.nameEn || item.venueNameEn || venueNameEn;
+
+        // 日時・開演時刻・終演時刻のパース
+        let dateStr = '2026-10-08';
+        let startTimeStr = '18:00';
+        let endTimeStr = '19:00';
+
+        if (item.date && typeof item.date === 'string') {
+          const rawDateStr = item.date.trim();
+          if (rawDateStr.includes('T')) {
+            // ISO 8601 日時文字列 (例: "2026-10-08T19:00:00+09:00")
+            const d = new Date(rawDateStr);
+            if (!isNaN(d.getTime())) {
+              // JST で日付と時刻をフォーマット
+              const jstDate = new Intl.DateTimeFormat('ja-JP', {
+                timeZone: 'Asia/Tokyo',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+              }).format(d).replace(/\//g, '-');
+
+              const jstTime = new Intl.DateTimeFormat('ja-JP', {
+                timeZone: 'Asia/Tokyo',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+              }).format(d);
+
+              dateStr = jstDate;
+              startTimeStr = jstTime;
+
+              const endTimestamp = d.getTime() + durationMins * 60 * 1000;
+              const endDate = new Date(endTimestamp);
+              endTimeStr = new Intl.DateTimeFormat('ja-JP', {
+                timeZone: 'Asia/Tokyo',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+              }).format(endDate);
+            }
+          } else {
+            dateStr = rawDateStr;
+            if (item.startTime) startTimeStr = String(item.startTime).trim();
+            if (item.endTime) endTimeStr = String(item.endTime).trim();
+          }
+        } else {
+          if (item.date) dateStr = String(item.date).trim();
+          if (item.startTime) startTimeStr = String(item.startTime).trim();
+          if (item.endTime) endTimeStr = String(item.endTime).trim();
+        }
+
+        enrichedSchedules.push({
+          date: dateStr,
+          startTime: startTimeStr,
+          endTime: endTimeStr,
+          rawDate: typeof item.date === 'string' ? item.date : undefined,
+          venueId: sVenueId,
+          venueName: sVenueName,
+          venueNameEn: sVenueNameEn,
+          venue: scheduleVenue,
+          note: item.note ? String(item.note).trim() : undefined,
+        });
+      }
+    }
+
+    if (enrichedSchedules.length === 0) {
+      enrichedSchedules.push({
+        date: '2026-10-08',
+        startTime: '18:00',
+        endTime: '19:00',
+        venueId: mainVenueId,
+        venueName,
+        venueNameEn,
+        venue: mainVenue,
+      });
     }
 
     // 5. 日英翻訳の自動補完
+    const rawGenre = perf.genre || perf.genreCustom || '';
+    const rawGenreEn = perf.genreEn || perf.genreCustomEn || '';
+
     const [
       titleEn,
-      genreCustomEn,
+      genreEnTranslated,
       descriptionEn,
       ticketPriceEn,
-      artistNameEnTranslated,
-      artistProfileEnTranslated,
-      venueNameEnTranslated,
-      venueAreaEnTranslated,
-      venueAccessEnTranslated,
     ] = await Promise.all([
       translateIfEmpty(perf.title, perf.titleEn, 'Performance title in fringe festival'),
-      translateIfEmpty(perf.genreCustom, perf.genreCustomEn, 'Artistic genre subcategory'),
+      translateIfEmpty(rawGenre, rawGenreEn, 'Artistic genre subcategory'),
       translateIfEmpty(perf.description, perf.descriptionEn, 'Performance synopsis'),
       translateIfEmpty(perf.ticketPrice, perf.ticketPriceEn, 'Ticket price details'),
-      translateIfEmpty(artistName, artistNameEn, 'Artist or company name'),
-      translateIfEmpty(artistProfile, artistProfileEn, 'Artist biography and background'),
-      translateIfEmpty(venueName, venueNameEn, 'Performance venue name'),
-      translateIfEmpty(venueArea, venueAreaEn, 'Osaka area name'),
-      translateIfEmpty(venueAccess, venueAccessEn, 'Venue transit instructions'),
     ]);
-
-    const finalArtistNameEn = artistNameEnTranslated || artistNameEn || artistName;
-    const finalVenueNameEn = venueNameEnTranslated || venueNameEn || venueName;
-
-    const synthesizedArtist: Artist = {
-      id: perf.artistId || `artist-${perf.id}`,
-      name: artistName,
-      nameEn: finalArtistNameEn,
-      origin: artistOrigin,
-      originEn: artistOriginEn,
-      profile: artistProfile,
-      profileEn: artistProfileEnTranslated || artistProfileEn,
-      websiteUrl: perf.artistWebsite,
-      snsTwitter: perf.artistTwitter,
-      snsInstagram: perf.artistInstagram,
-      snsYoutube: perf.artistYoutube,
-      image: imgUrl,
-    };
-
-    const synthesizedVenue: Venue = {
-      id: perf.venueId || `venue-${perf.id}`,
-      name: venueName,
-      nameEn: finalVenueNameEn,
-      area: venueArea,
-      areaEn: venueAreaEnTranslated || venueAreaEn,
-      address: venueAddress,
-      addressEn: venueAddressEn,
-      access: venueAccess,
-      accessEn: venueAccessEnTranslated || venueAccessEn,
-      location: { lat: venueLat, lng: venueLng },
-      lat: venueLat,
-      lng: venueLng,
-      image: imgUrl,
-    };
 
     const images = Array.isArray(perf.images) 
       ? perf.images.map(extractImageUrl).filter(Boolean) as string[]
@@ -299,39 +363,33 @@ export async function getPerformances(): Promise<Performance[]> {
 
     return {
       ...perf,
+      id: perf.id,
       title: perf.title,
       titleEn: titleEn || perf.titleEn || perf.title,
-      genreCustom: perf.genreCustom,
-      genreCustomEn: genreCustomEn || perf.genreCustomEn,
+      genre: perf.genre || 'theater',
+      genreEn: genreEnTranslated || rawGenreEn,
+      genreCustom: rawGenre,
+      genreCustomEn: genreEnTranslated || rawGenreEn,
       description: perf.description,
       descriptionEn: descriptionEn || perf.descriptionEn || perf.description,
       ticketPrice: perf.ticketPrice,
       ticketPriceEn: ticketPriceEn || perf.ticketPriceEn,
+      ticketUrl: perf.ticketUrl,
+      durationMinutes: durationMins,
+      isFeatured: Boolean(perf.isFeatured),
+      artists: resolvedArtist || resolvedArtistId,
+      artistId: resolvedArtistId,
+      artist: resolvedArtist,
       artistName,
-      artistNameEn: finalArtistNameEn,
-      artistOrigin,
-      artistOriginEn,
-      artistProfile,
-      artistProfileEn: artistProfileEnTranslated || artistProfileEn,
-      artistWebsite: perf.artistWebsite,
-      artistTwitter: perf.artistTwitter,
-      artistInstagram: perf.artistInstagram,
-      artistYoutube: perf.artistYoutube,
-      artist: synthesizedArtist,
+      artistNameEn,
+      venue: mainVenue,
+      venueId: mainVenueId,
       venueName,
-      venueNameEn: finalVenueNameEn,
-      venueArea,
-      venueAreaEn: venueAreaEnTranslated || venueAreaEn,
-      venueAddress,
-      venueAddressEn,
-      venueAccess,
-      venueAccessEn: venueAccessEnTranslated || venueAccessEn,
-      venueLat,
-      venueLng,
-      venue: synthesizedVenue,
-      image: imgUrl || '',
-      images,
+      venueNameEn,
+      dates: rawDateItems,
       schedules: enrichedSchedules,
+      image: imgUrl || resolvedArtist?.image || mainVenue?.image || '',
+      images,
     };
   };
 

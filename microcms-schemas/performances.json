@@ -1,227 +1,189 @@
 {
   "apiFields": [
     {
-      "fieldId": "title",
-      "name": "公演タイトル（日本語）",
-      "kind": "text",
-      "required": true
+      "fieldId": "artists",
+      "name": "アーティスト",
+      "kind": "relation",
+      "description": null,
+      "required": true,
+      "listViewFieldId": "DEFAULT",
+      "referencedApiEndpoint": "artists"
     },
     {
-      "fieldId": "titleEn",
-      "name": "公演タイトル（英語）",
-      "kind": "text",
-      "required": false
+      "fieldId": "venue",
+      "name": "会場（メイン）",
+      "kind": "relation",
+      "description": null,
+      "required": true,
+      "listViewFieldId": "DEFAULT",
+      "referencedApiEndpoint": "venues"
     },
     {
-      "fieldId": "genre",
-      "name": "ジャンル（street/dance/music/theater/traditional/kamishibai/exhibition/other）",
-      "kind": "text",
-      "required": true
-    },
-    {
-      "fieldId": "genreCustom",
-      "name": "カスタムジャンル詳細名（自由記述 例: フィジカルシアター、現代三味線）",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "genreCustomEn",
-      "name": "カスタムジャンル詳細名（英語）",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "description",
-      "name": "公演概要・紹介文（日本語）",
-      "kind": "textArea",
-      "required": true
-    },
-    {
-      "fieldId": "descriptionEn",
-      "name": "公演概要・紹介文（英語）",
-      "kind": "textArea",
-      "required": false
-    },
-    {
-      "fieldId": "artistName",
-      "name": "出演アーティスト・劇団名（日本語）",
-      "kind": "text",
-      "required": true
-    },
-    {
-      "fieldId": "artistNameEn",
-      "name": "出演アーティスト・劇団名（英語）",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "artistOrigin",
-      "name": "出身地・拠点（例: 大阪府 / 日本、ベルリン / ドイツ）",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "artistOriginEn",
-      "name": "出身地・拠点（英語）",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "artistProfile",
-      "name": "アーティスト紹介・プロフィール（日本語）",
-      "kind": "textArea",
-      "required": false
-    },
-    {
-      "fieldId": "artistProfileEn",
-      "name": "アーティスト紹介・プロフィール（英語）",
-      "kind": "textArea",
-      "required": false
-    },
-    {
-      "fieldId": "artistWebsite",
-      "name": "アーティスト公式サイトURL",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "artistTwitter",
-      "name": "アーティスト X (Twitter) URL",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "artistInstagram",
-      "name": "アーティスト Instagram URL",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "artistYoutube",
-      "name": "アーティスト YouTube URL",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "venueName",
-      "name": "会場名（日本語）",
-      "kind": "text",
-      "required": true
-    },
-    {
-      "fieldId": "venueNameEn",
-      "name": "会場名（英語）",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "venueArea",
-      "name": "会場エリア（例: 中崎町、心斎橋、中之島、天王寺）",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "venueAreaEn",
-      "name": "会場エリア（英語）",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "venueAddress",
-      "name": "会場住所（日本語）",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "venueAddressEn",
-      "name": "会場住所（英語）",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "venueAccess",
-      "name": "会場アクセス（例: 中崎町駅 徒歩3分）",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "venueAccessEn",
-      "name": "会場アクセス（英語）",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "venueLat",
-      "name": "会場緯度（例: 34.7065）",
-      "kind": "number",
-      "required": false
-    },
-    {
-      "fieldId": "venueLng",
-      "name": "会場経度（例: 135.5032）",
-      "kind": "number",
-      "required": false
-    },
-    {
-      "fieldId": "scheduleDates",
-      "name": "公演日程概要（日本語 例: 10/8 19:00, 10/9 14:00/18:00）",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "scheduleDatesEn",
-      "name": "公演日程概要（英語）",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "scheduleDetails",
-      "name": "公演タイムスケジュール詳細・開場時間・備考（複数行）",
-      "kind": "textArea",
-      "required": false
-    },
-    {
-      "fieldId": "ticketPrice",
-      "name": "チケット料金（日本語 例: 前売 2,500円 / 当日 3,000円）",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "ticketPriceEn",
-      "name": "チケット料金（英語）",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "ticketUrl",
-      "name": "チケット予約・購入URL",
-      "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "image",
-      "name": "公演メインビジュアル画像",
-      "kind": "media",
-      "required": false
-    },
-    {
-      "fieldId": "images",
-      "name": "公演ギャラリー写真（複数画像）",
-      "kind": "media",
-      "required": false
-    },
-    {
-      "fieldId": "durationMinutes",
-      "name": "上演時間（分）",
-      "kind": "number",
-      "required": false
+      "fieldId": "dates",
+      "name": "公演日程",
+      "kind": "repeater",
+      "description": null,
+      "required": true,
+      "repeaterCountLimitValidation": null,
+      "customFieldIds": [
+        "performancedate"
+      ]
     },
     {
       "fieldId": "isFeatured",
       "name": "おすすめ・注目公演フラグ",
       "kind": "boolean",
-      "required": false
+      "description": null,
+      "required": false,
+      "initialValue": false
+    },
+    {
+      "fieldId": "title",
+      "name": "公演タイトル（日本語）",
+      "kind": "text",
+      "description": null,
+      "required": true,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": null,
+      "isUnique": false,
+      "initialValue": null
+    },
+    {
+      "fieldId": "titleEn",
+      "name": "公演タイトル（英語）",
+      "kind": "text",
+      "description": null,
+      "required": false,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": null,
+      "isUnique": false,
+      "initialValue": null
+    },
+    {
+      "fieldId": "genre",
+      "name": "ジャンル（記述）",
+      "kind": "text",
+      "description": null,
+      "required": false,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": null,
+      "isUnique": false,
+      "initialValue": null
+    },
+    {
+      "fieldId": "genreEn",
+      "name": "ジャンル（英語）",
+      "kind": "text",
+      "description": null,
+      "required": false,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": null,
+      "isUnique": false,
+      "initialValue": null
+    },
+    {
+      "fieldId": "description",
+      "name": "公演概要・紹介文（日本語）",
+      "kind": "textArea",
+      "description": null,
+      "required": true,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": null,
+      "initialValue": null
+    },
+    {
+      "fieldId": "descriptionEn",
+      "name": "公演概要・紹介文（英語）",
+      "kind": "textArea",
+      "description": null,
+      "required": false,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": null,
+      "initialValue": null
+    },
+    {
+      "fieldId": "ticketPrice",
+      "name": "チケット料金",
+      "kind": "text",
+      "description": null,
+      "required": false,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": null,
+      "isUnique": false,
+      "initialValue": null
+    },
+    {
+      "fieldId": "ticketPriceEn",
+      "name": "チケット料金（英語）",
+      "kind": "text",
+      "description": null,
+      "required": false,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": null,
+      "isUnique": false,
+      "initialValue": null
+    },
+    {
+      "fieldId": "ticketUrl",
+      "name": "チケット予約・購入URL",
+      "kind": "text",
+      "description": null,
+      "required": false,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": null,
+      "isUnique": false,
+      "initialValue": null
+    },
+    {
+      "fieldId": "image",
+      "name": "公演メインビジュアル画像",
+      "kind": "media",
+      "description": null,
+      "required": false,
+      "imageSizeValidation": null,
+      "initialValue": null
+    },
+    {
+      "fieldId": "durationMinutes",
+      "name": "上演時間（分）",
+      "kind": "number",
+      "description": null,
+      "required": false,
+      "numberSizeLimitValidation": null,
+      "initialValue": null
     }
   ],
-  "customFields": []
+  "customFields": [
+    {
+      "fieldId": "performancedate",
+      "name": "公演",
+      "fieldOrderByColumn": [
+        [
+          "date",
+          "venue"
+        ],
+        []
+      ],
+      "fields": [
+        {
+          "fieldId": "date",
+          "name": "公演日時",
+          "kind": "date",
+          "description": null,
+          "required": false,
+          "dateFormat": false,
+          "initialValue": null
+        },
+        {
+          "fieldId": "venue",
+          "name": "会場",
+          "kind": "relation",
+          "description": null,
+          "required": false,
+          "listViewFieldId": "DEFAULT",
+          "referencedApiEndpoint": "venues"
+        }
+      ]
+    }
+  ]
 }
