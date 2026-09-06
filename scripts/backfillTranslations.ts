@@ -52,18 +52,42 @@ const client = createClient({
 const ai = geminiApiKey ? new GoogleGenAI({ apiKey: geminiApiKey }) : null;
 const translationCache = new Map<string, string>();
 
-async function translateText(text: string, contextHint: string): Promise<string> {
-  const clean = (text || '').trim();
-  if (!clean) return '';
-  if (translationCache.has(clean)) return translationCache.get(clean)!;
+// Statistics
+const stats = {
+  artistsScheduled: 0,
+  performancesScheduled: 0,
+  venuesScheduled: 0,
+  siteInfoFieldsScheduled: 0,
+  donationStoriesScheduled: 0,
+  donationImpactsScheduled: 0,
+  englishSkipped: 0,
+  translationFailed: 0,
+  writesCount: 0,
+};
 
-  if (!ai) {
-    console.warn('  ⚠️ Gemini API key missing, returning original text');
-    return clean;
+const isFilled = (val: unknown): val is string => typeof val === 'string' && val.trim().length > 0;
+
+/**
+ * Translate Japanese text to natural English using Gemini.
+ * Never returns Japanese text on error or missing API key.
+ * Retries up to 3 times on transient errors.
+ */
+async function translateText(text: string, contextHint: string): Promise<string | null> {
+  const clean = (text || '').trim();
+  if (!clean) return null;
+
+  const cacheKey = `${contextHint}\n${clean}`;
+  if (translationCache.has(cacheKey)) {
+    return translationCache.get(cacheKey)!;
   }
 
-  try {
-    const prompt = `
+  if (!ai) {
+    console.warn(`  ⚠️ Gemini API key missing, skipped translation for: ${contextHint}`);
+    stats.translationFailed++;
+    return null;
+  }
+
+  const prompt = `
 You are an expert translator specializing in performing arts, fringe festivals, and Osaka culture.
 Translate the following Japanese text into natural, vibrant, and engaging English suitable for the Osaka Fringe Festival official website and Audience App.
 Keep theater/arts nuances authentic. If there are Japanese location names (e.g. 中崎町 Nakazakicho, 心斎橋 Shinsaibashi), use standard Romaji.
@@ -75,44 +99,102 @@ ${clean}
 Respond ONLY with the translated English text, without markdown formatting, quotes, or conversational filler.
 `;
 
-    const response = await ai.models.generateContent({
-      model: process.env.GEMINI_MODEL || 'gemini-flash-latest',
-      contents: prompt,
-    });
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const response = await ai.models.generateContent({
+        model: process.env.GEMINI_MODEL || 'gemini-flash-latest',
+        contents: prompt,
+      });
 
-    const translated = response.text ? response.text.trim().replace(/^[\"']|[\"']$/g, '') : clean;
-    translationCache.set(clean, translated);
-    return translated;
-  } catch (err: any) {
-    console.error(`  ❌ Translation error for "${clean.slice(0, 30)}...":`, err.message || err);
-    return clean;
+      const translated = response.text ? response.text.trim().replace(/^["']|["']$/g, '') : null;
+      if (translated) {
+        translationCache.set(cacheKey, translated);
+        return translated;
+      }
+    } catch (err: any) {
+      if (attempt < 3) {
+        console.warn(`  ⚠️ Gemini attempt ${attempt} failed for "${contextHint}" (${err?.message || err}). Retrying in ${attempt}s...`);
+        await new Promise((r) => setTimeout(r, attempt * 1000));
+      } else {
+        console.error(`  ❌ skipped: ${contextHint} (Gemini error after 3 attempts: ${err?.message || err})`);
+      }
+    }
   }
+
+  stats.translationFailed++;
+  return null;
+}
+
+/**
+ * Pagination helper to fetch all items from microCMS endpoint
+ */
+async function getAllContents<T = any>(endpoint: string): Promise<T[]> {
+  const limit = 100;
+  let offset = 0;
+  const all: T[] = [];
+
+  while (true) {
+    const result = await client.getList<T>({
+      endpoint,
+      queries: { limit, offset },
+    });
+    all.push(...result.contents);
+    if (all.length >= result.totalCount || result.contents.length < limit) {
+      break;
+    }
+    offset += limit;
+  }
+
+  return all;
 }
 
 async function backfillArtists() {
   console.log('\n[1/4] Processing Artists...');
-  const res = await client.getList({ endpoint: 'artists', queries: { limit: 100 } });
-  let updatedCount = 0;
+  const contents = await getAllContents<any>('artists');
+  console.log(`  Total artists fetched: ${contents.length}`);
 
-  for (const item of res.contents as any[]) {
+  for (const item of contents) {
     const patchData: Record<string, any> = {};
+    const itemLabel = item.name || item.id;
 
-    if (item.name && (!item.nameEn || !item.nameEn.trim())) {
-      patchData.nameEn = await translateText(item.name, 'Artist / Company Name');
+    // name -> nameEn
+    if (isFilled(item.name)) {
+      if (isFilled(item.nameEn)) {
+        stats.englishSkipped++;
+      } else {
+        const translated = await translateText(item.name, `Artist name: ${itemLabel}`);
+        if (translated) patchData.nameEn = translated;
+      }
     }
-    if (item.origin && (!item.originEn || !item.originEn.trim())) {
-      patchData.originEn = await translateText(item.origin, 'Artist Origin / City / Country');
+
+    // origin -> originEn
+    if (isFilled(item.origin)) {
+      if (isFilled(item.originEn)) {
+        stats.englishSkipped++;
+      } else {
+        const translated = await translateText(item.origin, `Artist origin: ${itemLabel}`);
+        if (translated) patchData.originEn = translated;
+      }
     }
-    if (item.profile && (!item.profileEn || !item.profileEn.trim())) {
-      patchData.profileEn = await translateText(item.profile, 'Artist Biography / Profile');
+
+    // profile -> profileEn
+    if (isFilled(item.profile)) {
+      if (isFilled(item.profileEn)) {
+        stats.englishSkipped++;
+      } else {
+        const translated = await translateText(item.profile, `Artist profile: ${itemLabel}`);
+        if (translated) patchData.profileEn = translated;
+      }
     }
 
     // Artist.genre は英語コードのため翻訳しない
 
     if (Object.keys(patchData).length > 0) {
-      console.log(`  - Artist [${item.id}] ${item.name}:`);
+      stats.artistsScheduled++;
+      console.log(`  - Artist [${item.id}] ${itemLabel}:`);
       for (const [k, v] of Object.entries(patchData)) {
-        console.log(`      + ${k}: ${String(v).slice(0, 60)}${String(v).length > 60 ? '...' : ''}`);
+        const preview = String(v).replace(/\n/g, ' ');
+        console.log(`      + ${k}: ${preview.slice(0, 80)}${preview.length > 80 ? '...' : ''}`);
       }
 
       if (!isDryRun) {
@@ -121,39 +203,68 @@ async function backfillArtists() {
           contentId: item.id,
           content: patchData,
         });
+        stats.writesCount++;
         console.log(`    ✅ Updated ${item.id}`);
       }
-      updatedCount++;
     }
   }
-  console.log(`  Artists summary: ${updatedCount} items to update.`);
 }
 
 async function backfillPerformances() {
   console.log('\n[2/4] Processing Performances...');
-  const res = await client.getList({ endpoint: 'performances', queries: { limit: 100 } });
-  let updatedCount = 0;
+  const contents = await getAllContents<any>('performances');
+  console.log(`  Total performances fetched: ${contents.length}`);
 
-  for (const item of res.contents as any[]) {
+  for (const item of contents) {
     const patchData: Record<string, any> = {};
+    const itemLabel = item.title || item.id;
 
-    if (item.title && (!item.titleEn || !item.titleEn.trim())) {
-      patchData.titleEn = await translateText(item.title, 'Performance / Show Title');
+    // title -> titleEn
+    if (isFilled(item.title)) {
+      if (isFilled(item.titleEn)) {
+        stats.englishSkipped++;
+      } else {
+        const translated = await translateText(item.title, `Performance title: ${itemLabel}`);
+        if (translated) patchData.titleEn = translated;
+      }
     }
-    if (item.genre && (!item.genreEn || !item.genreEn.trim())) {
-      patchData.genreEn = await translateText(item.genre, 'Performance Sub-Genre (e.g. Comedy, Disco, Contemporary Dance)');
+
+    // genre -> genreEn (Performance自由記述ジャンル)
+    if (isFilled(item.genre)) {
+      if (isFilled(item.genreEn)) {
+        stats.englishSkipped++;
+      } else {
+        const translated = await translateText(item.genre, `Performance subgenre: ${itemLabel}`);
+        if (translated) patchData.genreEn = translated;
+      }
     }
-    if (item.description && (!item.descriptionEn || !item.descriptionEn.trim())) {
-      patchData.descriptionEn = await translateText(item.description, 'Performance Description / Synopsis');
+
+    // description -> descriptionEn
+    if (isFilled(item.description)) {
+      if (isFilled(item.descriptionEn)) {
+        stats.englishSkipped++;
+      } else {
+        const translated = await translateText(item.description, `Performance description: ${itemLabel}`);
+        if (translated) patchData.descriptionEn = translated;
+      }
     }
-    if (item.ticketPrice && (!item.ticketPriceEn || !item.ticketPriceEn.trim())) {
-      patchData.ticketPriceEn = await translateText(item.ticketPrice, 'Ticket Price / Admission Fee info');
+
+    // ticketPrice -> ticketPriceEn
+    if (isFilled(item.ticketPrice)) {
+      if (isFilled(item.ticketPriceEn)) {
+        stats.englishSkipped++;
+      } else {
+        const translated = await translateText(item.ticketPrice, `Performance ticket price: ${itemLabel}`);
+        if (translated) patchData.ticketPriceEn = translated;
+      }
     }
 
     if (Object.keys(patchData).length > 0) {
-      console.log(`  - Performance [${item.id}] ${item.title}:`);
+      stats.performancesScheduled++;
+      console.log(`  - Performance [${item.id}] ${itemLabel}:`);
       for (const [k, v] of Object.entries(patchData)) {
-        console.log(`      + ${k}: ${String(v).slice(0, 60)}${String(v).length > 60 ? '...' : ''}`);
+        const preview = String(v).replace(/\n/g, ' ');
+        console.log(`      + ${k}: ${preview.slice(0, 80)}${preview.length > 80 ? '...' : ''}`);
       }
 
       if (!isDryRun) {
@@ -162,42 +273,78 @@ async function backfillPerformances() {
           contentId: item.id,
           content: patchData,
         });
+        stats.writesCount++;
         console.log(`    ✅ Updated ${item.id}`);
       }
-      updatedCount++;
     }
   }
-  console.log(`  Performances summary: ${updatedCount} items to update.`);
 }
 
 async function backfillVenues() {
   console.log('\n[3/4] Processing Venues...');
-  const res = await client.getList({ endpoint: 'venues', queries: { limit: 100 } });
-  let updatedCount = 0;
+  const contents = await getAllContents<any>('venues');
+  console.log(`  Total venues fetched: ${contents.length}`);
 
-  for (const item of res.contents as any[]) {
+  for (const item of contents) {
     const patchData: Record<string, any> = {};
+    const itemLabel = item.name || item.id;
 
-    if (item.name && (!item.nameEn || !item.nameEn.trim())) {
-      patchData.nameEn = await translateText(item.name, 'Venue Name');
+    // name -> nameEn
+    if (isFilled(item.name)) {
+      if (isFilled(item.nameEn)) {
+        stats.englishSkipped++;
+      } else {
+        const translated = await translateText(item.name, `Venue name: ${itemLabel}`);
+        if (translated) patchData.nameEn = translated;
+      }
     }
-    if (item.area && (!item.areaEn || !item.areaEn.trim())) {
-      patchData.areaEn = await translateText(item.area, 'Venue Area (e.g. Namba, Umeda, Nakazakicho)');
+
+    // area -> areaEn
+    if (isFilled(item.area)) {
+      if (isFilled(item.areaEn)) {
+        stats.englishSkipped++;
+      } else {
+        const translated = await translateText(item.area, `Venue area: ${itemLabel}`);
+        if (translated) patchData.areaEn = translated;
+      }
     }
-    if (item.address && (!item.addressEn || !item.addressEn.trim())) {
-      patchData.addressEn = await translateText(item.address, 'Street Address in Osaka');
+
+    // address -> addressEn
+    if (isFilled(item.address)) {
+      if (isFilled(item.addressEn)) {
+        stats.englishSkipped++;
+      } else {
+        const translated = await translateText(item.address, `Venue address: ${itemLabel}`);
+        if (translated) patchData.addressEn = translated;
+      }
     }
-    if (item.access && (!item.accessEn || !item.accessEn.trim())) {
-      patchData.accessEn = await translateText(item.access, 'Transit & Access Directions');
+
+    // access -> accessEn
+    if (isFilled(item.access)) {
+      if (isFilled(item.accessEn)) {
+        stats.englishSkipped++;
+      } else {
+        const translated = await translateText(item.access, `Venue access: ${itemLabel}`);
+        if (translated) patchData.accessEn = translated;
+      }
     }
-    if (item.description && (!item.descriptionEn || !item.descriptionEn.trim())) {
-      patchData.descriptionEn = await translateText(item.description, 'Venue Description / Atmosphere');
+
+    // description -> descriptionEn
+    if (isFilled(item.description)) {
+      if (isFilled(item.descriptionEn)) {
+        stats.englishSkipped++;
+      } else {
+        const translated = await translateText(item.description, `Venue description: ${itemLabel}`);
+        if (translated) patchData.descriptionEn = translated;
+      }
     }
 
     if (Object.keys(patchData).length > 0) {
-      console.log(`  - Venue [${item.id}] ${item.name}:`);
+      stats.venuesScheduled++;
+      console.log(`  - Venue [${item.id}] ${itemLabel}:`);
       for (const [k, v] of Object.entries(patchData)) {
-        console.log(`      + ${k}: ${String(v).slice(0, 60)}${String(v).length > 60 ? '...' : ''}`);
+        const preview = String(v).replace(/\n/g, ' ');
+        console.log(`      + ${k}: ${preview.slice(0, 80)}${preview.length > 80 ? '...' : ''}`);
       }
 
       if (!isDryRun) {
@@ -206,56 +353,183 @@ async function backfillVenues() {
           contentId: item.id,
           content: patchData,
         });
+        stats.writesCount++;
         console.log(`    ✅ Updated ${item.id}`);
       }
-      updatedCount++;
     }
   }
-  console.log(`  Venues summary: ${updatedCount} items to update.`);
 }
 
 async function backfillSiteInfo() {
   console.log('\n[4/4] Processing Site Info...');
   try {
-    const info = await client.getObject<any>({ endpoint: 'site_info' });
-    if (info) {
-      const patchData: Record<string, any> = {};
+    const raw = await client.getObject<any>({ endpoint: 'site_info' });
+    const info = raw?.siteTitle ? raw : (Array.isArray(raw?.contents) ? raw.contents[0] : raw);
 
-      if (info.siteTitle && (!info.siteTitleEn || !info.siteTitleEn.trim())) {
-        patchData.siteTitleEn = await translateText(info.siteTitle, 'Site Title');
-      }
-      if (info.heroTagline && (!info.heroTaglineEn || !info.heroTaglineEn.trim())) {
-        patchData.heroTaglineEn = await translateText(info.heroTagline, 'Hero Tagline');
-      }
-      if (info.heroSubtitle && (!info.heroSubtitleEn || !info.heroSubtitleEn.trim())) {
-        patchData.heroSubtitleEn = await translateText(info.heroSubtitle, 'Hero Subtitle');
-      }
-      if (info.festivalPeriod && (!info.festivalPeriodEn || !info.festivalPeriodEn.trim())) {
-        patchData.festivalPeriodEn = await translateText(info.festivalPeriod, 'Festival Schedule / Dates');
-      }
-      if (info.locationSummary && (!info.locationSummaryEn || !info.locationSummaryEn.trim())) {
-        patchData.locationSummaryEn = await translateText(info.locationSummary, 'Location / Area Summary');
-      }
+    if (!info) {
+      console.log('  Site Info: content not found.');
+      return;
+    }
 
-      if (Object.keys(patchData).length > 0) {
-        console.log('  - Site Info:');
-        for (const [k, v] of Object.entries(patchData)) {
-          console.log(`      + ${k}: ${String(v).slice(0, 60)}${String(v).length > 60 ? '...' : ''}`);
+    const targetContentId: string | undefined = info.id;
+    const patchData: Record<string, any> = {};
+
+    // 1. Regular fields list
+    const regularFieldPairs: Array<[string, string, string]> = [
+      ['siteTitle', 'siteTitleEn', 'Site Title'],
+      ['heroTagline', 'heroTaglineEn', 'Hero Tagline'],
+      ['heroSubtitle', 'heroSubtitleEn', 'Hero Subtitle'],
+      ['festivalPeriod', 'festivalPeriodEn', 'Festival Schedule / Dates'],
+      ['locationSummary', 'locationSummaryEn', 'Location / Area Summary'],
+      ['aboutTitle', 'aboutTitleEn', 'About Section Title'],
+      ['aboutText', 'aboutTextEn', 'About Section Body Text'],
+      ['donationTitle', 'donationTitleEn', 'Donation Section Title'],
+      ['donationText', 'donationTextEn', 'Donation Section Body Text'],
+      ['donationBankInfo', 'donationBankInfoEn', 'Bank Transfer Details'],
+      ['donationBankNote', 'donationBankNoteEn', 'Bank Transfer Notes / Receipt Notice'],
+      ['newsNotice', 'newsNoticeEn', 'Global News Notice / Announcement'],
+    ];
+
+    console.log('  --- Checking regular fields ---');
+    for (const [jpKey, enKey, desc] of regularFieldPairs) {
+      const jpVal = info[jpKey];
+      const enVal = info[enKey];
+
+      if (isFilled(jpVal)) {
+        if (isFilled(enVal)) {
+          stats.englishSkipped++;
+        } else {
+          const translated = await translateText(jpVal, `Site Info ${desc} (${jpKey})`);
+          if (translated) {
+            patchData[enKey] = translated;
+            stats.siteInfoFieldsScheduled++;
+            console.log(`    + ${enKey} (TRANSLATE): ${translated.replace(/\n/g, ' ').slice(0, 80)}...`);
+          }
         }
+      }
+    }
 
-        if (!isDryRun) {
+    // 2. donationStories Repeater
+    console.log('  --- Checking donationStories repeater ---');
+    const existingStories = Array.isArray(info.donationStories) ? info.donationStories : [];
+    let storiesChanged = false;
+    const updatedStories = [];
+
+    for (const story of existingStories) {
+      const updatedStory = { ...story };
+      const keyLabel = Array.isArray(story.sectionKey)
+        ? story.sectionKey.join(',')
+        : (story.sectionKey || 'story');
+
+      // title -> titleEn
+      if (isFilled(story.title)) {
+        if (isFilled(story.titleEn)) {
+          stats.englishSkipped++;
+        } else {
+          const translated = await translateText(story.title, `donationStories[${keyLabel}].title`);
+          if (translated) {
+            updatedStory.titleEn = translated;
+            storiesChanged = true;
+            stats.donationStoriesScheduled++;
+            console.log(`    + donationStories[${keyLabel}].titleEn (TRANSLATE): ${translated.replace(/\n/g, ' ').slice(0, 80)}...`);
+          }
+        }
+      }
+
+      // text -> textEn
+      if (isFilled(story.text)) {
+        if (isFilled(story.textEn)) {
+          stats.englishSkipped++;
+        } else {
+          const translated = await translateText(story.text, `donationStories[${keyLabel}].text`);
+          if (translated) {
+            updatedStory.textEn = translated;
+            storiesChanged = true;
+            stats.donationStoriesScheduled++;
+            console.log(`    + donationStories[${keyLabel}].textEn (TRANSLATE): ${translated.replace(/\n/g, ' ').slice(0, 80)}...`);
+          }
+        }
+      }
+
+      updatedStories.push(updatedStory);
+    }
+
+    if (storiesChanged) {
+      patchData.donationStories = updatedStories;
+    }
+
+    // 3. donationImpacts Repeater
+    console.log('  --- Checking donationImpacts repeater ---');
+    const existingImpacts = Array.isArray(info.donationImpacts) ? info.donationImpacts : [];
+    let impactsChanged = false;
+    const updatedImpacts = [];
+
+    for (let i = 0; i < existingImpacts.length; i++) {
+      const impact = existingImpacts[i];
+      const updatedImpact = { ...impact };
+      const labelStr = impact.label || `0${i + 1}`;
+
+      // title -> titleEn
+      if (isFilled(impact.title)) {
+        if (isFilled(impact.titleEn)) {
+          stats.englishSkipped++;
+        } else {
+          const translated = await translateText(impact.title, `donationImpacts[${labelStr}].title`);
+          if (translated) {
+            updatedImpact.titleEn = translated;
+            impactsChanged = true;
+            stats.donationImpactsScheduled++;
+            console.log(`    + donationImpacts[${labelStr}].titleEn (TRANSLATE): ${translated.replace(/\n/g, ' ').slice(0, 80)}...`);
+          }
+        }
+      }
+
+      // text -> textEn
+      if (isFilled(impact.text)) {
+        if (isFilled(impact.textEn)) {
+          stats.englishSkipped++;
+        } else {
+          const translated = await translateText(impact.text, `donationImpacts[${labelStr}].text`);
+          if (translated) {
+            updatedImpact.textEn = translated;
+            impactsChanged = true;
+            stats.donationImpactsScheduled++;
+            console.log(`    + donationImpacts[${labelStr}].textEn (TRANSLATE): ${translated.replace(/\n/g, ' ').slice(0, 80)}...`);
+          }
+        }
+      }
+
+      updatedImpacts.push(updatedImpact);
+    }
+
+    if (impactsChanged) {
+      patchData.donationImpacts = updatedImpacts;
+    }
+
+    // Perform patch if any changes
+    if (Object.keys(patchData).length > 0) {
+      console.log(`  - Site Info summary: ${Object.keys(patchData).length} fields/repeaters updated.`);
+      if (!isDryRun) {
+        if (targetContentId) {
+          await client.update({
+            endpoint: 'site_info',
+            contentId: targetContentId,
+            content: patchData,
+          });
+        } else {
           await client.update({
             endpoint: 'site_info',
             content: patchData,
           });
-          console.log('    ✅ Updated site_info');
         }
-      } else {
-        console.log('  Site Info: All English fields already filled.');
+        stats.writesCount++;
+        console.log(`    ✅ Updated site_info (${targetContentId || 'object'})`);
       }
+    } else {
+      console.log('  Site Info: All English fields and repeaters already filled.');
     }
   } catch (e: any) {
-    console.log('  Site info check skipped / not an object endpoint:', e.message || e);
+    console.error('  ❌ Site info processing error:', e.message || e);
   }
 }
 
@@ -265,8 +539,20 @@ async function main() {
     await backfillPerformances();
     await backfillVenues();
     await backfillSiteInfo();
+
     console.log('\n====================================================');
-    console.log(`🎉 Backfill ${isDryRun ? 'DRY-RUN' : 'COMPLETED'} successfully!`);
+    console.log('📊 Translation Backfill Summary');
+    console.log('====================================================');
+    console.log(`実行モード: ${isDryRun ? '🔍 DRY-RUN (microCMSへの書き込みなし)' : '🚀 LIVE (microCMSへ書き込み実行)'}`);
+    console.log(`1. Artists 翻訳予定件数: ${stats.artistsScheduled}`);
+    console.log(`2. Performances 翻訳予定件数: ${stats.performancesScheduled}`);
+    console.log(`3. Venues 翻訳予定件数: ${stats.venuesScheduled}`);
+    console.log(`4. site_info 通常フィールド翻訳予定数: ${stats.siteInfoFieldsScheduled}`);
+    console.log(`5. donationStories の翻訳予定フィールド数: ${stats.donationStoriesScheduled}`);
+    console.log(`6. donationImpacts の翻訳予定フィールド数: ${stats.donationImpactsScheduled}`);
+    console.log(`7. 既存英語SKIP数: ${stats.englishSkipped}`);
+    console.log(`8. 翻訳失敗数: ${stats.translationFailed}`);
+    console.log(`9. microCMSへの書き込み件数: ${stats.writesCount}`);
     console.log('====================================================\n');
   } catch (err) {
     console.error('❌ Backfill failed:', err);
