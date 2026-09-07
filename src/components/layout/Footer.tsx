@@ -30,7 +30,7 @@ export default function Footer() {
                 </a>
                 {' ｜'}
                 <a href="https://art-flavor.osaka-info.jp/" target="_blank" rel="noopener noreferrer" className="hover:text-gray-200 transition-colors">
-                  ART Flavor OSAKA
+                  Art Flavor Osaka
                 </a>
               </p>
             </div>
