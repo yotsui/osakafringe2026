@@ -68,6 +68,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/logo_download" className="text-white/90 hover:text-white transition-colors">
+                  {t('navBrandAssets')}
+                </Link>
+              </li>
+              <li>
                 <Link href="/donate" className="text-white/90 hover:text-white transition-colors">
                   {t('navDonate')}
                 </Link>

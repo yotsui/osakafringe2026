@@ -18,7 +18,60 @@ export const translations: Dictionary = {
   navVenues: { ja: '会場', en: 'Venues' },
   navArtists: { ja: 'アーティスト', en: 'Artists' },
   navDonate: { ja: '応援・連携', en: 'Support' },
+  navBrandAssets: { ja: 'ロゴ・ブランド素材', en: 'Brand Assets' },
   navContact: { ja: 'お問い合わせ', en: 'Contact' },
+  
+  // Brand Assets & Logo Download
+  aboutBrandAssetsBadge: { ja: 'BRAND ASSETS', en: 'BRAND ASSETS' },
+  aboutBrandAssetsTitle: { ja: 'ロゴ・ブランド素材', en: 'Logo & Brand Assets' },
+  aboutBrandAssetsDesc: { 
+    ja: 'Osaka Fringeの広報・告知等にご利用いただける\n公式ロゴデータを配布しています。', 
+    en: 'Official Osaka Fringe logo files are available\nfor promotional and communication use.' 
+  },
+  aboutBrandAssetsCta: { ja: 'ロゴ・ブランド素材を見る →', en: 'View Brand Assets →' },
+  
+  logoDownloadHeroBadge: { ja: 'OSAKA FRINGE 2026 / PR MATERIAL', en: 'OSAKA FRINGE 2026 / PR MATERIAL' },
+  logoDownloadHeroTitle: { ja: 'PR MATERIAL DOWNLOAD', en: 'PR MATERIAL DOWNLOAD' },
+  logoDownloadHeroSubtitle: { ja: '公式ロゴ・広報素材ダウンロード', en: 'Official Logo & Brand Assets' },
+  logoDownloadHeroDesc: { 
+    ja: '大阪文化万博・Osaka Fringeに参加する皆さまへ。\n公演・作品のチラシやSNS、WEBサイトなどでご利用いただける公式ロゴ・広報素材をご用意しました。\nあなたの発信に、フリンジをプラスしてください。', 
+    en: 'To all participants in Osaka Cultural Expo & Osaka Fringe:\nOfficial logos and promotional materials are available for use in flyers, SNS, websites, and publicity.\nAdd Osaka Fringe to your communication.' 
+  },
+  logoSectionTitle: { ja: 'Official Logo', en: 'Official Logo' },
+  logoSectionSubtitle: { ja: '公式ロゴデータ（PNG）', en: 'Official Logo Files (PNG)' },
+  logoWithPeriod1: { ja: '開催期間あり 01（横型）', en: 'With Dates 01 (Horizontal)' },
+  logoWithPeriod2: { ja: '開催期間あり 02（縦型）', en: 'With Dates 02 (Stacked)' },
+  logoNoPeriod1: { ja: '開催期間なし 01（横型）', en: 'Without Dates 01 (Horizontal)' },
+  logoNoPeriod2: { ja: '開催期間なし 02（縦型）', en: 'Without Dates 02 (Stacked)' },
+  downloadPng: { ja: 'PNGダウンロード', en: 'Download PNG' },
+  pdfSectionTitle: { ja: 'PDF LOGO', en: 'PDF LOGO' },
+  pdfSectionDesc: { 
+    ja: 'SNSやWEBサイト、チラシなどにご利用いただけるPDF形式のロゴ（全4パターン収録）です。印刷入稿にも適した高品質データです。', 
+    en: 'Official logo package in PDF format (includes all 4 patterns) suitable for print, flyers, SNS, and web.' 
+  },
+  downloadPdf: { ja: 'PDFをダウンロード (全4パターン)', en: 'Download PDF Pack (All 4 Patterns)' },
+  guidelinesBadge: { ja: 'GUIDELINES', en: 'GUIDELINES' },
+  guidelinesTitle: { ja: '大阪文化万博｜osaka fringe ロゴ使用ガイドライン', en: 'Osaka Cultural Expo | Osaka Fringe Logo Usage Guidelines' },
+  guidelinesPolicyTitle: { ja: '基本方針', en: 'General Policy' },
+  guidelinesPolicyText: { 
+    ja: 'Osaka Fringeの公式ロゴを使用する制作物は、公開・入稿前に完成データを事務局へ提出してください。', 
+    en: 'All promotional and published materials using the official Osaka Fringe logo must be submitted to the secretariat before publishing or printing.' 
+  },
+  guidelinesLogoTitle: { ja: '使用するロゴ', en: '1. Logo Selection & Format' },
+  guidelinesLogoPriority: { ja: '優先順位：日付入りのロゴを優先して使用してください。', en: 'Priority: Please prioritize using the logo version with event dates.' },
+  guidelinesLogoSize: { ja: 'サイズ：使用サイズの指定はありません。', en: 'Size: No minimum/maximum size restrictions.' },
+  guidelinesLogoFormat: { ja: '支給形式：事務局が提供する公式データ（PDF・PNG）を使用してください。', en: 'Format: Use official data provided by the secretariat (PDF / PNG).' },
+  guidelinesReviewTitle: { ja: '公開・入稿前の確認', en: '2. Review Process Before Publication / Printing' },
+  guidelinesReviewTiming: { ja: '提出時期：Webサイト、チラシ等の制作物は、公開・入稿前に完成データを事務局へ送付してください。', en: 'Timing: Please submit completed designs to the secretariat prior to publication or print production.' },
+  guidelinesReviewPeriod: { ja: '※確認期間：事務局は、データ受領後２営業日以内に確認します。', en: 'Turnaround: The secretariat will review received data within 2 business days.' },
+  guidelinesReviewNoContact: { ja: '※連絡がない場合：送付後２営業日以内に事務局から連絡がない場合は、問題なしとしてそのまま進めてください。', en: 'No response: If no feedback is received within 2 business days, you may proceed with publication.' },
+  guidelinesScopeTitle: { ja: '適用範囲', en: '3. Scope of Application' },
+  guidelinesScopeText: { 
+    ja: '本ガイドラインは、Osaka Fringeのロゴを使用するWebサイト、チラシ、SNS等の広報物に適用します。', 
+    en: 'These guidelines apply to promotional materials including websites, flyers, social media, and printed matter using the Osaka Fringe logo.' 
+  },
+  guidelinesContactPrompt: { ja: 'ご提出・お問い合わせ先', en: 'Submission & Inquiries' },
+  guidelinesContactAction: { ja: 'お問い合わせフォームへ →', en: 'Contact Secretariat →' },
   
   // Hero & Home
   heroBrandTitle: { ja: '大阪文化万博Osaka Fringe 2026', en: 'Osaka Fringe 2026' },

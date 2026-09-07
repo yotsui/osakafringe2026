@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { SiteInfo, Partner } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
@@ -288,6 +289,33 @@ export default function AboutClient({ siteInfo, partners = [] }: AboutClientProp
       {/* Partners Section */}
       <div className="pt-4">
         <PartnerSection partners={partners} />
+      </div>
+
+      {/* Brand Assets Sub-section (Minimalist Rule + Typography) */}
+      <div className="pt-12 border-t border-slate-200">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+          <div className="space-y-3 max-w-2xl">
+            <div className="text-xs font-black text-[#E6007E] uppercase tracking-widest">
+              BRAND ASSETS
+            </div>
+            <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              {language === 'en' ? 'Logo & Brand Assets' : 'ロゴ・ブランド素材'}
+            </h3>
+            <p className="text-sm text-slate-600 font-medium whitespace-pre-line leading-relaxed">
+              {language === 'en'
+                ? 'Official Osaka Fringe logo files are available\nfor promotional and communication use.'
+                : 'Osaka Fringeの広報・告知等にご利用いただける\n公式ロゴデータを配布しています。'}
+            </p>
+          </div>
+          <div className="shrink-0">
+            <Link
+              href="/logo_download"
+              className="inline-flex items-center gap-2 px-6 py-3.5 bg-slate-900 hover:bg-[#E6007E] text-white font-black text-xs sm:text-sm tracking-wider transition-colors duration-200 rounded-lg shadow-xs group"
+            >
+              <span>{language === 'en' ? 'View Brand Assets →' : 'ロゴ・ブランド素材を見る →'}</span>
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );
