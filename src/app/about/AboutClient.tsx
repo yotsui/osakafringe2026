@@ -48,23 +48,23 @@ export default function AboutClient({ siteInfo, partners = [] }: AboutClientProp
       </div>
 
       {/* Philosophy Editorial Hero */}
-      <div className="bg-slate-900 rounded-3xl p-8 sm:p-14 text-white space-y-6 relative overflow-hidden shadow-lg">
+      <div className="bg-white border border-pink-100 rounded-3xl p-8 sm:p-14 space-y-6 relative overflow-hidden shadow-xs">
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
           <div className="space-y-4 max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#E6007E] text-white text-xs font-black tracking-wider uppercase">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-50 border border-pink-200 text-[#E6007E] text-xs font-black tracking-wider uppercase">
               PHILOSOPHY
             </div>
-            <h2 className="text-2xl sm:text-4xl font-black leading-tight tracking-tight">
+            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 leading-tight tracking-tight">
               {aboutTitle || (language === 'en' ? 'The Entire City of Osaka Becomes a Stage.' : '大阪の街じゅうが、舞台になる。')}
             </h2>
-            <div className="w-16 h-1 bg-[#E6007E]" />
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed whitespace-pre-line font-medium">
+            <div className="w-16 h-1 bg-[#E6007E] rounded-full" />
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed whitespace-pre-line font-medium">
               {aboutText || (language === 'en' ? 'Transforming the entire city into open stages—not just inside traditional theaters, but across plazas, historical landmarks, cafes, and neighborhoods. Artists of all backgrounds and genres participate in an open-access arts festival. In Autumn 2026, diverse performing arts will spill over into the streets of Osaka.' : '劇場だけでなく街中のあらゆる場所を舞台に。プロ・アマ問わずアーティストが自由に参加するオープンアクセス型芸術祭。2026年秋、大阪の街に多彩な文化芸術があふれだします。')}
             </p>
           </div>
 
-          <div className="relative w-48 h-28 bg-white/10 rounded-2xl backdrop-blur-md p-4 flex items-center justify-center border border-white/20 shrink-0">
-            <BrandLogo variant="stacked" linkToHome={false} className="w-full h-auto drop-shadow-md brightness-0 invert" />
+          <div className="relative w-48 h-28 bg-pink-50/50 rounded-2xl p-4 flex items-center justify-center border border-pink-100 shrink-0">
+            <BrandLogo variant="stacked" linkToHome={false} className="w-full h-auto" />
           </div>
         </div>
       </div>
