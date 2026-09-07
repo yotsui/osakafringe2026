@@ -248,36 +248,36 @@ export default function WorldFringeMap() {
       `}</style>
 
       {/* World Map Container Box */}
-      <div className="bg-slate-900 rounded-3xl p-3 sm:p-5 border border-slate-800 shadow-xl overflow-hidden space-y-4">
+      <div className="bg-white rounded-3xl p-4 sm:p-6 border border-pink-100 shadow-sm overflow-hidden space-y-4">
         {/* Map Header Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 px-2 pt-1 text-white">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-1 pt-1">
           <div className="flex items-center gap-2">
             <Globe className="w-4 h-4 text-[#E6007E]" />
-            <span className="text-xs font-black tracking-wider uppercase text-slate-300">
+            <span className="text-xs sm:text-sm font-black tracking-wider uppercase text-slate-800">
               {isJa ? '世界各地のFringe Festival' : 'GLOBAL FRINGE FESTIVALS'}
             </span>
           </div>
 
-          <div className="flex items-center gap-3 text-[11px] font-bold text-slate-300">
+          <div className="flex items-center gap-3 text-xs font-bold text-slate-600">
             <span className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#E6007E] inline-block" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#E6007E] inline-block shadow-xs" />
               <span>Fringe Cities ({WORLD_FRINGES.length})</span>
             </span>
-            <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#E6007E]/30 border border-[#E6007E] text-white">
-              <span className="w-2 h-2 rounded-full bg-[#FFF100] inline-block" />
+            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-50 border border-pink-200 text-[#E6007E] font-black text-xs shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-[#FFF100] border border-[#E6007E] inline-block" />
               <span>2026 OSAKA</span>
             </span>
           </div>
         </div>
 
         {/* Interactive Map Canvas */}
-        <div className="relative w-full h-[400px] sm:h-[480px] lg:h-[560px] rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 isolate">
+        <div className="relative w-full h-[400px] sm:h-[480px] lg:h-[560px] rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 isolate">
           <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />
         </div>
 
         {/* Map Note */}
-        <div className="px-2 pt-1 text-xs text-slate-400">
-          <p className="font-medium leading-relaxed max-w-3xl">
+        <div className="px-1 pt-1 text-xs text-slate-500 font-medium leading-relaxed max-w-3xl">
+          <p>
             {t('fringeWorldNote')}
           </p>
         </div>

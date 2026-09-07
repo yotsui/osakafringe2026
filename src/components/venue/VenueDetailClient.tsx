@@ -28,6 +28,24 @@ interface VenueDetailClientProps {
   performances: Performance[];
 }
 
+const isValidUrl = (url?: string | null): boolean => {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  if (
+    trimmed === '' ||
+    trimmed === '#' ||
+    trimmed === 'null' ||
+    trimmed === 'undefined' ||
+    trimmed === 'なし' ||
+    trimmed === 'None' ||
+    trimmed === 'http://' ||
+    trimmed === 'https://'
+  ) {
+    return false;
+  }
+  return /^https?:\/\//i.test(trimmed);
+};
+
 export default function VenueDetailClient({ venue, performances }: VenueDetailClientProps) {
   const { language, t, getText } = useLanguage();
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
@@ -194,7 +212,7 @@ export default function VenueDetailClient({ venue, performances }: VenueDetailCl
                   <ExternalLink className="w-3.5 h-3.5 opacity-80" />
                 </a>
 
-                {venue.websiteUrl && (
+                {isValidUrl(venue.websiteUrl) && (
                   <a
                     href={venue.websiteUrl}
                     target="_blank"
@@ -206,7 +224,7 @@ export default function VenueDetailClient({ venue, performances }: VenueDetailCl
                   </a>
                 )}
 
-                {venue.snsTwitter && (
+                {isValidUrl(venue.snsTwitter) && (
                   <a
                     href={venue.snsTwitter}
                     target="_blank"
@@ -218,7 +236,7 @@ export default function VenueDetailClient({ venue, performances }: VenueDetailCl
                   </a>
                 )}
 
-                {venue.snsInstagram && (
+                {isValidUrl(venue.snsInstagram) && (
                   <a
                     href={venue.snsInstagram}
                     target="_blank"

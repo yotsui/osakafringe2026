@@ -21,6 +21,24 @@ import {
 } from 'lucide-react';
 import { TwitterIcon, InstagramIcon, YoutubeIcon } from '@/components/common/SnsIcons';
 
+const isValidUrl = (url?: string | null): boolean => {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  if (
+    trimmed === '' ||
+    trimmed === '#' ||
+    trimmed === 'null' ||
+    trimmed === 'undefined' ||
+    trimmed === 'なし' ||
+    trimmed === 'None' ||
+    trimmed === 'http://' ||
+    trimmed === 'https://'
+  ) {
+    return false;
+  }
+  return /^https?:\/\//i.test(trimmed);
+};
+
 interface ArtistsClientProps {
   artists: Artist[];
   performances: Performance[];
@@ -150,9 +168,9 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
                   )}
 
                   {/* Social Links */}
-                  {(artist.websiteUrl || artist.snsTwitter || artist.snsInstagram || artist.snsYoutube) && (
+                  {(isValidUrl(artist.websiteUrl) || isValidUrl(artist.snsTwitter) || isValidUrl(artist.snsInstagram) || isValidUrl(artist.snsYoutube)) && (
                     <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
-                      {artist.websiteUrl && (
+                      {isValidUrl(artist.websiteUrl) && (
                         <a
                           href={artist.websiteUrl}
                           target="_blank"
@@ -163,7 +181,7 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
                           <Globe className="w-3.5 h-3.5" />
                         </a>
                       )}
-                      {artist.snsTwitter && (
+                      {isValidUrl(artist.snsTwitter) && (
                         <a
                           href={artist.snsTwitter}
                           target="_blank"
@@ -174,7 +192,7 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
                           <TwitterIcon className="w-3.5 h-3.5" />
                         </a>
                       )}
-                      {artist.snsInstagram && (
+                      {isValidUrl(artist.snsInstagram) && (
                         <a
                           href={artist.snsInstagram}
                           target="_blank"
@@ -185,7 +203,7 @@ export default function ArtistsClient({ artists, performances, venues }: Artists
                           <InstagramIcon className="w-3.5 h-3.5" />
                         </a>
                       )}
-                      {artist.snsYoutube && (
+                      {isValidUrl(artist.snsYoutube) && (
                         <a
                           href={artist.snsYoutube}
                           target="_blank"

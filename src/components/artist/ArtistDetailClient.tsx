@@ -27,6 +27,24 @@ interface ArtistDetailClientProps {
   performances: Performance[];
 }
 
+const isValidUrl = (url?: string | null): boolean => {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  if (
+    trimmed === '' ||
+    trimmed === '#' ||
+    trimmed === 'null' ||
+    trimmed === 'undefined' ||
+    trimmed === 'なし' ||
+    trimmed === 'None' ||
+    trimmed === 'http://' ||
+    trimmed === 'https://'
+  ) {
+    return false;
+  }
+  return /^https?:\/\//i.test(trimmed);
+};
+
 export default function ArtistDetailClient({ artist, performances }: ArtistDetailClientProps) {
   const { language, t, getText } = useLanguage();
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
@@ -149,9 +167,9 @@ export default function ArtistDetailClient({ artist, performances }: ArtistDetai
           {/* Body Content */}
           <div className="p-6 sm:p-10 space-y-8">
             {/* Social Links Bar */}
-            {(artist.websiteUrl || artist.snsTwitter || artist.snsInstagram || artist.snsYoutube || artist.snsFacebook) && (
+            {(isValidUrl(artist.websiteUrl) || isValidUrl(artist.snsTwitter) || isValidUrl(artist.snsInstagram) || isValidUrl(artist.snsYoutube) || isValidUrl(artist.snsFacebook)) && (
               <div className="flex flex-wrap items-center gap-2.5 pb-6 border-b border-slate-100">
-                {artist.websiteUrl && (
+                {isValidUrl(artist.websiteUrl) && (
                   <a
                     href={artist.websiteUrl}
                     target="_blank"
@@ -164,7 +182,7 @@ export default function ArtistDetailClient({ artist, performances }: ArtistDetai
                   </a>
                 )}
 
-                {artist.snsTwitter && (
+                {isValidUrl(artist.snsTwitter) && (
                   <a
                     href={artist.snsTwitter}
                     target="_blank"
@@ -176,7 +194,7 @@ export default function ArtistDetailClient({ artist, performances }: ArtistDetai
                   </a>
                 )}
 
-                {artist.snsInstagram && (
+                {isValidUrl(artist.snsInstagram) && (
                   <a
                     href={artist.snsInstagram}
                     target="_blank"
@@ -188,7 +206,7 @@ export default function ArtistDetailClient({ artist, performances }: ArtistDetai
                   </a>
                 )}
 
-                {artist.snsYoutube && (
+                {isValidUrl(artist.snsYoutube) && (
                   <a
                     href={artist.snsYoutube}
                     target="_blank"

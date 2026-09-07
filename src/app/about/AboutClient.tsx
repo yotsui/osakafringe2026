@@ -12,7 +12,7 @@ const WorldFringeMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-[400px] sm:h-[480px] lg:h-[560px] rounded-3xl bg-slate-900 animate-pulse flex items-center justify-center text-slate-500 font-bold text-sm border border-slate-800">
+      <div className="w-full h-[400px] sm:h-[480px] lg:h-[560px] rounded-3xl bg-slate-100 animate-pulse flex items-center justify-center text-slate-400 font-bold text-sm border border-slate-200">
         Loading World Fringe Map...
       </div>
     ),
@@ -220,25 +220,25 @@ export default function AboutClient({ siteInfo, partners = [] }: AboutClientProp
             </div>
 
             {/* Timeline Typography (1947 EDINBURGH -> 2026 OSAKA) */}
-            <div className="flex items-center gap-3 sm:gap-4 bg-slate-900 text-white px-5 py-3 rounded-2xl shrink-0 shadow-sm border border-slate-800">
+            <div className="inline-flex items-center gap-3 sm:gap-4 bg-white px-5 py-3 rounded-2xl shrink-0 shadow-xs border border-pink-200">
               <div className="text-left">
                 <div className="text-base sm:text-lg font-black text-[#E6007E] leading-none tracking-tight">
                   1947
                 </div>
-                <div className="text-[10px] sm:text-xs font-bold text-slate-300 tracking-widest uppercase">
+                <div className="text-[10px] sm:text-xs font-bold text-slate-500 tracking-wider uppercase">
                   EDINBURGH
                 </div>
               </div>
 
-              <div className="flex items-center text-[#FFF100] px-1 font-black text-sm sm:text-base">
+              <div className="flex items-center text-[#E6007E] px-1 font-black text-sm sm:text-base">
                 →
               </div>
 
               <div className="text-left">
-                <div className="text-base sm:text-lg font-black text-[#FFF100] leading-none tracking-tight">
+                <div className="text-base sm:text-lg font-black text-slate-900 leading-none tracking-tight">
                   2026
                 </div>
-                <div className="text-[10px] sm:text-xs font-bold text-slate-200 tracking-widest uppercase">
+                <div className="text-[10px] sm:text-xs font-black text-[#E6007E] tracking-wider uppercase">
                   OSAKA
                 </div>
               </div>

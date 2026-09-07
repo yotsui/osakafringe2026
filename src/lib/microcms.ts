@@ -37,6 +37,30 @@ function extractImageUrl(media: unknown): string | undefined {
 }
 
 /**
+ * 有効なURL文字列のみを抽出（空文字、#、null、undefined、なし等を安全に除外）
+ */
+export function cleanUrl(url: unknown): string | undefined {
+  if (!url || typeof url !== 'string') return undefined;
+  const trimmed = url.trim();
+  if (
+    trimmed === '' ||
+    trimmed === '#' ||
+    trimmed === 'null' ||
+    trimmed === 'undefined' ||
+    trimmed === 'なし' ||
+    trimmed === 'None' ||
+    trimmed === 'http://' ||
+    trimmed === 'https://'
+  ) {
+    return undefined;
+  }
+  if (!/^https?:\/\//i.test(trimmed)) {
+    return undefined;
+  }
+  return trimmed;
+}
+
+/**
  * 会場のデフォルト座標マッピング
  */
 const DEFAULT_COORDINATES: Record<string, { lat: number; lng: number }> = {
@@ -68,6 +92,9 @@ export const getVenues = cache(async (): Promise<Venue[]> => {
       accessEn: v.accessEn || v.access,
       descriptionEn: v.descriptionEn || v.description,
       venueType: v.venueType || undefined,
+      websiteUrl: cleanUrl(v.websiteUrl),
+      snsTwitter: cleanUrl(v.snsTwitter),
+      snsInstagram: cleanUrl(v.snsInstagram),
       lat,
       lng,
       image: imgUrl,
@@ -118,6 +145,11 @@ export const getArtists = cache(async (): Promise<Artist[]> => {
       nameEn: a.nameEn || a.name,
       originEn: a.originEn || a.origin,
       profileEn: a.profileEn || a.profile,
+      websiteUrl: cleanUrl(a.websiteUrl),
+      snsTwitter: cleanUrl(a.snsTwitter),
+      snsInstagram: cleanUrl(a.snsInstagram),
+      snsYoutube: cleanUrl(a.snsYoutube),
+      snsFacebook: cleanUrl(a.snsFacebook),
       image: imgUrl,
       images,
     };
@@ -376,7 +408,7 @@ export const getPerformances = cache(async (): Promise<Performance[]> => {
       descriptionEn: perf.descriptionEn || perf.description,
       ticketPrice: perf.ticketPrice || '',
       ticketPriceEn: perf.ticketPriceEn || perf.ticketPrice || '',
-      ticketUrl: perf.ticketUrl,
+      ticketUrl: cleanUrl(perf.ticketUrl),
       durationMinutes: typeof perf.durationMinutes === 'number' && perf.durationMinutes > 0 ? perf.durationMinutes : undefined,
       isFeatured: Boolean(perf.isFeatured),
       artists: resolvedArtist || resolvedArtistId,

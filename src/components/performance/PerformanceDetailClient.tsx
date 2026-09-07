@@ -29,6 +29,24 @@ interface PerformanceDetailClientProps {
   performance: Performance;
 }
 
+const isValidUrl = (url?: string | null): boolean => {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  if (
+    trimmed === '' ||
+    trimmed === '#' ||
+    trimmed === 'null' ||
+    trimmed === 'undefined' ||
+    trimmed === 'なし' ||
+    trimmed === 'None' ||
+    trimmed === 'http://' ||
+    trimmed === 'https://'
+  ) {
+    return false;
+  }
+  return /^https?:\/\//i.test(trimmed);
+};
+
 export default function PerformanceDetailClient({ performance }: PerformanceDetailClientProps) {
   const { language, t, getText } = useLanguage();
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
@@ -246,7 +264,7 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
             {/* Action Bar */}
             <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100">
               <div className="flex flex-wrap items-center gap-2.5">
-                {performance.ticketUrl && (
+                {isValidUrl(performance.ticketUrl) && (
                   <a
                     href={performance.ticketUrl}
                     target="_blank"
@@ -259,7 +277,7 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
                   </a>
                 )}
 
-                {websiteUrl && (
+                {isValidUrl(websiteUrl) && (
                   <a
                     href={websiteUrl}
                     target="_blank"
@@ -271,7 +289,7 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
                   </a>
                 )}
 
-                {snsTwitter && (
+                {isValidUrl(snsTwitter) && (
                   <a
                     href={snsTwitter}
                     target="_blank"
@@ -283,7 +301,7 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
                   </a>
                 )}
 
-                {snsInstagram && (
+                {isValidUrl(snsInstagram) && (
                   <a
                     href={snsInstagram}
                     target="_blank"
@@ -295,7 +313,7 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
                   </a>
                 )}
 
-                {snsYoutube && (
+                {isValidUrl(snsYoutube) && (
                   <a
                     href={snsYoutube}
                     target="_blank"

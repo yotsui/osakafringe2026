@@ -36,6 +36,24 @@ interface VenuesClientProps {
   performances: Performance[];
 }
 
+const isValidUrl = (url?: string | null): boolean => {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  if (
+    trimmed === '' ||
+    trimmed === '#' ||
+    trimmed === 'null' ||
+    trimmed === 'undefined' ||
+    trimmed === 'なし' ||
+    trimmed === 'None' ||
+    trimmed === 'http://' ||
+    trimmed === 'https://'
+  ) {
+    return false;
+  }
+  return /^https?:\/\//i.test(trimmed);
+};
+
 export default function VenuesClient({ venues, performances }: VenuesClientProps) {
   const { t, getText } = useLanguage();
   const searchParams = useSearchParams();
@@ -204,7 +222,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
 
                     {/* SNS・Web Links */}
                     <div className="flex flex-wrap items-center gap-2 pt-1">
-                      {venue.websiteUrl && (
+                      {isValidUrl(venue.websiteUrl) && (
                         <a
                           href={venue.websiteUrl}
                           target="_blank"
@@ -215,7 +233,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                           <span>Website</span>
                         </a>
                       )}
-                      {venue.snsTwitter && (
+                      {isValidUrl(venue.snsTwitter) && (
                         <a
                           href={venue.snsTwitter}
                           target="_blank"
@@ -226,7 +244,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                           <TwitterIcon className="w-3.5 h-3.5" />
                         </a>
                       )}
-                      {venue.snsInstagram && (
+                      {isValidUrl(venue.snsInstagram) && (
                         <a
                           href={venue.snsInstagram}
                           target="_blank"
