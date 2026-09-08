@@ -19,7 +19,6 @@ interface PerformanceCardProps {
 
 export default function PerformanceCard({
   performance,
-  onSelect,
   isFavorite,
   onToggleFavorite,
 }: PerformanceCardProps) {

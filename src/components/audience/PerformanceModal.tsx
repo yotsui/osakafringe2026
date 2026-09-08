@@ -15,8 +15,7 @@ import {
   ExternalLink, 
   Navigation, 
   Heart,
-  User,
-  Image as ImageIcon
+  User
 } from 'lucide-react';
 import { TwitterIcon, InstagramIcon, YoutubeIcon } from '@/components/common/SnsIcons';
 import { formatScheduleDetailed, sortSchedules, deduplicateSchedules } from '@/utils/dateFormat';
@@ -37,12 +36,16 @@ export default function PerformanceModal({
 }: PerformanceModalProps) {
   const { language, t, getText } = useLanguage();
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
+  const [prevPerformanceId, setPrevPerformanceId] = useState<string | null>(performance?.id ?? null);
+
+  if (performance && performance.id !== prevPerformanceId) {
+    setPrevPerformanceId(performance.id);
+    setActiveImageIndex(0);
+  }
 
   // Handle ESC key press to close modal
   useEffect(() => {
     if (!performance) return;
-
-    setActiveImageIndex(0);
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {

@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import BrandLogo from '@/components/common/BrandLogo';
-import { SparkleIcon } from '@/components/common/CustomIcons';
 import { Menu, X } from 'lucide-react';
 
 export default function Navbar() {

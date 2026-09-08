@@ -26,9 +26,9 @@ Next.js (App Router)、Tailwind CSS、MicroCMS、Google Gemini API（自動翻�
 - **Osaka Fringeについて (/about)**: フェスティバルの理念、歴史、楽しみ方
 - **会場一覧 & マップ (/venues)**: 全会場の詳細、アクセス、上演作品一覧
 - **アーティスト一覧 (/artists)**: 出演パフォーマー・作品情報
-- **Award (/awards)**: グランプリ、観客賞、歴代受賞者一覧
 - **寄付・サポート (/donate)**: クラウドファンディング・振込先案内
-- **お問い合わせ (/contact)**: Google Forms 連携（レスポンシブ埋め込み & 直接リンク）
+- **お問い合わせ (/contact)**: お問い合わせフォーム
+- **ロゴデータ (/logo_download)**: 公式ロゴダウンロード
 - **公式バナー (/components/common/BannerSection)**: Instagram、大阪観光局ポータル等
 
 ### 3. 多言語対応 (日本語 / 英語) & Gemini API 自動翻訳
@@ -44,6 +44,11 @@ Next.js (App Router)、Tailwind CSS、MicroCMS、Google Gemini API（自動翻�
 npm run dev
 ```
 ブラウザで `http://localhost:3000` を開きます。
+
+### テストの実行
+```bash
+npm test
+```
 
 ### プロダクションビルド
 ```bash
@@ -98,16 +103,7 @@ MicroCMS管理画面で以下のエンドポイントを作成することで、
 - `image` (画像フィールド): メインビジュアル
 - `isFeatured` (真偽値): 注目公演フラグ
 
-### 3. `awards` (リスト形式)
-- `year` (数値): 受賞年
-- `title` (テキストフィールド): 賞名
-- `category` (テキストフィールド): 部門
-- `winner` (テキストフィールド): 受賞者
-- `workTitle` (テキストフィールド): 受賞作品名
-- `comment` (テキストエリア): 講評
-- `image` (画像フィールド): 写真
-
-### 4. `site_info` (単一コンテンツ形式)
+### 3. `site_info` (単一コンテンツ形式)
 - `aboutTitle`, `aboutText`: Osaka Fringeについてのタイトルと本文
 - `festivalPeriod`: 開催期間
 - `donationTitle`, `donationText`: 寄付についての案内

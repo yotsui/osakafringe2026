@@ -5,18 +5,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { SiteInfo } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
-import BrandLogo from '@/components/common/BrandLogo';
-import { SparkleIcon, ArrowRightIcon, CalendarIcon, MapPinIcon } from '@/components/common/CustomIcons';
+import { ArrowRightIcon } from '@/components/common/CustomIcons';
 
 interface HomeHeroClientProps {
-  siteInfo: SiteInfo;
+  siteInfo?: SiteInfo;
 }
 
-export default function HomeHeroClient({ siteInfo }: HomeHeroClientProps) {
-  const { t, getText } = useLanguage();
-
-  const period = getText(siteInfo.festivalPeriod, siteInfo.festivalPeriodEn);
-  const location = getText(siteInfo.locationSummary, siteInfo.locationSummaryEn);
+export default function HomeHeroClient({}: HomeHeroClientProps) {
+  const { t } = useLanguage();
 
   return (
     <section className="relative overflow-hidden bg-[#E6007E] text-white">

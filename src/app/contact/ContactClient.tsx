@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { SiteInfo } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
-import { Mail, Send, CheckCircle2, AlertCircle, RefreshCw, MessageSquare } from 'lucide-react';
+import { Send, CheckCircle2, AlertCircle, RefreshCw, MessageSquare } from 'lucide-react';
 
 interface ContactClientProps {
   siteInfo: SiteInfo;

@@ -2,11 +2,15 @@
   "name": "fringe",
   "version": "0.1.0",
   "private": true,
+  "imports": {
+    "@/*": "./src/*"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "node --test --experimental-strip-types tests/**/*.test.ts",
     "translate:backfill": "node --experimental-strip-types scripts/backfillTranslations.ts"
   },
   "dependencies": {

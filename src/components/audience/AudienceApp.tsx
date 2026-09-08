@@ -18,11 +18,9 @@ const FestivalMap = dynamic(() => import('./FestivalMap'), {
 });
 import { 
   Search, 
-  Filter, 
   Sparkles, 
   MapPin, 
   Calendar, 
-  Flame, 
   RotateCcw,
   Layers,
   Map as MapIcon,

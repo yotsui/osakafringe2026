@@ -3,20 +3,13 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Artist, Performance, Venue } from '@/types';
+import { Artist, Performance } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import PerformanceModal from '@/components/audience/PerformanceModal';
 import SafeImage from '@/components/common/SafeImage';
 import { 
-  Users, 
-  Sparkles, 
-  Calendar, 
-  MapPin, 
-  Ticket, 
   Globe, 
-  ExternalLink, 
   ArrowRight,
-  Theater,
   Eye
 } from 'lucide-react';
 import { TwitterIcon, InstagramIcon, YoutubeIcon } from '@/components/common/SnsIcons';
@@ -42,10 +35,10 @@ const isValidUrl = (url?: string | null): boolean => {
 interface ArtistsClientProps {
   artists: Artist[];
   performances: Performance[];
-  venues?: Venue[];
+  venues?: unknown[];
 }
 
-export default function ArtistsClient({ artists, performances, venues }: ArtistsClientProps) {
+export default function ArtistsClient({ artists, performances }: ArtistsClientProps) {
   const { t, getText } = useLanguage();
   const searchParams = useSearchParams();
   const [selectedPerformance, setSelectedPerformance] = useState<Performance | null>(null);

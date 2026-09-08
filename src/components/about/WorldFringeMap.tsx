@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import type { Map as MapLibreMap } from 'maplibre-gl';
 import { useLanguage } from '@/context/LanguageContext';
 import { WORLD_FRINGES } from '@/data/worldFringes';
 import { Globe } from 'lucide-react';
@@ -9,7 +10,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 export default function WorldFringeMap() {
   const { language, t } = useLanguage();
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<any>(null);
+  const mapInstanceRef = useRef<{ map: MapLibreMap; maplibregl: typeof import('maplibre-gl') } | null>(null);
   const isMapReadyRef = useRef<boolean>(false);
 
   const isJa = language === 'ja';
@@ -21,7 +22,7 @@ export default function WorldFringeMap() {
     let isCancelled = false;
 
     const initMap = async () => {
-      const maplibregl = (await import('maplibre-gl')) as any;
+      const maplibregl = await import('maplibre-gl');
 
       if (isCancelled || !mapContainerRef.current) return;
 
@@ -94,8 +95,6 @@ export default function WorldFringeMap() {
             `;
           }
 
-          // Popup content - City name in ALPHABET ONLY (no Japanese)
-          const locationLabel = `${festival.city}, ${festival.country}`;
           const visitBtnLabel = 'OFFICIAL SITE ↗';
 
           let popupHtml = '';

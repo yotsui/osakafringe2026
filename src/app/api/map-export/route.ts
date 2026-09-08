@@ -1,4 +1,3 @@
-import { NextRequest, NextResponse } from 'next/server';
 import {
   buildOverpassQuery,
   parseOverpassData,
@@ -6,18 +5,63 @@ import {
   calculateBbox,
   PAPER_SIZES,
   MapExportOptions,
+  StylePresetId,
+  OsmOverpassResponse,
 } from '@/lib/svgMapGenerator';
+import { getClientIp, checkRateLimit, createRateLimitResponse } from '@/lib/rateLimit';
+import {
+  isValidCoordinateNumber,
+  validateMapVenues,
+  MIN_MAP_RADIUS_KM,
+  MAX_MAP_RADIUS_KM,
+} from '@/lib/apiValidators';
 
-// Overpass API ミラーエンドポイント一覧 (フォールバック用)
+// Overpass API mirror endpoints for fallback
 const OVERPASS_ENDPOINTS = [
   'https://overpass-api.de/api/interpreter',
   'https://lz4.overpass-api.de/api/interpreter',
   'https://overpass.kumi.systems/api/interpreter',
 ];
 
-export async function POST(req: NextRequest) {
+const ALLOWED_STYLE_PRESETS: StylePresetId[] = [
+  'minimal-gray',
+  'print-mono',
+  'fringe-pop',
+  'clean-outline',
+];
+
+const RATE_LIMIT_CONFIG = {
+  maxRequests: 15,
+  windowMs: 60 * 1000, // 15 requests per minute per IP
+};
+
+export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    // 1. Rate Limiting
+    const clientIp = getClientIp(req);
+    const rateLimit = checkRateLimit(`map-export:${clientIp}`, RATE_LIMIT_CONFIG);
+    if (!rateLimit.success) {
+      return createRateLimitResponse(rateLimit);
+    }
+
+    // 2. Parse & Validate JSON
+    let body: unknown;
+    try {
+      body = await req.json();
+    } catch {
+      return Response.json(
+        { error: 'Invalid JSON request body' },
+        { status: 400 }
+      );
+    }
+
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      return Response.json(
+        { error: 'Request body must be a JSON object' },
+        { status: 400 }
+      );
+    }
+
     const {
       centerLat,
       centerLng,
@@ -26,24 +70,55 @@ export async function POST(req: NextRequest) {
       stylePresetId = 'minimal-gray',
       layers,
       venues = [],
-      format = 'svg', // 'svg' | 'json'
-    } = body;
+      format = 'svg',
+    } = body as Record<string, unknown>;
 
-    if (typeof centerLat !== 'number' || typeof centerLng !== 'number') {
-      return NextResponse.json(
-        { error: 'Invalid coordinates: centerLat and centerLng are required numbers' },
+    // 3. Coordinate validation
+    if (!isValidCoordinateNumber(centerLat, -90, 90) || !isValidCoordinateNumber(centerLng, -180, 180)) {
+      return Response.json(
+        { error: 'Invalid coordinates: centerLat must be between -90 and 90, centerLng between -180 and 180' },
         { status: 400 }
       );
     }
 
-    const paper = PAPER_SIZES[paperSizeId] || PAPER_SIZES['square'];
+    // 4. Radius validation
+    if (!isValidCoordinateNumber(radiusKm, MIN_MAP_RADIUS_KM, MAX_MAP_RADIUS_KM)) {
+      return Response.json(
+        { error: `radiusKm must be a number between ${MIN_MAP_RADIUS_KM} and ${MAX_MAP_RADIUS_KM}` },
+        { status: 400 }
+      );
+    }
+
+    // 5. Paper size & Style preset validation
+    const selectedPaperSizeId = typeof paperSizeId === 'string' && PAPER_SIZES[paperSizeId] ? paperSizeId : 'square';
+    const selectedStylePresetId = typeof stylePresetId === 'string' && ALLOWED_STYLE_PRESETS.includes(stylePresetId as StylePresetId)
+      ? (stylePresetId as StylePresetId)
+      : 'minimal-gray';
+
+    // 6. Format validation
+    if (format !== 'svg' && format !== 'json') {
+      return Response.json(
+        { error: "format must be either 'svg' or 'json'" },
+        { status: 400 }
+      );
+    }
+
+    // 7. Venues validation
+    const venuesResult = validateMapVenues(venues);
+    if (!venuesResult.valid || !venuesResult.data) {
+      return Response.json(
+        { error: venuesResult.error || 'Invalid venues parameter' },
+        { status: 400 }
+      );
+    }
+
+    const paper = PAPER_SIZES[selectedPaperSizeId] || PAPER_SIZES['square'];
     const aspectRatio = paper.widthPt / paper.heightPt;
     const bbox = calculateBbox(centerLat, centerLng, radiusKm, aspectRatio);
     const query = buildOverpassQuery(bbox);
 
-    // Overpass API からデータ取得（ミラーフォールバック付き）
-    let osmJson: any = null;
-    let lastError: any = null;
+    // Overpass API fetch with mirror fallbacks
+    let osmJson: OsmOverpassResponse | null = null;
 
     for (const endpoint of OVERPASS_ENDPOINTS) {
       try {
@@ -58,28 +133,25 @@ export async function POST(req: NextRequest) {
           },
           body: `data=${encodeURIComponent(query)}`,
           signal: controller.signal,
-          next: { revalidate: 3600 }, // 1時間キャッシュ
+          next: { revalidate: 3600 },
         });
 
         clearTimeout(timeoutId);
 
         if (res.ok) {
-          osmJson = await res.json();
+          osmJson = (await res.json()) as OsmOverpassResponse;
           break;
-        } else {
-          lastError = new Error(`Overpass returned HTTP ${res.status} from ${endpoint}`);
         }
-      } catch (err: any) {
-        lastError = err;
-        console.warn(`[Overpass API] Failed at ${endpoint}:`, err.message || err);
+      } catch (err: unknown) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        console.warn(`[Overpass API] Failed at ${endpoint}:`, errMsg);
       }
     }
 
-    // もしOverpass APIが全滅した場合でも空データでエラーにせずSVG生成を続行（ローカル鉄道や会場データは描画可能）
     const parsedData = parseOverpassData(osmJson || { elements: [] });
 
     if (format === 'json') {
-      return NextResponse.json({
+      return Response.json({
         bbox,
         data: parsedData,
         elementCount: osmJson?.elements?.length || 0,
@@ -90,9 +162,9 @@ export async function POST(req: NextRequest) {
       centerLat,
       centerLng,
       radiusKm,
-      paperSizeId,
-      stylePresetId,
-      layers: layers || {
+      paperSizeId: selectedPaperSizeId,
+      stylePresetId: selectedStylePresetId,
+      layers: (layers as MapExportOptions['layers']) || {
         background: true,
         water: true,
         greenery: true,
@@ -105,22 +177,22 @@ export async function POST(req: NextRequest) {
         venues: true,
         gridScale: true,
       },
-      venues,
+      venues: venuesResult.data,
     };
 
     const svgString = generateIllustratorSvg(exportOptions, parsedData);
 
-    return new NextResponse(svgString, {
+    return new Response(svgString, {
       status: 200,
       headers: {
         'Content-Type': 'image/svg+xml; charset=utf-8',
         'Content-Disposition': `attachment; filename="osaka-fringe-map-${centerLat.toFixed(4)}_${centerLng.toFixed(4)}.svg"`,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[Map Export API Error]', error);
-    return NextResponse.json(
-      { error: error.message || 'Internal server error while generating SVG map' },
+    return Response.json(
+      { error: 'Internal server error while generating SVG map' },
       { status: 500 }
     );
   }

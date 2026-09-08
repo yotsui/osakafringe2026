@@ -4,7 +4,6 @@ import React from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import BrandLogo from '@/components/common/BrandLogo';
-import { SparkleIcon } from '@/components/common/CustomIcons';
 import { InstagramIcon } from '@/components/common/SnsIcons';
 import { ExternalLink } from 'lucide-react';
 

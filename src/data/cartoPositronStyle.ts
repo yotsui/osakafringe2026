@@ -1,7 +1,9 @@
+import type { StyleSpecification } from 'maplibre-gl';
+
 /**
  * CARTO Positron MVT Vector Tile Style Definition (Self-contained with API key)
  */
-export const CARTO_POSITRON_VECTOR_STYLE: any = {
+export const CARTO_POSITRON_VECTOR_STYLE: StyleSpecification = ({
   "version": 8,
   "name": "CartoPositronVector",
   "sprite": "https://tiles.basemaps.cartocdn.com/gl/positron-gl-style/sprite?key=cb1_2u9e_1_e673ff91216e39ecfb52f65d",
@@ -5897,4 +5899,4 @@ export const CARTO_POSITRON_VECTOR_STYLE: any = {
       }
     }
   ]
-};
+} as unknown) as StyleSpecification;

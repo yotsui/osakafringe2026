@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import type { Map as MapLibreMap, Marker as MapLibreMarker, GeoJSONSource } from 'maplibre-gl';
 import { Venue } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import {
-  MAP_DIMENSIONS,
   STYLE_PRESETS,
   DEFAULT_LAYERS,
   StylePresetId,
@@ -31,7 +31,6 @@ import {
   ChevronDown,
   Navigation,
   Crosshair,
-  Sliders,
 } from 'lucide-react';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { CARTO_POSITRON_VECTOR_STYLE } from '@/data/cartoPositronStyle';
@@ -54,7 +53,6 @@ export default function SvgMapGeneratorClient({ initialVenues }: SvgMapGenerator
 
   // Status & Data
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [svgString, setSvgString] = useState<string>('');
   const [parsedData, setParsedData] = useState<ParsedGeoData | null>(null);
   const [activeTab, setActiveTab] = useState<'preview' | 'picker'>('preview');
   const [isCopied, setIsCopied] = useState<boolean>(false);
@@ -63,15 +61,30 @@ export default function SvgMapGeneratorClient({ initialVenues }: SvgMapGenerator
 
   // MapLibre Reference for Location Picker
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<any>(null);
-  const markerRef = useRef<any>(null);
+  const mapInstanceRef = useRef<MapLibreMap | null>(null);
+  const markerRef = useRef<MapLibreMarker | null>(null);
 
   // SVG Preview Container Ref
   const svgPreviewContainerRef = useRef<HTMLDivElement>(null);
 
+  // Derive SVG string directly from parsed data and current options
+  const svgString = React.useMemo(() => {
+    if (!parsedData) return '';
+    const exportOptions: MapExportOptions = {
+      centerLat,
+      centerLng,
+      radiusKm,
+      paperSizeId: 'square',
+      stylePresetId,
+      layers,
+      venues: initialVenues,
+    };
+    return generateIllustratorSvg(exportOptions, parsedData);
+  }, [parsedData, centerLat, centerLng, radiusKm, stylePresetId, layers, initialVenues]);
+
   // Generate SVG locally or via API
   const handleGenerateMap = useCallback(
-    async (lat = centerLat, lng = centerLng, r = radiusKm, currentStyle = stylePresetId, currentLayers = layers) => {
+    async (lat = centerLat, lng = centerLng, r = radiusKm) => {
       setIsLoading(true);
       setStatusMessage('OpenStreetMap から地理ベクターデータを取得中...');
 
@@ -84,8 +97,8 @@ export default function SvgMapGeneratorClient({ initialVenues }: SvgMapGenerator
             centerLng: lng,
             radiusKm: r,
             paperSizeId: 'square',
-            stylePresetId: currentStyle,
-            layers: currentLayers,
+            stylePresetId,
+            layers,
             venues: initialVenues,
             format: 'json',
           }),
@@ -98,39 +111,14 @@ export default function SvgMapGeneratorClient({ initialVenues }: SvgMapGenerator
         const resData = await res.json();
         const data: ParsedGeoData = resData.data;
         setParsedData(data);
-
-        // Generate SVG string client-side with full options
-        const exportOptions: MapExportOptions = {
-          centerLat: lat,
-          centerLng: lng,
-          radiusKm: r,
-          paperSizeId: 'square',
-          stylePresetId: currentStyle,
-          layers: currentLayers,
-          venues: initialVenues,
-        };
-
-        const svg = generateIllustratorSvg(exportOptions, data);
-        setSvgString(svg);
         setStatusMessage('');
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('[SVG Generator Error]', err);
         setStatusMessage('データ取得に失敗しました。ローカルデータで再構成します。');
 
         // Fallback with empty/local data
         const fallbackData = parseOverpassData({ elements: [] });
         setParsedData(fallbackData);
-        const exportOptions: MapExportOptions = {
-          centerLat: lat,
-          centerLng: lng,
-          radiusKm: r,
-          paperSizeId: 'square',
-          stylePresetId: currentStyle,
-          layers: currentLayers,
-          venues: initialVenues,
-        };
-        const svg = generateIllustratorSvg(exportOptions, fallbackData);
-        setSvgString(svg);
       } finally {
         setIsLoading(false);
       }
@@ -138,38 +126,30 @@ export default function SvgMapGeneratorClient({ initialVenues }: SvgMapGenerator
     [centerLat, centerLng, radiusKm, stylePresetId, layers, initialVenues]
   );
 
-  // Fast client-side SVG re-render when style or layer checkboxes change (no network fetch needed)
-  useEffect(() => {
-    if (parsedData) {
-      const exportOptions: MapExportOptions = {
-        centerLat,
-        centerLng,
-        radiusKm,
-        paperSizeId: 'square',
-        stylePresetId,
-        layers,
-        venues: initialVenues,
-      };
-      const svg = generateIllustratorSvg(exportOptions, parsedData);
-      setSvgString(svg);
-    }
-  }, [stylePresetId, layers, centerLat, centerLng, radiusKm, initialVenues, parsedData]);
-
   // Initial Load
   useEffect(() => {
-    handleGenerateMap(centerLat, centerLng, radiusKm, stylePresetId, layers);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    let isCancelled = false;
+    const fetchInitial = async () => {
+      await Promise.resolve();
+      if (isCancelled) return;
+      await handleGenerateMap();
+    };
+    fetchInitial();
+    return () => {
+      isCancelled = true;
+    };
+  }, [handleGenerateMap]);
 
   // Helper to update the bounding box polygon layer on MapLibre map
   const updateMapBboxLayer = useCallback(
-    (map: any, lat: number, lng: number, r: number) => {
+    (map: MapLibreMap | null, lat: number, lng: number, r: number) => {
       if (!map) return;
       const bbox = calculateBbox(lat, lng, r, 1.0);
       const bboxGeoJSON = {
-        type: 'Feature',
+        type: 'Feature' as const,
+        properties: {},
         geometry: {
-          type: 'Polygon',
+          type: 'Polygon' as const,
           coordinates: [
             [
               [bbox.west, bbox.south],
@@ -182,13 +162,18 @@ export default function SvgMapGeneratorClient({ initialVenues }: SvgMapGenerator
         },
       };
 
-      const source = map.getSource('export-bbox');
-      if (source) {
+      const source = map.getSource('export-bbox') as GeoJSONSource | undefined;
+      if (source && typeof source.setData === 'function') {
         source.setData(bboxGeoJSON);
       }
     },
     []
   );
+
+  const radiusKmRef = useRef(radiusKm);
+  useEffect(() => {
+    radiusKmRef.current = radiusKm;
+  }, [radiusKm]);
 
   // Initialize MapLibre once and keep it active across tab switches
   useEffect(() => {
@@ -196,7 +181,7 @@ export default function SvgMapGeneratorClient({ initialVenues }: SvgMapGenerator
     let isCancelled = false;
 
     const initMap = async () => {
-      const maplibregl = (await import('maplibre-gl')) as any;
+      const maplibregl = await import('maplibre-gl');
       if (isCancelled || !mapContainerRef.current || mapInstanceRef.current) return;
 
       if (typeof maplibregl.setWorkerUrl === 'function') {
@@ -215,11 +200,12 @@ export default function SvgMapGeneratorClient({ initialVenues }: SvgMapGenerator
 
       map.on('load', () => {
         // Add Bounding Box source & layers
-        const bbox = calculateBbox(centerLat, centerLng, radiusKm, 1.0);
+        const bbox = calculateBbox(centerLat, centerLng, radiusKmRef.current, 1.0);
         map.addSource('export-bbox', {
           type: 'geojson',
           data: {
             type: 'Feature',
+            properties: {},
             geometry: {
               type: 'Polygon',
               coordinates: [
@@ -275,7 +261,7 @@ export default function SvgMapGeneratorClient({ initialVenues }: SvgMapGenerator
 
       marker.on('drag', () => {
         const lngLat = marker.getLngLat();
-        updateMapBboxLayer(map, lngLat.lat, lngLat.lng, radiusKm);
+        updateMapBboxLayer(map, lngLat.lat, lngLat.lng, radiusKmRef.current);
       });
 
       marker.on('dragend', () => {
@@ -284,20 +270,20 @@ export default function SvgMapGeneratorClient({ initialVenues }: SvgMapGenerator
         const newLng = Math.round(lngLat.lng * 100000) / 100000;
         setCenterLat(newLat);
         setCenterLng(newLng);
-        updateMapBboxLayer(map, newLat, newLng, radiusKm);
+        updateMapBboxLayer(map, newLat, newLng, radiusKmRef.current);
       });
 
       markerRef.current = marker;
 
       // Click to move center
-      map.on('click', (e: any) => {
+      map.on('click', (e: { lngLat: { lng: number; lat: number } }) => {
         const { lng, lat } = e.lngLat;
         const newLat = Math.round(lat * 100000) / 100000;
         const newLng = Math.round(lng * 100000) / 100000;
         setCenterLat(newLat);
         setCenterLng(newLng);
         marker.setLngLat([newLng, newLat]);
-        updateMapBboxLayer(map, newLat, newLng, radiusKm);
+        updateMapBboxLayer(map, newLat, newLng, radiusKmRef.current);
       });
 
       mapInstanceRef.current = map;
@@ -312,6 +298,7 @@ export default function SvgMapGeneratorClient({ initialVenues }: SvgMapGenerator
         mapInstanceRef.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Resize MapLibre when switching tabs or coordinates/radius change

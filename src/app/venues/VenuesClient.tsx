@@ -20,12 +20,8 @@ const FestivalMap = dynamic(() => import('@/components/audience/FestivalMap'), {
 });
 import { 
   MapPin, 
-  ExternalLink, 
   Globe, 
   Navigation, 
-  Sparkles,
-  Building2,
-  Users,
   Eye,
   ArrowRight
 } from 'lucide-react';

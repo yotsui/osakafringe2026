@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Venue, Performance, SiteInfo, Partner } from '@/types';
+import { Performance, SiteInfo, Partner } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import HomeHeroClient from './HomeHeroClient';
 import PerformanceCard from '@/components/audience/PerformanceCard';
@@ -12,14 +12,13 @@ import { ArrowRightIcon } from '@/components/common/CustomIcons';
 import { selectFeaturedPerformances } from '@/utils/performanceUtils';
 
 interface HomeClientProps {
-  venues: Venue[];
+  venues?: unknown[];
   performances: Performance[];
   partners?: Partner[];
   siteInfo: SiteInfo;
 }
 
 export default function HomeClient({
-  venues,
   performances,
   partners = [],
   siteInfo,

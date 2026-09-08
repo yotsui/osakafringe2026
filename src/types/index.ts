@@ -42,6 +42,8 @@ export type PerformanceGenre =
   | 'exhibition'  // 作品展示
   | 'other';      // その他
 
+export type Genre = PerformanceGenre;
+
 export interface Artist {
   id: string;
   name: string;
@@ -62,6 +64,7 @@ export interface Artist {
 }
 
 export interface PerformanceSchedule {
+  id?: string;
   date: string; // YYYY-MM-DD (Asia/Tokyo)
   startTime: string; // HH:mm (Asia/Tokyo)
   endDate?: string; // YYYY-MM-DD (Asia/Tokyo) - 終了日
@@ -72,15 +75,28 @@ export interface PerformanceSchedule {
   venueName?: string;
   venueNameEn?: string;
   venue?: Venue;
+  ticketPrice?: string;
+  ticketUrl?: string;
   note?: string;
 }
 
 export interface PerformanceDateCustomField {
   fieldId?: string;
+  id?: string;
   date?: string; // ISO 8601 開始日時文字列
   date_end?: string; // ISO 8601 終了日時文字列
-  venue?: Venue | string; // 会場参照（未指定時は null/undefined）
+  venue?: Venue | string | { id: string }; // 会場参照（未指定時は null/undefined）
+  venueId?: string;
   note?: string;
+  ticketPrice?: string;
+  ticketUrl?: string;
+  startAt?: string;
+  endAt?: string;
+  startDate?: string;
+  endDate?: string;
+  startTime?: string;
+  endTime?: string;
+  time?: string;
 }
 
 export interface Performance {

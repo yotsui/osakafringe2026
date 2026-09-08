@@ -42,6 +42,26 @@ export const PAPER_SIZES: Record<string, PaperSizeOption> = {
   },
 };
 
+export interface OsmOverpassElement {
+  type: 'node' | 'way' | 'relation';
+  id: number;
+  lat?: number;
+  lon?: number;
+  nodes?: number[];
+  tags?: Record<string, string>;
+  members?: Array<{
+    type: string;
+    ref: number;
+    role: string;
+  }>;
+}
+
+export interface OsmOverpassResponse {
+  version?: number;
+  generator?: string;
+  elements?: OsmOverpassElement[];
+}
+
 export type StylePresetId = 'minimal-gray' | 'print-mono' | 'fringe-pop' | 'clean-outline';
 
 export interface StyleTheme {
@@ -353,7 +373,7 @@ export interface ParsedGeoData {
   labels: { text: string; lat: number; lng: number; type: string }[];
 }
 
-export function parseOverpassData(osmJson: any): ParsedGeoData {
+export function parseOverpassData(osmJson: OsmOverpassResponse | null | undefined): ParsedGeoData {
   const nodesMap = new Map<number, [number, number]>();
   const data: ParsedGeoData = {
     waterPolygons: [],
@@ -371,17 +391,17 @@ export function parseOverpassData(osmJson: any): ParsedGeoData {
     return data;
   }
 
-  osmJson.elements.forEach((el: any) => {
+  osmJson.elements.forEach((el: OsmOverpassElement) => {
     if (el.type === 'node' && typeof el.lat === 'number' && typeof el.lon === 'number') {
       nodesMap.set(el.id, [el.lon, el.lat]);
     }
   });
 
-  osmJson.elements.forEach((el: any) => {
+  osmJson.elements.forEach((el: OsmOverpassElement) => {
     if (el.type === 'node') {
       if (el.tags && (el.tags.railway === 'station' || el.tags.railway === 'halt' || el.tags.public_transport === 'station')) {
         const name = el.tags.name || el.tags['name:ja'] || el.tags['name:en'] || '';
-        if (name) {
+        if (name && typeof el.lat === 'number' && typeof el.lon === 'number') {
           data.stations.push({
             name,
             nameEn: el.tags['name:en'],
@@ -882,15 +902,15 @@ export function generateIllustratorSvg(
 
   // レイヤー8: Osaka Metro・地域路線（ローカル高精度データ連携）
   if (options.layers.metroLines) {
-    const metroFeatures = (OSAKA_TRANSIT_LINES?.features || []) as any[];
+    const metroFeatures = OSAKA_TRANSIT_LINES?.features || [];
     const metroSvgLines: string[] = [];
 
     metroFeatures.forEach((feat) => {
       if (!feat.geometry || !feat.geometry.coordinates) return;
-      const coords = feat.geometry.coordinates as [number, number][];
-      const color = feat.properties?.color || theme.railwayStroke;
-      const width = feat.properties?.width ? feat.properties.width * 1.2 : 3.5;
-      const name = feat.properties?.name || '路線';
+      const coords = feat.geometry.coordinates;
+      const color = (feat.properties?.color as string) || theme.railwayStroke;
+      const width = typeof feat.properties?.width === 'number' ? feat.properties.width * 1.2 : 3.5;
+      const name = (feat.properties?.name as string) || '路線';
 
       const ds = coordsToPolylinePathDs(coords, projector, clipBounds);
       ds.forEach((d) => {
@@ -918,18 +938,18 @@ ${metroSvgLines.join('\n')}
 
   // レイヤー9: 鉄道駅 & 駅名 (Stations & Labels)
   if (options.layers.stations) {
-    const localStations = (OSAKA_TRANSIT_STATIONS?.features || []) as any[];
+    const localStations = OSAKA_TRANSIT_STATIONS?.features || [];
     const allStations: { name: string; lat: number; lng: number; color?: string; isMajor?: boolean }[] = [];
 
     localStations.forEach((st) => {
       const [lng, lat] = st.geometry.coordinates;
       if (projector.isInside(lat, lng)) {
         allStations.push({
-          name: st.properties.name,
+          name: String(st.properties.name || ''),
           lat,
           lng,
-          color: st.properties.color,
-          isMajor: st.properties.isMajor,
+          color: typeof st.properties.color === 'string' ? st.properties.color : undefined,
+          isMajor: Boolean(st.properties.isMajor),
         });
       }
     });

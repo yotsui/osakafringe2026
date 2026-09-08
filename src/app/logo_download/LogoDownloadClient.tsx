@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useLanguage } from '@/context/LanguageContext';
-import { Download, FileText, ArrowRight, CheckCircle2, ChevronRight, Mail } from 'lucide-react';
+import { Download, FileText, ChevronRight, Mail } from 'lucide-react';
 
 interface LogoItem {
   id: string;

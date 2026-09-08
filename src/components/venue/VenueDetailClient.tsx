@@ -10,17 +10,14 @@ import {
   MapPin, 
   Navigation, 
   Calendar, 
-  Ticket, 
   Globe, 
   ExternalLink, 
   ArrowLeft,
   ArrowRight,
   Share2,
-  Check,
-  Clock
+  Check
 } from 'lucide-react';
 import { TwitterIcon, InstagramIcon } from '@/components/common/SnsIcons';
-import { formatScheduleCompact } from '@/utils/dateFormat';
 import { formatTicketPrice } from '@/utils/priceFormat';
 
 interface VenueDetailClientProps {

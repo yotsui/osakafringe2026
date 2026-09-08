@@ -31,7 +31,6 @@ export default function AboutClient({ siteInfo, partners = [] }: AboutClientProp
   const siteTitle = getText(siteInfo.siteTitle, siteInfo.siteTitleEn) || (language === 'en' ? 'Osaka Fringe 2026' : '大阪文化万博Osaka Fringe 2026');
   const aboutTitle = getText(siteInfo.aboutTitle, siteInfo.aboutTitleEn);
   const aboutText = getText(siteInfo.aboutText, siteInfo.aboutTextEn);
-  const tagline = getText(siteInfo.heroTagline, siteInfo.heroTaglineEn);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-20">

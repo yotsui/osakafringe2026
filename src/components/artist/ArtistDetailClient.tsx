@@ -6,11 +6,9 @@ import { Artist, Performance } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import SafeImage from '@/components/common/SafeImage';
 import { 
-  Users, 
   Sparkles, 
   Calendar, 
   MapPin, 
-  Ticket, 
   Globe, 
   ExternalLink, 
   ArrowLeft,
@@ -19,7 +17,6 @@ import {
   Check
 } from 'lucide-react';
 import { TwitterIcon, InstagramIcon, YoutubeIcon } from '@/components/common/SnsIcons';
-import { formatScheduleCompact } from '@/utils/dateFormat';
 import { formatTicketPrice } from '@/utils/priceFormat';
 
 interface ArtistDetailClientProps {

@@ -100,7 +100,7 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
       }
 
       // Redirect to Stripe Checkout
-      window.location.href = data.url;
+      window.location.assign(data.url);
     } catch (err: unknown) {
       console.error(err);
       const msg = err instanceof Error ? err.message : 'Error redirecting to payment. Please try again.';

@@ -2,11 +2,11 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
+import type { Map as MapLibreMap, Marker as MapLibreMarker, Popup as MapLibrePopup } from 'maplibre-gl';
 import { Venue, Performance } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
-import { Navigation, ExternalLink, Calendar, Train, ArrowRight, Building2 } from 'lucide-react';
+import { Navigation, Calendar, ArrowRight, Building2 } from 'lucide-react';
 import SafeImage from '@/components/common/SafeImage';
-import { METRO_LINES_INFO } from '@/data/transitLinesInfo';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 interface FestivalMapProps {
@@ -19,8 +19,8 @@ interface FestivalMapProps {
 
 interface MarkerItem {
   venue: Venue;
-  marker: any;
-  popup: any;
+  marker: MapLibreMarker;
+  popup: MapLibrePopup;
   pinEl: HTMLDivElement;
   dotEl: HTMLDivElement;
   el: HTMLDivElement;
@@ -31,17 +31,36 @@ export default function FestivalMap({
   performances = [],
   selectedVenueId,
   onSelectVenue,
-  onSelectPerformance,
 }: FestivalMapProps) {
   const { getText, t } = useLanguage();
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<any>(null);
+  const mapInstanceRef = useRef<{ map: MapLibreMap; maplibregl: typeof import('maplibre-gl') } | null>(null);
   const markersRef = useRef<MarkerItem[]>([]);
   const isMapReadyRef = useRef<boolean>(false);
 
-  const [activeVenue, setActiveVenue] = useState<Venue | null>(null);
-  const activeVenueRef = useRef<Venue | null>(null);
-  activeVenueRef.current = activeVenue;
+  const [activeVenue, setActiveVenue] = useState<Venue | null>(() => {
+    if (venues.length === 0) return null;
+    if (selectedVenueId) {
+      return venues.find((v) => v.id === selectedVenueId) || venues[0];
+    }
+    return venues[0];
+  });
+  const activeVenueRef = useRef<Venue | null>(activeVenue);
+
+  useEffect(() => {
+    activeVenueRef.current = activeVenue;
+  }, [activeVenue]);
+
+  const [prevSelectedId, setPrevSelectedId] = useState<string | null | undefined>(selectedVenueId);
+  if (selectedVenueId !== prevSelectedId) {
+    setPrevSelectedId(selectedVenueId);
+    if (selectedVenueId) {
+      const found = venues.find((v) => v.id === selectedVenueId);
+      if (found) {
+        setActiveVenue(found);
+      }
+    }
+  }
 
   const [visibleVenues, setVisibleVenues] = useState<Venue[]>(venues);
 
@@ -63,7 +82,7 @@ export default function FestivalMap({
 
   // 地図の表示範囲（bounds）に含まれる会場を抽出＆範囲外時の最近傍会場選択
   const updateVisibleVenues = useCallback(
-    (map: any) => {
+    (map: MapLibreMap) => {
       if (!map || !venues || venues.length === 0) {
         setVisibleVenues([]);
         return;
@@ -100,10 +119,12 @@ export default function FestivalMap({
             });
 
             setActiveVenue(closestVenue);
+            activeVenueRef.current = closestVenue;
             if (onSelectVenue) onSelectVenue(closestVenue.id);
             updateMarkerColors(closestVenue.id);
           } else {
             setActiveVenue(null);
+            activeVenueRef.current = null;
             updateMarkerColors(null);
           }
         }
@@ -113,18 +134,6 @@ export default function FestivalMap({
     },
     [venues, onSelectVenue, updateMarkerColors]
   );
-
-  // 初期アクティブ会場
-  useEffect(() => {
-    if (venues.length > 0 && !activeVenue) {
-      if (selectedVenueId) {
-        const found = venues.find((v) => v.id === selectedVenueId);
-        if (found) setActiveVenue(found);
-      } else {
-        setActiveVenue(venues[0]);
-      }
-    }
-  }, [venues, selectedVenueId, activeVenue]);
 
   // venues プロパティ変更時の visibleVenues 初期化
   useEffect(() => {
@@ -137,15 +146,16 @@ export default function FestivalMap({
 
   // 会場マーカーの配置・更新
   const renderMarkers = useCallback(
-    (map: any, maplibregl: any) => {
+    (map: MapLibreMap, maplibregl: typeof import('maplibre-gl')) => {
       // 既存マーカークリア
       markersRef.current.forEach(({ marker }) => marker.remove());
       markersRef.current = [];
 
       if (!map || !venues || venues.length === 0) return;
 
+      const currentActiveId = activeVenueRef.current?.id;
       venues.forEach((v) => {
-        const isSelected = activeVenue?.id === v.id;
+        const isSelected = currentActiveId === v.id;
         const vName = getText(v.name, v.nameEn);
         const vArea = getText(v.area, v.areaEn);
         const vAccess = getText(v.access, v.accessEn);
@@ -189,7 +199,7 @@ export default function FestivalMap({
         el.appendChild(pinEl);
 
         // ポップアップが上下左右どの方向に出てもPIN本体を覆い隠さない方向別オフセット (28px確保)
-        const popupOffsets: Record<string, [number, number]> = {
+        const popupOffsets = {
           'top': [0, 28],
           'top-left': [18, 28],
           'top-right': [-18, 28],
@@ -198,7 +208,7 @@ export default function FestivalMap({
           'bottom-right': [-18, -28],
           'left': [28, 0],
           'right': [-28, 0],
-        };
+        } as unknown as import('maplibre-gl').Offset;
 
         // POPUP 生成
         const popup = new maplibregl.Popup({
@@ -287,7 +297,7 @@ export default function FestivalMap({
   );
 
   // 鉄道レイヤー（路線ライン＆駅）を追加する関数
-  const addTransitLayers = useCallback((map: any) => {
+  const addTransitLayers = useCallback((map: MapLibreMap) => {
     try {
       // 1. 鉄道路線（/data/transit-lines.geojson）
       if (!map.getSource('osaka-transit-lines')) {
@@ -410,7 +420,7 @@ export default function FestivalMap({
     let isCancelled = false;
 
     const initMap = async () => {
-      const maplibregl = (await import('maplibre-gl')) as any;
+      const maplibregl = await import('maplibre-gl');
 
       if (isCancelled || !mapContainerRef.current) return;
 
@@ -485,7 +495,7 @@ export default function FestivalMap({
       map.on('moveend', () => updateVisibleVenues(map));
       map.on('zoomend', () => updateVisibleVenues(map));
 
-      map.on('error', (e: any) => {
+      map.on('error', (e) => {
         console.warn('[MapLibre Warning]', e);
       });
 

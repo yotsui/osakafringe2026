@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useSyncExternalStore, useCallback } from 'react';
 import { Language } from '@/types';
 
 interface Dictionary {
@@ -340,40 +340,54 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguage] = useState<Language>('ja');
+const getSavedLanguageSnapshot = (): Language => {
+  if (typeof window === 'undefined') return 'ja';
+  try {
+    const saved = localStorage.getItem('osaka_fringe_lang');
+    if (saved === 'ja' || saved === 'en') return saved;
+  } catch {
+    // ignore
+  }
+  return 'ja';
+};
 
-  useEffect(() => {
+const getServerLanguageSnapshot = (): Language => 'ja';
+
+const subscribeLanguage = (callback: () => void) => {
+  if (typeof window === 'undefined') return () => {};
+  window.addEventListener('storage', callback);
+  window.addEventListener('osaka_fringe_lang_change', callback);
+  return () => {
+    window.removeEventListener('storage', callback);
+    window.removeEventListener('osaka_fringe_lang_change', callback);
+  };
+};
+
+export function LanguageProvider({ children }: { children: React.ReactNode }) {
+  const language = useSyncExternalStore(
+    subscribeLanguage,
+    getSavedLanguageSnapshot,
+    getServerLanguageSnapshot
+  );
+
+  const handleSetLanguage = useCallback((lang: Language) => {
     try {
-      const saved = localStorage.getItem('osaka_fringe_lang') as Language;
-      if (saved && (saved === 'ja' || saved === 'en')) {
-        setLanguage(saved);
-      }
+      localStorage.setItem('osaka_fringe_lang', lang);
+      window.dispatchEvent(new Event('osaka_fringe_lang_change'));
     } catch (e) {
       console.error(e);
     }
   }, []);
 
-  const handleSetLanguage = (lang: Language) => {
-    setLanguage(lang);
-    try {
-      localStorage.setItem('osaka_fringe_lang', lang);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const t = (key: string): string => {
+  const t = useCallback((key: string): string => {
     if (!translations[key]) return key;
     return translations[key][language] || translations[key].ja;
-  };
+  }, [language]);
 
-  const getText = (jaText?: string, enText?: string): string => {
-    if (language === 'en') {
-      return enText || jaText || '';
-    }
+  const getText = useCallback((jaText?: string, enText?: string): string => {
+    if (language === 'en' && enText) return enText;
     return jaText || enText || '';
-  };
+  }, [language]);
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t, getText }}>
