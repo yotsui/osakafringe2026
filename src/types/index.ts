@@ -31,8 +31,8 @@ export interface Venue {
   capacity?: number;
 }
 
-// ユーザー指定の8大ジャンル
-export type PerformanceGenre = 
+// アーティスト分類・規定8ジャンル
+export type ArtistGenre = 
   | 'street'      // 大道芸
   | 'dance'       // ダンス
   | 'music'       // 音楽
@@ -42,7 +42,9 @@ export type PerformanceGenre =
   | 'exhibition'  // 作品展示
   | 'other';      // その他
 
-export type Genre = PerformanceGenre;
+// 互換性のための型エイリアス
+export type PerformanceGenre = ArtistGenre;
+export type Genre = ArtistGenre;
 
 export interface Artist {
   id: string;
@@ -50,7 +52,7 @@ export interface Artist {
   nameEn?: string;
   origin?: string; // 拠点・出身 (例: "大阪 / 日本", "UK / Australia")
   originEn?: string;
-  genre?: PerformanceGenre;
+  genre: ArtistGenre;
   profile: string;
   profileEn?: string;
   image?: string;
@@ -122,7 +124,7 @@ export interface Performance {
   schedules: PerformanceSchedule[]; // タイムライン/カレンダー用パース済み配列
 
   // ジャンル・説明
-  genre: PerformanceGenre | string;
+  genre?: string;
   genreEn?: string;
   genreCustom?: string;
   genreCustomEn?: string;
@@ -141,7 +143,28 @@ export interface Performance {
   // 連携イベント・パートナー
   partner?: Partner | string;
   partnerId?: string;
+
+  // microCMS 日時メタデータ（新着順ソート用）
+  publishedAt?: string;
+  createdAt?: string;
 }
+
+export type PerformanceTimingStatus = 'ongoing' | 'upcoming' | 'no_schedule' | 'ended';
+
+export interface PerformanceTimingInfo {
+  status: PerformanceTimingStatus;
+  isOngoing: boolean;
+  isUpcoming: boolean;
+  hasNoSchedule: boolean;
+  isPast: boolean; // isEnded と同義
+  isToday: boolean;
+  closestOngoingEndMs: number;
+  nextStartMs: number;
+  lastEndMs: number;
+  nextSchedule?: PerformanceSchedule;
+}
+
+export type PerformanceSortOption = 'date' | 'featured' | 'newest' | 'title';
 
 export type PartnerCategory =
   | '組織（後援・協力）'

@@ -20,6 +20,7 @@ import {
 import { TwitterIcon, InstagramIcon, YoutubeIcon } from '@/components/common/SnsIcons';
 import { formatScheduleDetailed, sortSchedules, deduplicateSchedules } from '@/utils/dateFormat';
 import { formatTicketPrice } from '@/utils/priceFormat';
+import { getArtistGenreLabel, getPerformanceGenreText } from '@/utils/genre';
 
 interface PerformanceModalProps {
   performance: Performance | null;
@@ -71,9 +72,8 @@ export default function PerformanceModal({
   );
   const artistOrigin = performance.artist ? getText(performance.artist.origin, performance.artist.originEn) : null;
   const artistProfile = performance.artist ? getText(performance.artist.profile, performance.artist.profileEn) : null;
-  const genreCustom = language === 'en'
-    ? (performance.genreCustomEn || performance.genreCustom)
-    : (performance.genreCustom || performance.genreCustomEn);
+  const categoryLabel = getArtistGenreLabel(performance.artist?.genre, language);
+  const workGenreText = getPerformanceGenreText(performance, language);
   const description = getText(performance.description, performance.descriptionEn);
   const priceDisplay = formatTicketPrice(performance.ticketPrice, performance.ticketPriceEn, language);
 
@@ -108,11 +108,11 @@ export default function PerformanceModal({
         <div className="sticky top-0 z-40 flex items-center justify-between px-6 py-3.5 bg-white/90 backdrop-blur-md border-b border-pink-100/80 shadow-xs">
           <div className="flex items-center gap-2 overflow-hidden mr-3">
             <span className="px-2.5 py-0.5 rounded-full bg-pink-50 border border-pink-200 text-[#E6007E] text-[11px] font-black uppercase">
-              {performance.genre}
+              {categoryLabel}
             </span>
-            {genreCustom && (
-              <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 text-[10px] font-bold">
-                {genreCustom}
+            {workGenreText && (
+              <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold">
+                {workGenreText}
               </span>
             )}
             <span className="text-xs font-bold text-slate-700 truncate">
@@ -156,7 +156,7 @@ export default function PerformanceModal({
               src={currentImage}
               alt={title}
               fill
-              fallbackGenre={performance.genre}
+              fallbackGenre={performance.artist?.genre || 'other'}
               fallbackText={title}
               className="object-cover"
             />
@@ -204,6 +204,23 @@ export default function PerformanceModal({
 
           {/* Modal Body */}
           <div className="px-6 sm:px-8 pb-8 space-y-8">
+            {/* Category & Work Genre Metadata Section */}
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-wrap items-center gap-4 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="text-slate-500 font-bold">{language === 'ja' ? 'カテゴリー' : 'Category'}:</span>
+                <span className="px-2.5 py-1 rounded-xl bg-pink-100 text-[#E6007E] font-black">
+                  {categoryLabel}
+                </span>
+              </div>
+              {workGenreText && (
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-500 font-bold">{language === 'ja' ? '作品ジャンル' : 'Genre'}:</span>
+                  <span className="px-2.5 py-1 rounded-xl bg-white border border-slate-200 text-slate-800 font-bold">
+                    {workGenreText}
+                  </span>
+                </div>
+              )}
+            </div>
             {/* Action Bar */}
             <div className="flex flex-wrap items-center justify-between gap-3 pb-6 border-b border-slate-100">
               <div className="flex flex-wrap items-center gap-2">
@@ -302,7 +319,7 @@ export default function PerformanceModal({
                         src={performance.artist?.image || performance.artist?.images?.[0]}
                         alt={artistName}
                         fill
-                        fallbackGenre={performance.genre}
+                        fallbackGenre={performance.artist?.genre || 'other'}
                         fallbackText={artistName}
                         className="object-cover"
                       />

@@ -1,4 +1,4 @@
-import { Venue, Artist, Performance, Banner, SiteInfo, Partner } from '@/types';
+import type { Venue, Artist, Performance, Banner, SiteInfo, Partner } from '../types/index.ts';
 
 export const mockVenues: Venue[] = [
   {

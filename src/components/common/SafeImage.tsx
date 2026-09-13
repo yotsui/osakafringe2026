@@ -12,11 +12,11 @@ import {
   Landmark, 
   Building2
 } from 'lucide-react';
-import { PerformanceGenre } from '@/types';
+import { ArtistGenre } from '@/types';
 
 interface SafeImageProps extends Omit<ImageProps, 'src'> {
   src?: string | null;
-  fallbackGenre?: PerformanceGenre | string;
+  fallbackGenre?: ArtistGenre | string;
   fallbackType?: 'performance' | 'venue' | 'banner' | 'generic';
   fallbackText?: string;
 }
@@ -49,6 +49,10 @@ const GENRE_STYLES: Record<string, { bg: string; icon: React.ComponentType<{ cla
   exhibition: {
     bg: 'from-blue-600 via-cyan-600 to-teal-500',
     icon: Palette,
+  },
+  other: {
+    bg: 'from-pink-600 via-fuchsia-600 to-purple-800',
+    icon: Sparkles,
   },
   venue: {
     bg: 'from-slate-800 via-pink-900 to-slate-900',

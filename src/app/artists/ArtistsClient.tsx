@@ -13,6 +13,7 @@ import {
   Eye
 } from 'lucide-react';
 import { TwitterIcon, InstagramIcon, YoutubeIcon } from '@/components/common/SnsIcons';
+import { getArtistGenreLabel } from '@/utils/genre';
 
 const isValidUrl = (url?: string | null): boolean => {
   if (!url || typeof url !== 'string') return false;
@@ -39,7 +40,7 @@ interface ArtistsClientProps {
 }
 
 export default function ArtistsClient({ artists, performances }: ArtistsClientProps) {
-  const { t, getText } = useLanguage();
+  const { language, t, getText } = useLanguage();
   const searchParams = useSearchParams();
   const [selectedPerformance, setSelectedPerformance] = useState<Performance | null>(null);
 
@@ -101,8 +102,8 @@ export default function ArtistsClient({ artists, performances }: ArtistsClientPr
         </Link>
       </div>
 
-      {/* Editorial Catalog Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
+      {/* Grid of Artists */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {displayArtists.map((artist) => {
           const artistName = getText(artist.name, artist.nameEn);
           const origin = getText(artist.origin, artist.originEn);
@@ -125,7 +126,7 @@ export default function ArtistsClient({ artists, performances }: ArtistsClientPr
                     src={artist.image}
                     alt={artistName}
                     fill
-                    fallbackGenre={artist.genre || 'theater'}
+                    fallbackGenre={artist.genre || 'other'}
                     fallbackText={artistName}
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
@@ -137,7 +138,7 @@ export default function ArtistsClient({ artists, performances }: ArtistsClientPr
                   {/* Genre & Origin Typography */}
                   <div className="flex items-center justify-between text-xs font-black tracking-wider uppercase">
                     <span className="text-[#E6007E]">
-                      {artist.genre || 'performance'}
+                      {getArtistGenreLabel(artist.genre, language)}
                     </span>
                     {origin && (
                       <span className="text-slate-400 font-bold text-[11px]">

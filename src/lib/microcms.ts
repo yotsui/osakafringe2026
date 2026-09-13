@@ -1,6 +1,6 @@
 import { cache } from 'react';
 import { createClient } from 'microcms-js-sdk';
-import {
+import type {
   Venue,
   Artist,
   Performance,
@@ -12,9 +12,9 @@ import {
   DonationStory,
   DonationImpact,
   DonationStoryKey,
-  Genre,
-} from '@/types';
-import { mockVenues, mockArtists, mockPerformances, mockBanners, mockSiteInfo, mockPartners } from './mockData';
+} from '../types/index.ts';
+import { normalizeArtistGenre } from '../utils/genre.ts';
+import { mockVenues, mockArtists, mockPerformances, mockBanners, mockSiteInfo, mockPartners } from './mockData.ts';
 
 const REVALIDATE_TIME = 300; // 5分キャッシュ (ISR)
 
@@ -72,6 +72,7 @@ interface RawArtistData {
   nameEn?: string;
   origin?: string;
   originEn?: string;
+  genre?: string | string[];
   profile?: string;
   profileEn?: string;
   websiteUrl?: string;
@@ -114,6 +115,7 @@ interface RawPerformanceData {
   title: string;
   titleEn?: string;
   genre?: string | string[];
+  genreEn?: string;
   genreCustom?: string;
   genreCustomEn?: string;
   description?: string;
@@ -145,6 +147,8 @@ interface RawPerformanceData {
   partnerId?: string;
   image?: string | MicroCMSMedia;
   images?: Array<string | MicroCMSMedia>;
+  publishedAt?: string;
+  createdAt?: string;
 }
 
 interface RawPartnerData {
@@ -320,33 +324,37 @@ export const getVenueById = cache(async (id: string): Promise<Venue | undefined>
 });
 
 /**
+ * アーティストデータの正規化
+ */
+export function normalizeArtist(a: RawArtistData): Artist {
+  const imgUrl = extractImageUrl(a.image);
+  const images = Array.isArray(a.images)
+    ? (a.images.map(extractImageUrl).filter(Boolean) as string[])
+    : (imgUrl ? [imgUrl] : []);
+
+  return {
+    id: a.id,
+    name: a.name,
+    nameEn: a.nameEn || a.name,
+    origin: a.origin,
+    originEn: a.originEn || a.origin,
+    genre: normalizeArtistGenre(a.genre),
+    profile: a.profile || '',
+    profileEn: a.profileEn || a.profile || '',
+    websiteUrl: cleanUrl(a.websiteUrl),
+    snsTwitter: cleanUrl(a.snsTwitter),
+    snsInstagram: cleanUrl(a.snsInstagram),
+    snsYoutube: cleanUrl(a.snsYoutube),
+    snsFacebook: cleanUrl(a.snsFacebook),
+    image: imgUrl,
+    images,
+  };
+}
+
+/**
  * アーティスト一覧を取得 (React cache & ISR 300s)
  */
 export const getArtists = cache(async (): Promise<Artist[]> => {
-  const normalizeArtist = (a: RawArtistData): Artist => {
-    const imgUrl = extractImageUrl(a.image);
-    const images = Array.isArray(a.images)
-      ? (a.images.map(extractImageUrl).filter(Boolean) as string[])
-      : (imgUrl ? [imgUrl] : []);
-
-    return {
-      id: a.id,
-      name: a.name,
-      nameEn: a.nameEn || a.name,
-      origin: a.origin,
-      originEn: a.originEn || a.origin,
-      profile: a.profile || '',
-      profileEn: a.profileEn || a.profile || '',
-      websiteUrl: cleanUrl(a.websiteUrl),
-      snsTwitter: cleanUrl(a.snsTwitter),
-      snsInstagram: cleanUrl(a.snsInstagram),
-      snsYoutube: cleanUrl(a.snsYoutube),
-      snsFacebook: cleanUrl(a.snsFacebook),
-      image: imgUrl,
-      images,
-    };
-  };
-
   let rawList: RawArtistData[] = mockArtists;
   if (client) {
     try {
@@ -375,26 +383,20 @@ export const getArtistById = cache(async (id: string): Promise<Artist | undefine
 });
 
 /**
- * 公演一覧を取得 (会場情報およびアーティスト情報をマージ & React cache & ISR 300s)
+ * 公演データの正規化
  */
-export const getPerformances = cache(async (): Promise<Performance[]> => {
-  const [venues, artists, partners] = await Promise.all([
-    getVenues(),
-    getArtists(),
-    getPartners(),
-  ]);
+export function normalizePerformance(
+  perf: RawPerformanceData,
+  venueMap: Map<string, Venue> = new Map(),
+  artistMap: Map<string, Artist> = new Map(),
+  partnerMap: Map<string, Partner> = new Map()
+): Performance {
+  // 1. 画像URLの正規化
+  const imgUrl = extractImageUrl(perf.image);
 
-  const venueMap = new Map(venues.map((v) => [v.id, v]));
-  const artistMap = new Map(artists.map((a) => [a.id, a]));
-  const partnerMap = new Map(partners.map((p) => [p.id, p]));
-
-  const normalizePerformance = (perf: RawPerformanceData): Performance => {
-    // 1. 画像URLの正規化
-    const imgUrl = extractImageUrl(perf.image);
-
-    // 2. アーティスト参照の解決
-    let resolvedArtist: Artist | undefined = undefined;
-    let resolvedArtistId = '';
+  // 2. アーティスト参照の解決
+  let resolvedArtist: Artist | undefined = undefined;
+  let resolvedArtistId = '';
 
     if (perf.artists && typeof perf.artists === 'object' && 'id' in perf.artists) {
       resolvedArtist = artistMap.get(perf.artists.id) || (perf.artists as Artist);
@@ -599,20 +601,27 @@ export const getPerformances = cache(async (): Promise<Performance[]> => {
       resolvedPartnerId = perf.partnerId.trim();
     }
 
-    // 7. ジャンルの解決
+    // 7. 作品ジャンル（自由記述）の解決
     let rawGenre = perf.genre;
     if (Array.isArray(rawGenre) && rawGenre.length > 0) {
       rawGenre = rawGenre[0];
     }
-    const genreStr = typeof rawGenre === 'string' ? rawGenre.toLowerCase() : 'theater';
-    const mainGenre: Genre = (
-      ['theater', 'dance', 'comedy', 'music', 'circus', 'art', 'other'].includes(genreStr)
-        ? genreStr
-        : 'other'
-    ) as Genre;
+    const performanceGenre =
+      typeof rawGenre === 'string' && rawGenre.trim()
+        ? rawGenre.trim()
+        : (typeof perf.genreCustom === 'string' && perf.genreCustom.trim() ? perf.genreCustom.trim() : undefined);
 
-    const customGenre = perf.genreCustom || (mainGenre === 'other' ? 'その他' : undefined);
-    const customGenreEn = perf.genreCustomEn || (mainGenre === 'other' ? 'Other' : undefined);
+    let rawGenreEn = perf.genreEn;
+    if (Array.isArray(rawGenreEn) && rawGenreEn.length > 0) {
+      rawGenreEn = rawGenreEn[0];
+    }
+    const performanceGenreEn =
+      typeof rawGenreEn === 'string' && rawGenreEn.trim()
+        ? rawGenreEn.trim()
+        : (typeof perf.genreCustomEn === 'string' && perf.genreCustomEn.trim() ? perf.genreCustomEn.trim() : undefined);
+
+    const customGenre = typeof perf.genreCustom === 'string' && perf.genreCustom.trim() ? perf.genreCustom.trim() : undefined;
+    const customGenreEn = typeof perf.genreCustomEn === 'string' && perf.genreCustomEn.trim() ? perf.genreCustomEn.trim() : undefined;
 
     const images = Array.isArray(perf.images)
       ? (perf.images.map(extractImageUrl).filter(Boolean) as string[])
@@ -622,8 +631,8 @@ export const getPerformances = cache(async (): Promise<Performance[]> => {
       id: perf.id,
       title: perf.title,
       titleEn: perf.titleEn || perf.title,
-      genre: mainGenre,
-      genreEn: mainGenre,
+      genre: performanceGenre,
+      genreEn: performanceGenreEn,
       genreCustom: customGenre,
       genreCustomEn: customGenreEn,
       description: perf.description || '',
@@ -648,26 +657,65 @@ export const getPerformances = cache(async (): Promise<Performance[]> => {
       partnerId: resolvedPartnerId || undefined,
       image: imgUrl || resolvedArtist?.image || mainVenue?.image || '',
       images,
+      publishedAt: perf.publishedAt,
+      createdAt: perf.createdAt,
     };
-  };
+}
+
+/**
+ * 公演一覧を取得 (会場情報およびアーティスト情報をマージ & React cache & ISR 300s)
+ */
+export const getPerformances = cache(async (): Promise<Performance[]> => {
+  const [venues, artists, partners] = await Promise.all([
+    getVenues(),
+    getArtists(),
+    getPartners(),
+  ]);
+
+  const venueMap = new Map(venues.map((v) => [v.id, v]));
+  const artistMap = new Map(artists.map((a) => [a.id, a]));
+  const partnerMap = new Map(partners.map((p) => [p.id, p]));
 
   let rawList: RawPerformanceData[] = mockPerformances as unknown as RawPerformanceData[];
   if (client) {
     try {
-      const data = await client.getList<RawPerformanceData>({
-        endpoint: 'performances',
-        queries: { limit: 100 },
-        customRequestInit: { next: { revalidate: REVALIDATE_TIME } },
-      });
-      if (data.contents && data.contents.length > 0) {
-        rawList = data.contents;
+      const allContents: RawPerformanceData[] = [];
+      const pageSize = 100;
+      let offset = 0;
+      let totalCount = Infinity;
+      const MAX_PAGES = 50; // 最大5,000件までの安全ガード（無限ループ防止）
+      let page = 0;
+
+      while (offset < totalCount && page < MAX_PAGES) {
+        page++;
+        const data = await client.getList<RawPerformanceData>({
+          endpoint: 'performances',
+          queries: { limit: pageSize, offset },
+          customRequestInit: { next: { revalidate: REVALIDATE_TIME } },
+        });
+
+        if (data.contents && data.contents.length > 0) {
+          allContents.push(...data.contents);
+        }
+
+        totalCount = typeof data.totalCount === 'number' ? data.totalCount : allContents.length;
+        offset += pageSize;
+
+        // 取得件数がlimit未満なら最後のページと判定
+        if (!data.contents || data.contents.length < pageSize) {
+          break;
+        }
+      }
+
+      if (allContents.length > 0) {
+        rawList = allContents;
       }
     } catch (error) {
       console.warn('[MicroCMS] Failed to fetch performances, using mock data:', error);
     }
   }
 
-  return rawList.map(normalizePerformance);
+  return rawList.map((p) => normalizePerformance(p, venueMap, artistMap, partnerMap));
 });
 
 /**

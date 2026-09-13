@@ -9,6 +9,16 @@
   --text-dark: #1A1A1A;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
   background-color: var(--bg-base);
   color: var(--text-dark);

@@ -8,6 +8,8 @@ import SafeImage from '@/components/common/SafeImage';
 import { CalendarIcon, MapPinIcon, TicketIcon, ArrowRightIcon } from '@/components/common/CustomIcons';
 import { formatScheduleCompact, sortSchedules, deduplicateSchedules, hasMultipleVenues } from '@/utils/dateFormat';
 import { formatTicketPrice } from '@/utils/priceFormat';
+import { getPerformanceTimingInfo } from '@/utils/performanceUtils';
+import { getArtistGenreLabel, getPerformanceGenreText } from '@/utils/genre';
 import { Heart } from 'lucide-react';
 
 interface PerformanceCardProps {
@@ -26,9 +28,8 @@ export default function PerformanceCard({
 
   const title = getText(performance.title, performance.titleEn);
   const artistName = getText(performance.artistName, performance.artistNameEn);
-  const genreCustom = language === 'en'
-    ? (performance.genreCustomEn || performance.genreCustom)
-    : (performance.genreCustom || performance.genreCustomEn);
+  const categoryLabel = getArtistGenreLabel(performance.artist?.genre, language);
+  const workGenreText = getPerformanceGenreText(performance, language);
   const description = getText(performance.description, performance.descriptionEn);
   const priceDisplay = formatTicketPrice(performance.ticketPrice, performance.ticketPriceEn, language);
 
@@ -43,6 +44,7 @@ export default function PerformanceCard({
     : fallbackVenueName;
 
   const performanceUrl = `/performances/${performance.id}`;
+  const timingInfo = getPerformanceTimingInfo(performance);
 
   return (
     <div className="group relative bg-white rounded-2xl overflow-hidden border border-slate-200/90 hover:border-[#E6007E] shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between">
@@ -55,18 +57,27 @@ export default function PerformanceCard({
           src={performance.image}
           alt={title}
           fill
-          fallbackGenre={performance.genre}
+          fallbackGenre={performance.artist?.genre || 'other'}
           fallbackText={title}
           className="object-cover group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none" />
 
-        {/* Small 1-Line Genre Badge */}
-        <div className="absolute top-3 left-3 z-10 pointer-events-none">
+        {/* Small Badges: Category & Status */}
+        <div className="absolute top-3 left-3 z-10 pointer-events-none flex items-center gap-1.5 flex-wrap">
           <span className="px-2.5 py-0.5 rounded bg-black/75 backdrop-blur-xs text-white text-[10px] font-bold tracking-wider uppercase border border-white/10">
-            {performance.genre}
-            {genreCustom && ` / ${genreCustom}`}
+            {categoryLabel}
           </span>
+          {timingInfo.status === 'ongoing' ? (
+            <span className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black tracking-wider uppercase flex items-center gap-1 shadow-sm border border-emerald-400/40">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-200 animate-ping" />
+              {t('statusOngoing')}
+            </span>
+          ) : timingInfo.isToday ? (
+            <span className="px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black tracking-wider uppercase shadow-sm border border-amber-300/40">
+              {t('statusToday')}
+            </span>
+          ) : null}
         </div>
 
         {/* Favorite Button */}
@@ -102,16 +113,23 @@ export default function PerformanceCard({
       {/* Card Content */}
       <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
         <div className="space-y-2">
-          {/* Artist Name */}
-          <p className="text-xs font-bold text-[#E6007E] truncate">
-            {performance.artist?.id ? (
-              <Link href={`/artists/${performance.artist.id}`} className="hover:underline">
-                {artistName}
-              </Link>
-            ) : (
-              artistName
+          {/* Artist Name & Optional Work Genre */}
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-bold text-[#E6007E] truncate">
+              {performance.artist?.id ? (
+                <Link href={`/artists/${performance.artist.id}`} className="hover:underline">
+                  {artistName}
+                </Link>
+              ) : (
+                artistName
+              )}
+            </p>
+            {workGenreText && (
+              <span className="shrink-0 px-2 py-0.5 rounded-md bg-pink-50 border border-pink-200/80 text-[#E6007E] text-[10px] font-bold tracking-tight max-w-[50%] truncate">
+                {workGenreText}
+              </span>
             )}
-          </p>
+          </div>
 
           {/* Title - Priority #1 */}
           <Link 

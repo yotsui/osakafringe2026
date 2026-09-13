@@ -24,6 +24,7 @@ import {
 import { TwitterIcon, InstagramIcon, YoutubeIcon } from '@/components/common/SnsIcons';
 import { formatScheduleDetailed, sortSchedules, deduplicateSchedules } from '@/utils/dateFormat';
 import { formatTicketPrice } from '@/utils/priceFormat';
+import { getArtistGenreLabel, getPerformanceGenreText } from '@/utils/genre';
 
 interface PerformanceDetailClientProps {
   performance: Performance;
@@ -77,7 +78,9 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
             favs = favs.filter((id) => id !== performance.id);
           }
           localStorage.setItem('osaka_fringe_favs', JSON.stringify(favs));
-        } catch {}
+        } catch {
+          // ignore
+        }
       }
       return next;
     });
@@ -85,14 +88,13 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
 
   const handleShare = async () => {
     const url = typeof window !== 'undefined' ? window.location.href : `https://osakafringe.com/performances/${performance.id}`;
-    if (navigator.share) {
+    if (typeof navigator !== 'undefined' && navigator.share) {
       try {
         await navigator.share({
           title: getText(performance.title, performance.titleEn),
           url,
         });
       } catch {
-        // Fallback to clipboard
         await navigator.clipboard.writeText(url);
         setIsCopied(true);
         setTimeout(() => setIsCopied(false), 2000);
@@ -111,9 +113,8 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
   );
   const artistOrigin = performance.artist ? getText(performance.artist.origin, performance.artist.originEn) : null;
   const artistProfile = performance.artist ? getText(performance.artist.profile, performance.artist.profileEn) : null;
-  const genreCustom = language === 'en'
-    ? (performance.genreCustomEn || performance.genreCustom)
-    : (performance.genreCustom || performance.genreCustomEn);
+  const categoryLabel = getArtistGenreLabel(performance.artist?.genre, language);
+  const workGenreText = getPerformanceGenreText(performance, language);
   const description = getText(performance.description, performance.descriptionEn);
   const priceDisplay = formatTicketPrice(performance.ticketPrice, performance.ticketPriceEn, language);
 
@@ -184,7 +185,7 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
               alt={title}
               fill
               priority
-              fallbackGenre={performance.genre}
+              fallbackGenre={performance.artist?.genre || 'other'}
               fallbackText={title}
               className="object-cover"
             />
@@ -194,11 +195,11 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
             <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 z-10">
               <div className="flex items-center gap-2">
                 <span className="px-3 py-1 rounded-full bg-black/75 backdrop-blur-md text-white text-xs font-black uppercase tracking-wider border border-white/20">
-                  {performance.genre}
+                  {categoryLabel}
                 </span>
-                {genreCustom && (
-                  <span className="px-2.5 py-1 rounded-full bg-amber-500/90 text-white text-[11px] font-bold">
-                    {genreCustom}
+                {workGenreText && (
+                  <span className="px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-slate-900 text-[11px] font-bold">
+                    {workGenreText}
                   </span>
                 )}
               </div>
@@ -261,6 +262,24 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
 
           {/* Body Content */}
           <div className="p-6 sm:p-10 space-y-8">
+            {/* Category & Work Genre Metadata Section */}
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-wrap items-center gap-4 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="text-slate-500 font-bold">{language === 'ja' ? 'カテゴリー' : 'Category'}:</span>
+                <span className="px-2.5 py-1 rounded-xl bg-pink-100 text-[#E6007E] font-black">
+                  {categoryLabel}
+                </span>
+              </div>
+              {workGenreText && (
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-500 font-bold">{language === 'ja' ? '作品ジャンル' : 'Genre'}:</span>
+                  <span className="px-2.5 py-1 rounded-xl bg-white border border-slate-200 text-slate-800 font-bold">
+                    {workGenreText}
+                  </span>
+                </div>
+              )}
+            </div>
+
             {/* Action Bar */}
             <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100">
               <div className="flex flex-wrap items-center gap-2.5">
@@ -368,7 +387,7 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
                         src={performance.artist.image || performance.artist.images?.[0]}
                         alt={artistName}
                         fill
-                        fallbackGenre={performance.genre}
+                        fallbackGenre={performance.artist?.genre || 'other'}
                         fallbackText={artistName}
                         className="object-cover"
                       />

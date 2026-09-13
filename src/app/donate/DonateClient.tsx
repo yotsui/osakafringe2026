@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { SiteInfo, DonationStoryKey, DonationStory } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import {
@@ -57,6 +57,29 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // IntersectionObserver for donation form visibility (controls mobile fixed CTA)
+  const formSectionRef = useRef<HTMLElement | null>(null);
+  const [isFormInView, setIsFormInView] = useState<boolean>(false);
+
+  useEffect(() => {
+    const target = formSectionRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsFormInView(entry.isIntersecting);
+      },
+      {
+        threshold: 0.05,
+      }
+    );
+
+    observer.observe(target);
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   // Calculate final amount
   const getFinalAmount = (): number => {
     if (selectedAmount === 'custom') {
@@ -110,7 +133,7 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-14 sm:space-y-20 text-slate-900">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 pb-28 sm:pb-20 space-y-14 sm:space-y-20 text-slate-900">
       
       {/* 1. Header & Lead */}
       <section className="space-y-6">
@@ -130,6 +153,32 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
             </p>
           </div>
         )}
+
+        {/* Hero CTA Area */}
+        <div className="pt-2 space-y-3.5">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+            <a
+              href="#donation-form"
+              className="inline-flex items-center justify-center gap-2 px-6 sm:px-7 py-3.5 rounded-xl bg-[#E6007E] hover:bg-[#c4006b] text-white font-black text-sm sm:text-base shadow-sm transition-all transform active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E6007E]"
+            >
+              <span>{t('heroDonateButton')}</span>
+              <ArrowRight className="w-4 h-4" />
+            </a>
+
+            <a
+              href="#donation-impact"
+              className="inline-flex items-center justify-center gap-1.5 px-5 py-3.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-bold text-sm sm:text-base transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
+            >
+              <span>{t('heroReadImpactLink')}</span>
+              <ArrowRight className="w-4 h-4 text-slate-400" />
+            </a>
+          </div>
+
+          <div className="flex items-center gap-2 text-slate-500 text-xs font-medium pt-0.5">
+            <Lock className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
+            <span>{t('heroSecurePaymentNote')}</span>
+          </div>
+        </div>
       </section>
 
       {/* 2. History & Contemporary Reconstruction (1980s — 1990s) */}
@@ -205,7 +254,7 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
 
       {/* 5. 4 Core Support Impacts (01 - 04) */}
       {impacts.length > 0 && (
-        <section className="space-y-6 pt-2">
+        <section id="donation-impact" className="space-y-6 pt-2 scroll-mt-24">
           <div className="space-y-1.5 border-b border-slate-200 pb-3">
             <div className="text-xs font-black tracking-widest text-[#E6007E] uppercase">
               {t('donatePurposeBadge')}
@@ -247,6 +296,25 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
               );
             })}
           </div>
+
+          {/* Mid-page CTA after reading impacts */}
+          <div className="bg-gradient-to-br from-pink-50/70 via-white to-slate-50 border border-pink-200/90 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-5 shadow-2xs mt-8">
+            <div className="space-y-1">
+              <h3 className="text-lg sm:text-xl font-black text-slate-900">
+                {t('midDonateTitle')}
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
+                {t('midDonateDesc')}
+              </p>
+            </div>
+            <a
+              href="#donation-form"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[#E6007E] hover:bg-[#c4006b] text-white font-black text-sm sm:text-base shadow-sm transition-all transform active:scale-[0.99] shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E6007E]"
+            >
+              <span>{t('midDonateButton')}</span>
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
         </section>
       )}
 
@@ -270,7 +338,11 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
       )}
 
       {/* 7. Online Donation Form via Stripe */}
-      <section className="bg-white border-2 border-slate-900 rounded-2xl p-6 sm:p-8 space-y-6 shadow-sm">
+      <section
+        id="donation-form"
+        ref={formSectionRef}
+        className="scroll-mt-24 bg-white border-2 border-slate-900 rounded-2xl p-6 sm:p-8 space-y-6 shadow-sm"
+      >
         <div className="space-y-1">
           <h3 className="text-xl sm:text-2xl font-black text-slate-900">
             {t('onlineDonationTitle')}
@@ -508,6 +580,20 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
             {t('closingSign')}
           </div>
         </section>
+      )}
+
+      {/* 10. Smartphone Fixed Bottom CTA */}
+      {!isFormInView && !loading && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 sm:hidden bg-white/95 backdrop-blur-md border-t border-slate-200/90 px-4 pt-3 pb-[max(0.875rem,env(safe-area-inset-bottom))] shadow-lg animate-fadeIn">
+          <a
+            href="#donation-form"
+            className="w-full py-3.5 px-4 rounded-xl bg-[#E6007E] hover:bg-[#c4006b] active:scale-[0.99] text-white font-black text-sm flex items-center justify-center gap-2 shadow-sm transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E6007E] cursor-pointer"
+          >
+            <CreditCard className="w-4 h-4" />
+            <span>{t('heroDonateButton')}</span>
+            <ArrowRight className="w-4 h-4" />
+          </a>
+        </div>
       )}
 
     </div>

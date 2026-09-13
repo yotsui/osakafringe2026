@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { TwitterIcon, InstagramIcon } from '@/components/common/SnsIcons';
 import { formatTicketPrice } from '@/utils/priceFormat';
+import { getArtistGenreLabel, getPerformanceGenreText } from '@/utils/genre';
 
 interface VenueDetailClientProps {
   venue: Venue;
@@ -322,8 +323,8 @@ export default function VenueDetailClient({ venue, performances }: VenueDetailCl
                       >
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
-                            <span className="px-2 py-0.5 rounded bg-pink-100 text-[#E6007E] text-[10px] font-black uppercase">
-                              {perf.genre}
+                            <span className="px-2 py-0.5 rounded bg-pink-100 text-[#E6007E] text-[10px] font-bold">
+                              {getPerformanceGenreText(perf, language) || getArtistGenreLabel(perf.artist?.genre, language)}
                             </span>
                             <span className="text-xs font-bold text-[#E6007E] truncate">
                               {perfArtist}

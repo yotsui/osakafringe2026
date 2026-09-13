@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Performance, Venue } from '@/types';
+import { Performance, Venue, PerformanceSortOption } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
+import { sortPerformances } from '@/utils/performanceUtils';
+import { getArtistGenreLabel } from '@/utils/genre';
 import dynamic from 'next/dynamic';
 import PerformanceCard from './PerformanceCard';
 import PerformanceModal from './PerformanceModal';
@@ -24,7 +26,8 @@ import {
   RotateCcw,
   Layers,
   Map as MapIcon,
-  Heart
+  Heart,
+  ArrowUpDown
 } from 'lucide-react';
 
 interface AudienceAppProps {
@@ -36,13 +39,14 @@ export default function AudienceApp({
   initialPerformances,
   venues,
 }: AudienceAppProps) {
-  const { t, getText } = useLanguage();
+  const { language, t, getText } = useLanguage();
 
   // Filters State
   const [selectedGenre, setSelectedGenre] = useState<string>('all');
   const [selectedVenueId, setSelectedVenueId] = useState<string>('all');
   const [selectedDate, setSelectedDate] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [sortOption, setSortOption] = useState<PerformanceSortOption>('date');
   const [activeTab, setActiveTab] = useState<'search' | 'map' | 'favorites'>('search');
 
   // Favorites in state & localStorage
@@ -104,17 +108,20 @@ export default function AudienceApp({
     return venues.filter((v) => performanceVenueIds.has(v.id));
   }, [venues, performanceVenueIds]);
 
-  // Filter logic
+  // Filter & Sort logic
   const filteredPerformances = useMemo(() => {
-    return initialPerformances.filter((perf) => {
+    const filtered = initialPerformances.filter((perf) => {
       // Favorites filter
       if (activeTab === 'favorites' && !favorites.includes(perf.id)) {
         return false;
       }
 
-      // Genre filter (8 genres)
-      if (selectedGenre !== 'all' && perf.genre !== selectedGenre) {
-        return false;
+      // Genre filter (evaluated against associated Artist.genre, fallback to 'other' if artist not found)
+      if (selectedGenre !== 'all') {
+        const artistGenre = perf.artist?.genre || 'other';
+        if (artistGenre !== selectedGenre) {
+          return false;
+        }
       }
 
       // Venue filter
@@ -138,15 +145,19 @@ export default function AudienceApp({
         }
       }
 
-      // Search query (keyword)
+      // Search query (keyword: title, artist, description, performance genre, performance genreEn, artist genre ja/en)
       if (searchQuery.trim() !== '') {
         const q = searchQuery.toLowerCase();
-        const titleJa = perf.title.toLowerCase();
+        const titleJa = (perf.title || '').toLowerCase();
         const titleEn = (perf.titleEn || '').toLowerCase();
         const artistJa = (perf.artist?.name || perf.artistName || '').toLowerCase();
         const artistEn = (perf.artist?.nameEn || perf.artistNameEn || '').toLowerCase();
-        const descJa = perf.description.toLowerCase();
+        const descJa = (perf.description || '').toLowerCase();
         const descEn = (perf.descriptionEn || '').toLowerCase();
+        const perfGenreJa = (perf.genre || perf.genreCustom || '').toLowerCase();
+        const perfGenreEn = (perf.genreEn || perf.genreCustomEn || '').toLowerCase();
+        const artistGenreJa = getArtistGenreLabel(perf.artist?.genre, 'ja').toLowerCase();
+        const artistGenreEn = getArtistGenreLabel(perf.artist?.genre, 'en').toLowerCase();
 
         const matches =
           titleJa.includes(q) ||
@@ -154,19 +165,27 @@ export default function AudienceApp({
           artistJa.includes(q) ||
           artistEn.includes(q) ||
           descJa.includes(q) ||
-          descEn.includes(q);
+          descEn.includes(q) ||
+          perfGenreJa.includes(q) ||
+          perfGenreEn.includes(q) ||
+          artistGenreJa.includes(q) ||
+          artistGenreEn.includes(q);
 
         if (!matches) return false;
       }
 
       return true;
     });
+
+    return sortPerformances(filtered, sortOption, language, selectedDate);
   }, [
     initialPerformances,
     selectedGenre,
     selectedVenueId,
     selectedDate,
     searchQuery,
+    sortOption,
+    language,
     activeTab,
     favorites,
   ]);
@@ -176,6 +195,7 @@ export default function AudienceApp({
     setSelectedVenueId('all');
     setSelectedDate('all');
     setSearchQuery('');
+    setSortOption('date');
   };
 
   const genres = [
@@ -281,8 +301,8 @@ export default function AudienceApp({
               )}
             </div>
 
-            {/* 3 Select Dropdowns: WHAT / WHERE / WHEN */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* 4 Select Dropdowns: WHAT / WHERE / WHEN / SORT */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               
               {/* WHAT: Genre */}
               <div className="space-y-1.5">
@@ -343,10 +363,28 @@ export default function AudienceApp({
                 </select>
               </div>
 
+              {/* SORT: Sort By */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-black text-slate-700 flex items-center gap-1">
+                  <ArrowUpDown className="w-3.5 h-3.5 text-pink-600" />
+                  <span>{t('sortBy')}</span>
+                </label>
+                <select
+                  value={sortOption}
+                  onChange={(e) => setSortOption(e.target.value as PerformanceSortOption)}
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-pink-500 shadow-2xs"
+                >
+                  <option value="date">{t('sortDate')}</option>
+                  <option value="featured">{t('sortFeatured')}</option>
+                  <option value="newest">{t('sortNewest')}</option>
+                  <option value="title">{t('sortTitle')}</option>
+                </select>
+              </div>
+
             </div>
 
             {/* Reset Button */}
-            {(selectedGenre !== 'all' || selectedVenueId !== 'all' || selectedDate !== 'all' || searchQuery) && (
+            {(selectedGenre !== 'all' || selectedVenueId !== 'all' || selectedDate !== 'all' || searchQuery || sortOption !== 'date') && (
               <div className="flex justify-end pt-2">
                 <button
                   onClick={resetFilters}

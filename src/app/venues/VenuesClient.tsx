@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Venue, Performance } from '@/types';
@@ -8,6 +8,14 @@ import dynamic from 'next/dynamic';
 import { useLanguage } from '@/context/LanguageContext';
 import SafeImage from '@/components/common/SafeImage';
 import PerformanceModal from '@/components/audience/PerformanceModal';
+import {
+  getAllFestivalDates,
+  getJstDateString,
+  sortVenuesForDate,
+  sortVenuesForAllDates,
+  getNextAvailableDate,
+} from '@/utils/performanceUtils';
+import { formatDatePart } from '@/utils/dateFormat';
 
 const FestivalMap = dynamic(() => import('@/components/audience/FestivalMap'), {
   ssr: false,
@@ -18,12 +26,17 @@ const FestivalMap = dynamic(() => import('@/components/audience/FestivalMap'), {
     </div>
   ),
 });
+
 import { 
   MapPin, 
   Globe, 
   Navigation, 
   Eye,
-  ArrowRight
+  ArrowRight,
+  Calendar,
+  Clock,
+  ChevronDown,
+  Sparkles
 } from 'lucide-react';
 import { InstagramIcon, TwitterIcon } from '@/components/common/SnsIcons';
 
@@ -51,34 +64,81 @@ const isValidUrl = (url?: string | null): boolean => {
 };
 
 export default function VenuesClient({ venues, performances }: VenuesClientProps) {
-  const { t, getText } = useLanguage();
+  const { t, getText, language } = useLanguage();
   const searchParams = useSearchParams();
   const [selectedPerformance, setSelectedPerformance] = useState<Performance | null>(null);
-
-  // Group performances by venue
-  const getPerformancesForVenue = (venueId: string) => {
-    return performances.filter(
-      (p) => 
-        p.venueId === venueId || 
-        p.venue?.id === venueId ||
-        (p.schedules && p.schedules.some((s) => s.venueId === venueId || s.venue?.id === venueId))
-    );
-  };
 
   // デモモード（?demo または ?demo=true/1 等）判定
   const isDemoMode = searchParams.has('demo') && searchParams.get('demo') !== 'false';
 
-  // 公演が登録されている会場のみを抽出（デモモード時は全件）
-  const displayVenues = isDemoMode
-    ? venues
-    : venues.filter((v) => getPerformancesForVenue(v.id).length > 0);
+  // 1. JST 日時の取得
+  const [nowMs] = useState<number>(() => Date.now());
+  const todayStr = useMemo(() => getJstDateString(nowMs), [nowMs]);
+  const tomorrowStr = useMemo(() => getJstDateString(nowMs + 24 * 60 * 60 * 1000), [nowMs]);
+
+  // 2. 全登録公演の日付一覧（昇順）
+  const allFestivalDates = useMemo(() => getAllFestivalDates(performances), [performances]);
+
+  // 3. 初期選択タブの判定
+  // - フェスティバル開催前：すべての日程
+  // - 開催期間中：今日
+  // - 開催終了後：すべての日程
+  const initialFilterMode = useMemo(() => {
+    if (allFestivalDates.length === 0) return 'all';
+    const minDate = allFestivalDates[0];
+    const maxDate = allFestivalDates[allFestivalDates.length - 1];
+    if (todayStr >= minDate && todayStr <= maxDate) {
+      return 'today';
+    }
+    return 'all';
+  }, [allFestivalDates, todayStr]);
+
+  const [filterMode, setFilterMode] = useState<'today' | 'tomorrow' | 'pick_date' | 'all'>(initialFilterMode);
+  const [customDate, setCustomDate] = useState<string>(
+    allFestivalDates.includes(todayStr)
+      ? todayStr
+      : (allFestivalDates[0] || todayStr)
+  );
+
+  // 現在選択されている対象日付 (YYYY-MM-DD または null)
+  const activeTargetDate = useMemo(() => {
+    if (filterMode === 'today') return todayStr;
+    if (filterMode === 'tomorrow') return tomorrowStr;
+    if (filterMode === 'pick_date') return customDate;
+    return null;
+  }, [filterMode, todayStr, tomorrowStr, customDate]);
+
+  // 4. 選択日・全日程に応じた会場一覧の計算とソート
+  const dateVenueItems = useMemo(() => {
+    if (!activeTargetDate) return [];
+    return sortVenuesForDate(venues, performances, activeTargetDate, isDemoMode);
+  }, [venues, performances, activeTargetDate, isDemoMode]);
+
+  const allDatesVenueItems = useMemo(() => {
+    if (activeTargetDate) return [];
+    return sortVenuesForAllDates(venues, performances, nowMs, isDemoMode);
+  }, [venues, performances, activeTargetDate, nowMs, isDemoMode]);
+
+  // マップに渡す会場一覧
+  const mapVenues = useMemo(() => {
+    if (activeTargetDate) {
+      return dateVenueItems.map((item) => item.venue);
+    }
+    return allDatesVenueItems.map((item) => item.venue);
+  }, [activeTargetDate, dateVenueItems, allDatesVenueItems]);
+
+  // 次に公演がある日付の算出（0件時の案内用）
+  const nextAvailableDate = useMemo(() => {
+    if (!activeTargetDate) return null;
+    return getNextAvailableDate(allFestivalDates, activeTargetDate);
+  }, [allFestivalDates, activeTargetDate]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
       {/* 3-Step Editorial Header */}
       <div className="border-l-4 border-[#E6007E] pl-4 sm:pl-6 space-y-2 py-2">
         <div className="text-xs font-black tracking-widest text-[#E6007E] uppercase">
-          VENUES
+          VENUES & SCHEDULE
         </div>
         <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
           {t('venuesPageTitle')}
@@ -94,228 +154,593 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
         )}
       </div>
 
+      {/* Date Filter Tabs (Placed directly before the map) */}
+      <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-[#E6007E]" />
+            <span className="text-xs font-black text-slate-800 uppercase tracking-wider">
+              {language === 'en' ? 'Select Date' : '日程で会場を探す'}
+            </span>
+          </div>
+          {activeTargetDate && (
+            <span className="text-xs font-bold text-[#E6007E] bg-pink-50 px-2.5 py-0.5 rounded-full border border-pink-100">
+              {formatDatePart(activeTargetDate, language)}
+            </span>
+          )}
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {/* 今日 (Today) */}
+          <button
+            type="button"
+            onClick={() => setFilterMode('today')}
+            className={`px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
+              filterMode === 'today'
+                ? 'bg-[#E6007E] text-white shadow-sm ring-2 ring-[#E6007E]/30 font-black'
+                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+            }`}
+          >
+            <span>{t('venueFilterToday')}</span>
+            <span className={`text-[10px] ${filterMode === 'today' ? 'text-pink-100' : 'text-slate-400'}`}>
+              {formatDatePart(todayStr, language)}
+            </span>
+          </button>
+
+          {/* 明日 (Tomorrow) */}
+          <button
+            type="button"
+            onClick={() => setFilterMode('tomorrow')}
+            className={`px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
+              filterMode === 'tomorrow'
+                ? 'bg-[#E6007E] text-white shadow-sm ring-2 ring-[#E6007E]/30 font-black'
+                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+            }`}
+          >
+            <span>{t('venueFilterTomorrow')}</span>
+            <span className={`text-[10px] ${filterMode === 'tomorrow' ? 'text-pink-100' : 'text-slate-400'}`}>
+              {formatDatePart(tomorrowStr, language)}
+            </span>
+          </button>
+
+          {/* 日付を選ぶ (Pick Date Dropdown) */}
+          <div className="relative">
+            <select
+              value={filterMode === 'pick_date' ? customDate : ''}
+              onChange={(e) => {
+                if (e.target.value) {
+                  setCustomDate(e.target.value);
+                  setFilterMode('pick_date');
+                }
+              }}
+              className={`w-full h-full min-h-[52px] px-3 py-2 rounded-xl text-xs sm:text-sm font-bold appearance-none transition-all cursor-pointer text-center ${
+                filterMode === 'pick_date'
+                  ? 'bg-[#E6007E] text-white shadow-sm ring-2 ring-[#E6007E]/30 font-black'
+                  : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+              }`}
+            >
+              <option value="" disabled className="text-slate-700 bg-white">
+                {t('venueFilterPickDate')}
+              </option>
+              {allFestivalDates.map((date) => (
+                <option key={date} value={date} className="text-slate-900 bg-white font-medium py-1">
+                  {formatDatePart(date, language)}
+                </option>
+              ))}
+            </select>
+            <div className={`absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none ${
+              filterMode === 'pick_date' ? 'text-white' : 'text-slate-400'
+            }`}>
+              <ChevronDown className="w-3.5 h-3.5" />
+            </div>
+          </div>
+
+          {/* すべての日程 (All Dates) */}
+          <button
+            type="button"
+            onClick={() => setFilterMode('all')}
+            className={`px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
+              filterMode === 'all'
+                ? 'bg-[#E6007E] text-white shadow-sm ring-2 ring-[#E6007E]/30 font-black'
+                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+            }`}
+          >
+            <span>{t('venueFilterAllDates')}</span>
+            <span className={`text-[10px] ${filterMode === 'all' ? 'text-pink-100' : 'text-slate-400'}`}>
+              {language === 'en' ? 'Entire Festival' : '全期間・次回順'}
+            </span>
+          </button>
+        </div>
+      </div>
+
       {/* Interactive Map */}
       <div className="space-y-4">
         <FestivalMap
-          venues={displayVenues}
+          venues={mapVenues}
           performances={performances}
           onSelectPerformance={(p) => setSelectedPerformance(p)}
         />
       </div>
 
-      {/* Venues Grid Cards */}
+      {/* Venues Section */}
       <div className="space-y-8">
         <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
-          <h2 className="text-xl sm:text-2xl font-black text-slate-900">
-            {t('allVenuesTitle')}
-          </h2>
-          <span className="text-xs font-bold text-slate-500">
-            <span className="text-[#E6007E] font-black">{displayVenues.length}</span> {t('venuesCountUnit')}
-            {!isDemoMode && venues.length > displayVenues.length && (
-              <span className="ml-1 text-slate-400 font-normal">（公演登録会場のみ）</span>
+          <div className="space-y-0.5">
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+              {activeTargetDate
+                ? `${formatDatePart(activeTargetDate, language)} ${t('showsTodayTitle')}`
+                : t('allVenuesTitle')}
+            </h2>
+            {activeTargetDate && (
+              <p className="text-xs text-slate-500 font-medium">
+                {language === 'en' ? 'Venues sorted by earliest show start time' : '公演開始時刻が早い順に会場を表示しています'}
+              </p>
             )}
+          </div>
+          <span className="text-xs font-bold text-slate-500">
+            <span className="text-[#E6007E] font-black">{mapVenues.length}</span> {t('venuesCountUnit')}
           </span>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
-          {displayVenues.map((venue) => {
-            const venueName = getText(venue.name, venue.nameEn);
-            const venueArea = getText(venue.area, venue.areaEn);
-            const venueAddress = getText(venue.address, venue.addressEn);
-            const venueAccess = getText(venue.access, venue.accessEn);
-            const venueDesc = getText(venue.description, venue.descriptionEn);
-            const venueShows = getPerformancesForVenue(venue.id);
-            const venueUrl = `/venues/${venue.id}`;
+        {/* 1. 選択日に公演がない場合（Empty State） */}
+        {activeTargetDate && dateVenueItems.length === 0 ? (
+          <div className="bg-slate-50 border border-dashed border-slate-300 rounded-3xl p-8 sm:p-12 text-center space-y-4 max-w-2xl mx-auto">
+            <div className="w-12 h-12 bg-pink-100 text-[#E6007E] rounded-full flex items-center justify-center mx-auto">
+              <Calendar className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-lg font-black text-slate-900">
+                {t('noShowsOnThisDate')}
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                {formatDatePart(activeTargetDate, language)} に開催される公演はありません。
+              </p>
+            </div>
 
-            const mapQuery = venueAddress || venueName;
-            const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery + ' Osaka')}`;
-
-            const photoGallery: string[] = venue.images && venue.images.length > 0
-              ? venue.images.filter(Boolean)
-              : (venue.image ? [venue.image] : []);
-            const hasPhotos = photoGallery.length > 0;
-
-            return (
-              <div
-                key={venue.id}
-                className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden hover:border-[#E6007E] transition-all duration-300 flex flex-col justify-between shadow-2xs hover:shadow-md"
+            {nextAvailableDate ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setCustomDate(nextAvailableDate);
+                  setFilterMode('pick_date');
+                }}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#E6007E] text-white text-xs sm:text-sm font-black shadow-md hover:bg-pink-600 transition-all cursor-pointer"
               >
-                <div className="space-y-4">
-                  {/* Venue Photo with Typographic Overlay */}
-                  {hasPhotos && (
-                    <Link
-                      href={venueUrl}
-                      className="relative aspect-16/9 w-full bg-slate-900 overflow-hidden block select-none group"
-                    >
-                      <SafeImage
-                        src={photoGallery[0]}
-                        alt={venueName}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 580px"
-                        quality={75}
-                        fallbackType="venue"
-                        fallbackText={venueName}
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none" />
-                      
-                      {/* Area / Venue Type Typography */}
-                      <div className="absolute top-3 left-3 flex items-center gap-2 z-10 pointer-events-none">
-                        <span className="px-3 py-1 rounded bg-[#E6007E] text-white text-xs font-black tracking-wider uppercase shadow-xs">
-                          {venueArea}
-                        </span>
-                        {venue.venueType && (
-                          <span className="px-2.5 py-1 rounded bg-black/75 backdrop-blur-xs text-white text-[11px] font-bold border border-white/20 tracking-wider">
-                            {venue.venueType}
-                          </span>
-                        )}
-                      </div>
-                    </Link>
-                  )}
+                <span>次の公演日（{formatDatePart(nextAvailableDate, language)}）を見る</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setFilterMode('all')}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#E6007E] text-white text-xs sm:text-sm font-black shadow-md hover:bg-pink-600 transition-all cursor-pointer"
+              >
+                <span>{t('venueFilterAllDates')}を見る</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        ) : null}
 
-                  <div className="p-6 space-y-4">
-                    {/* Header: Area & Type (if no photo) + Name */}
-                    {!hasPhotos && (
-                      <div className="flex items-center gap-2 text-xs font-black tracking-wider uppercase">
-                        <span className="text-[#E6007E]">{venueArea}</span>
-                        {venue.venueType && (
-                          <span className="text-slate-400">/ {venue.venueType}</span>
-                        )}
-                      </div>
-                    )}
+        {/* 2. 選択日指定時の会場カード一覧 */}
+        {activeTargetDate && dateVenueItems.length > 0 && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+            {dateVenueItems.map(({ venue, shows }) => {
+              const venueName = getText(venue.name, venue.nameEn);
+              const venueArea = getText(venue.area, venue.areaEn);
+              const venueAddress = getText(venue.address, venue.addressEn);
+              const venueAccess = getText(venue.access, venue.accessEn);
+              const venueDesc = getText(venue.description, venue.descriptionEn);
+              const venueUrl = `/venues/${venue.id}`;
 
-                    <div className="space-y-1.5">
-                      <div className="flex items-start justify-between gap-2">
-                        <Link href={venueUrl} className="group">
-                          <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-[#E6007E] transition-colors leading-tight">
-                            {venueName}
-                          </h3>
-                        </Link>
-                        {venue.capacity && (
-                          <span className="text-[11px] font-bold text-slate-500 shrink-0 bg-slate-100 px-2.5 py-0.5 rounded">
-                            {venue.capacity}席
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs font-bold text-[#E6007E] flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 shrink-0" />
-                        <span>{venueAddress}</span>
-                      </p>
-                    </div>
+              const mapQuery = venueAddress || venueName;
+              const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery + ' Osaka')}`;
 
-                    {venueDesc && (
-                      <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium line-clamp-3">
-                        {venueDesc}
-                      </p>
-                    )}
+              const photoGallery: string[] = venue.images && venue.images.length > 0
+                ? venue.images.filter(Boolean)
+                : (venue.image ? [venue.image] : []);
+              const hasPhotos = photoGallery.length > 0;
 
-                    {venueAccess && (
-                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs text-slate-700 space-y-0.5">
-                        <span className="text-[10px] text-[#E6007E] uppercase font-black tracking-wider block">Access</span>
-                        <p className="font-medium">{venueAccess}</p>
-                      </div>
-                    )}
-
-                    {/* SNS・Web Links */}
-                    <div className="flex flex-wrap items-center gap-2 pt-1">
-                      {isValidUrl(venue.websiteUrl) && (
-                        <a
-                          href={venue.websiteUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-3 py-1 rounded-lg bg-slate-50 hover:bg-pink-50 text-slate-700 hover:text-[#E6007E] text-xs font-bold flex items-center gap-1.5 transition-colors border border-slate-100"
-                        >
-                          <Globe className="w-3.5 h-3.5 text-[#E6007E]" />
-                          <span>Website</span>
-                        </a>
-                      )}
-                      {isValidUrl(venue.snsTwitter) && (
-                        <a
-                          href={venue.snsTwitter}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-1.5 rounded-lg bg-slate-50 hover:bg-pink-50 text-slate-700 hover:text-[#E6007E] transition-colors border border-slate-100"
-                          aria-label="X (Twitter)"
-                        >
-                          <TwitterIcon className="w-3.5 h-3.5" />
-                        </a>
-                      )}
-                      {isValidUrl(venue.snsInstagram) && (
-                        <a
-                          href={venue.snsInstagram}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-1.5 rounded-lg bg-slate-50 hover:bg-pink-50 text-slate-700 hover:text-[#E6007E] transition-colors border border-slate-100"
-                          aria-label="Instagram"
-                        >
-                          <InstagramIcon className="w-3.5 h-3.5" />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Shows at Venue & Detail Link */}
-                <div className="p-6 pt-0 space-y-3">
-                  <div className="pt-3 border-t border-slate-100 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                        {t('showsAtVenue')} ({venueShows.length})
-                      </span>
-                      <a
-                        href={googleMapsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs font-black text-[#E6007E] hover:underline flex items-center gap-1"
-                      >
-                        <span>{t('goToMaps')}</span>
-                        <Navigation className="w-3 h-3" />
-                      </a>
-                    </div>
-
-                    {venueShows.length > 0 ? (
-                      <div className="space-y-1.5">
-                        {venueShows.slice(0, 3).map((perf) => (
-                          <Link
-                            key={perf.id}
-                            href={`/performances/${perf.id}`}
-                            className="w-full text-left p-2.5 rounded-xl bg-slate-50 hover:bg-pink-50/80 border border-slate-100 hover:border-pink-200 transition-all flex items-center justify-between gap-2 group"
-                          >
-                            <div className="truncate pr-2">
-                              <p className="text-xs font-bold text-slate-900 group-hover:text-[#E6007E] truncate">
-                                {getText(perf.title, perf.titleEn)}
-                              </p>
-                              <p className="text-[10px] text-slate-400 font-medium">
-                                {getText(perf.artistName, perf.artistNameEn)}
-                              </p>
-                            </div>
-                            <span className="text-[11px] font-bold text-[#E6007E] shrink-0">
-                              詳細 →
-                            </span>
-                          </Link>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-xs text-slate-400 italic">
-                        {t('noShowsScheduled')}
-                      </p>
-                    )}
-
-                    <div className="pt-2 flex justify-end">
+              return (
+                <div
+                  key={venue.id}
+                  className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden hover:border-[#E6007E] transition-all duration-300 flex flex-col justify-between shadow-2xs hover:shadow-md"
+                >
+                  <div className="space-y-4">
+                    {/* Venue Photo with Typographic Overlay */}
+                    {hasPhotos && (
                       <Link
                         href={venueUrl}
-                        className="inline-flex items-center gap-1 text-xs font-black text-[#E6007E] hover:underline"
+                        className="relative aspect-16/9 w-full bg-slate-900 overflow-hidden block select-none group"
                       >
-                        <span>会場詳細を見る</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
+                        <SafeImage
+                          src={photoGallery[0]}
+                          alt={venueName}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 580px"
+                          quality={75}
+                          fallbackType="venue"
+                          fallbackText={venueName}
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none" />
+                        
+                        {/* Area / Venue Type Typography */}
+                        <div className="absolute top-3 left-3 flex items-center gap-2 z-10 pointer-events-none">
+                          <span className="px-3 py-1 rounded bg-[#E6007E] text-white text-xs font-black tracking-wider uppercase shadow-xs">
+                            {venueArea}
+                          </span>
+                          {venue.venueType && (
+                            <span className="px-2.5 py-1 rounded bg-black/75 backdrop-blur-xs text-white text-[11px] font-bold border border-white/20 tracking-wider">
+                              {venue.venueType}
+                            </span>
+                          )}
+                        </div>
                       </Link>
+                    )}
+
+                    <div className="p-6 space-y-4">
+                      {/* Header: Area & Type (if no photo) + Name */}
+                      {!hasPhotos && (
+                        <div className="flex items-center gap-2 text-xs font-black tracking-wider uppercase">
+                          <span className="text-[#E6007E]">{venueArea}</span>
+                          {venue.venueType && (
+                            <span className="text-slate-400">/ {venue.venueType}</span>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="space-y-1.5">
+                        <div className="flex items-start justify-between gap-2">
+                          <Link href={venueUrl} className="group">
+                            <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-[#E6007E] transition-colors leading-tight">
+                              {venueName}
+                            </h3>
+                          </Link>
+                          {venue.capacity && (
+                            <span className="text-[11px] font-bold text-slate-500 shrink-0 bg-slate-100 px-2.5 py-0.5 rounded">
+                              {venue.capacity}席
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs font-bold text-[#E6007E] flex items-center gap-1">
+                          <MapPin className="w-3.5 h-3.5 shrink-0" />
+                          <span>{venueAddress}</span>
+                        </p>
+                      </div>
+
+                      {venueDesc && (
+                        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium line-clamp-3">
+                          {venueDesc}
+                        </p>
+                      )}
+
+                      {venueAccess && (
+                        <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs text-slate-700 space-y-0.5">
+                          <span className="text-[10px] text-[#E6007E] uppercase font-black tracking-wider block">Access</span>
+                          <p className="font-medium">{venueAccess}</p>
+                        </div>
+                      )}
+
+                      {/* SNS・Web Links */}
+                      <div className="flex flex-wrap items-center gap-2 pt-1">
+                        {isValidUrl(venue.websiteUrl) && (
+                          <a
+                            href={venue.websiteUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1 rounded-lg bg-slate-50 hover:bg-pink-50 text-slate-700 hover:text-[#E6007E] text-xs font-bold flex items-center gap-1.5 transition-colors border border-slate-100"
+                          >
+                            <Globe className="w-3.5 h-3.5 text-[#E6007E]" />
+                            <span>Website</span>
+                          </a>
+                        )}
+                        {isValidUrl(venue.snsTwitter) && (
+                          <a
+                            href={venue.snsTwitter}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1.5 rounded-lg bg-slate-50 hover:bg-pink-50 text-slate-700 hover:text-[#E6007E] transition-colors border border-slate-100"
+                            aria-label="X (Twitter)"
+                          >
+                            <TwitterIcon className="w-3.5 h-3.5" />
+                          </a>
+                        )}
+                        {isValidUrl(venue.snsInstagram) && (
+                          <a
+                            href={venue.snsInstagram}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1.5 rounded-lg bg-slate-50 hover:bg-pink-50 text-slate-700 hover:text-[#E6007E] transition-colors border border-slate-100"
+                            aria-label="Instagram"
+                          >
+                            <InstagramIcon className="w-3.5 h-3.5" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Shows at Venue on Selected Date */}
+                  <div className="p-6 pt-0 space-y-3">
+                    <div className="pt-3 border-t border-slate-100 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5 text-[#E6007E]" />
+                          <span>{formatDatePart(activeTargetDate, language)} の公演 ({shows.length}{t('showsCountUnit')})</span>
+                        </span>
+                        <a
+                          href={googleMapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs font-black text-[#E6007E] hover:underline flex items-center gap-1"
+                        >
+                          <span>{t('goToMaps')}</span>
+                          <Navigation className="w-3 h-3" />
+                        </a>
+                      </div>
+
+                      {shows.length > 0 ? (
+                        <div className="space-y-2">
+                          {shows.map((item) => (
+                            <Link
+                              key={item.performance.id}
+                              href={`/performances/${item.performance.id}`}
+                              className="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-pink-50/80 border border-slate-100 hover:border-pink-200 transition-all flex items-center justify-between gap-3 group"
+                            >
+                              <div className="flex items-start gap-2.5 truncate pr-2">
+                                <span className="inline-flex items-center justify-center px-2 py-1 rounded bg-[#E6007E]/10 text-[#E6007E] text-[11px] font-black shrink-0">
+                                  {item.displayTime || t('allDayShow')}
+                                </span>
+                                <div className="truncate">
+                                  <p className="text-xs font-bold text-slate-900 group-hover:text-[#E6007E] truncate">
+                                    {getText(item.performance.title, item.performance.titleEn)}
+                                  </p>
+                                  <p className="text-[10px] text-slate-400 font-medium truncate">
+                                    {getText(item.performance.artist?.name || item.performance.artistName, item.performance.artist?.nameEn || item.performance.artistNameEn)}
+                                  </p>
+                                </div>
+                              </div>
+                              <span className="text-[11px] font-bold text-[#E6007E] shrink-0">
+                                詳細 →
+                              </span>
+                            </Link>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-slate-400 italic">
+                          {t('noShowsScheduled')}
+                        </p>
+                      )}
+
+                      <div className="pt-2 flex justify-end">
+                        <Link
+                          href={venueUrl}
+                          className="inline-flex items-center gap-1 text-xs font-black text-[#E6007E] hover:underline"
+                        >
+                          <span>会場詳細を見る</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* 3. 「すべての日程」選択時の会場カード一覧 */}
+        {!activeTargetDate && allDatesVenueItems.length > 0 && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+            {allDatesVenueItems.map(({ venue, nextShows }) => {
+              const venueName = getText(venue.name, venue.nameEn);
+              const venueArea = getText(venue.area, venue.areaEn);
+              const venueAddress = getText(venue.address, venue.addressEn);
+              const venueAccess = getText(venue.access, venue.accessEn);
+              const venueDesc = getText(venue.description, venue.descriptionEn);
+              const venueUrl = `/venues/${venue.id}`;
+
+              const mapQuery = venueAddress || venueName;
+              const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery + ' Osaka')}`;
+
+              const photoGallery: string[] = venue.images && venue.images.length > 0
+                ? venue.images.filter(Boolean)
+                : (venue.image ? [venue.image] : []);
+              const hasPhotos = photoGallery.length > 0;
+
+              return (
+                <div
+                  key={venue.id}
+                  className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden hover:border-[#E6007E] transition-all duration-300 flex flex-col justify-between shadow-2xs hover:shadow-md"
+                >
+                  <div className="space-y-4">
+                    {/* Venue Photo with Typographic Overlay */}
+                    {hasPhotos && (
+                      <Link
+                        href={venueUrl}
+                        className="relative aspect-16/9 w-full bg-slate-900 overflow-hidden block select-none group"
+                      >
+                        <SafeImage
+                          src={photoGallery[0]}
+                          alt={venueName}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 580px"
+                          quality={75}
+                          fallbackType="venue"
+                          fallbackText={venueName}
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none" />
+                        
+                        {/* Area / Venue Type Typography */}
+                        <div className="absolute top-3 left-3 flex items-center gap-2 z-10 pointer-events-none">
+                          <span className="px-3 py-1 rounded bg-[#E6007E] text-white text-xs font-black tracking-wider uppercase shadow-xs">
+                            {venueArea}
+                          </span>
+                          {venue.venueType && (
+                            <span className="px-2.5 py-1 rounded bg-black/75 backdrop-blur-xs text-white text-[11px] font-bold border border-white/20 tracking-wider">
+                              {venue.venueType}
+                            </span>
+                          )}
+                        </div>
+                      </Link>
+                    )}
+
+                    <div className="p-6 space-y-4">
+                      {/* Header: Area & Type (if no photo) + Name */}
+                      {!hasPhotos && (
+                        <div className="flex items-center gap-2 text-xs font-black tracking-wider uppercase">
+                          <span className="text-[#E6007E]">{venueArea}</span>
+                          {venue.venueType && (
+                            <span className="text-slate-400">/ {venue.venueType}</span>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="space-y-1.5">
+                        <div className="flex items-start justify-between gap-2">
+                          <Link href={venueUrl} className="group">
+                            <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-[#E6007E] transition-colors leading-tight">
+                              {venueName}
+                            </h3>
+                          </Link>
+                          {venue.capacity && (
+                            <span className="text-[11px] font-bold text-slate-500 shrink-0 bg-slate-100 px-2.5 py-0.5 rounded">
+                              {venue.capacity}席
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs font-bold text-[#E6007E] flex items-center gap-1">
+                          <MapPin className="w-3.5 h-3.5 shrink-0" />
+                          <span>{venueAddress}</span>
+                        </p>
+                      </div>
+
+                      {venueDesc && (
+                        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium line-clamp-3">
+                          {venueDesc}
+                        </p>
+                      )}
+
+                      {venueAccess && (
+                        <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs text-slate-700 space-y-0.5">
+                          <span className="text-[10px] text-[#E6007E] uppercase font-black tracking-wider block">Access</span>
+                          <p className="font-medium">{venueAccess}</p>
+                        </div>
+                      )}
+
+                      {/* SNS・Web Links */}
+                      <div className="flex flex-wrap items-center gap-2 pt-1">
+                        {isValidUrl(venue.websiteUrl) && (
+                          <a
+                            href={venue.websiteUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1 rounded-lg bg-slate-50 hover:bg-pink-50 text-slate-700 hover:text-[#E6007E] text-xs font-bold flex items-center gap-1.5 transition-colors border border-slate-100"
+                          >
+                            <Globe className="w-3.5 h-3.5 text-[#E6007E]" />
+                            <span>Website</span>
+                          </a>
+                        )}
+                        {isValidUrl(venue.snsTwitter) && (
+                          <a
+                            href={venue.snsTwitter}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1.5 rounded-lg bg-slate-50 hover:bg-pink-50 text-slate-700 hover:text-[#E6007E] transition-colors border border-slate-100"
+                            aria-label="X (Twitter)"
+                          >
+                            <TwitterIcon className="w-3.5 h-3.5" />
+                          </a>
+                        )}
+                        {isValidUrl(venue.snsInstagram) && (
+                          <a
+                            href={venue.snsInstagram}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1.5 rounded-lg bg-slate-50 hover:bg-pink-50 text-slate-700 hover:text-[#E6007E] transition-colors border border-slate-100"
+                            aria-label="Instagram"
+                          >
+                            <InstagramIcon className="w-3.5 h-3.5" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Next Shows at Venue */}
+                  <div className="p-6 pt-0 space-y-3">
+                    <div className="pt-3 border-t border-slate-100 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5 text-[#E6007E]" />
+                          <span>{t('nextShowsTitle')}</span>
+                        </span>
+                        <a
+                          href={googleMapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs font-black text-[#E6007E] hover:underline flex items-center gap-1"
+                        >
+                          <span>{t('goToMaps')}</span>
+                          <Navigation className="w-3 h-3" />
+                        </a>
+                      </div>
+
+                      {nextShows.length > 0 ? (
+                        <div className="space-y-2">
+                          {nextShows.map((item) => (
+                            <Link
+                              key={item.performance.id}
+                              href={`/performances/${item.performance.id}`}
+                              className="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-pink-50/80 border border-slate-100 hover:border-pink-200 transition-all flex items-center justify-between gap-3 group"
+                            >
+                              <div className="flex items-start gap-2.5 truncate pr-2">
+                                <span className={`inline-flex items-center justify-center px-2 py-1 rounded text-[11px] font-black shrink-0 ${
+                                  item.isOngoing
+                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                    : 'bg-[#E6007E]/10 text-[#E6007E]'
+                                }`}>
+                                  {item.isOngoing ? '開催中' : item.displayDateTime}
+                                </span>
+                                <div className="truncate">
+                                  <p className="text-xs font-bold text-slate-900 group-hover:text-[#E6007E] truncate">
+                                    {getText(item.performance.title, item.performance.titleEn)}
+                                  </p>
+                                  <p className="text-[10px] text-slate-400 font-medium truncate">
+                                    {getText(item.performance.artist?.name || item.performance.artistName, item.performance.artist?.nameEn || item.performance.artistNameEn)}
+                                  </p>
+                                </div>
+                              </div>
+                              <span className="text-[11px] font-bold text-[#E6007E] shrink-0">
+                                詳細 →
+                              </span>
+                            </Link>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-slate-400 italic">
+                          {t('noShowsScheduled')}
+                        </p>
+                      )}
+
+                      <div className="pt-2 flex justify-end">
+                        <Link
+                          href={venueUrl}
+                          className="inline-flex items-center gap-1 text-xs font-black text-[#E6007E] hover:underline"
+                        >
+                          <span>会場詳細を見る</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Performance Modal (preserved for future Intercepting Routes) */}

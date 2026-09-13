@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { TwitterIcon, InstagramIcon, YoutubeIcon } from '@/components/common/SnsIcons';
 import { formatTicketPrice } from '@/utils/priceFormat';
+import { getArtistGenreLabel, getPerformanceGenreText } from '@/utils/genre';
 
 interface ArtistDetailClientProps {
   artist: Artist;
@@ -34,8 +35,9 @@ const isValidUrl = (url?: string | null): boolean => {
     trimmed === 'undefined' ||
     trimmed === 'なし' ||
     trimmed === 'None' ||
-    trimmed === 'http://' ||
-    trimmed === 'https://'
+    trimmed === '-' ||
+    trimmed.startsWith('/') ||
+    trimmed.startsWith('javascript:')
   ) {
     return false;
   }
@@ -49,7 +51,7 @@ export default function ArtistDetailClient({ artist, performances }: ArtistDetai
 
   const handleShare = async () => {
     const url = typeof window !== 'undefined' ? window.location.href : `https://osakafringe.com/artists/${artist.id}`;
-    if (navigator.share) {
+    if (typeof navigator !== 'undefined' && navigator.share) {
       try {
         await navigator.share({
           title: getText(artist.name, artist.nameEn),
@@ -87,7 +89,7 @@ export default function ArtistDetailClient({ artist, performances }: ArtistDetai
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-[#E6007E] text-slate-700 hover:text-[#E6007E] shadow-2xs transition-all"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>{t('artistsPageTitle')}</span>
+            <span>{t('viewAllArtists')}</span>
           </Link>
 
           <button
@@ -110,7 +112,7 @@ export default function ArtistDetailClient({ artist, performances }: ArtistDetai
               alt={name}
               fill
               priority
-              fallbackGenre={artist.genre || 'theater'}
+              fallbackGenre={artist.genre || 'other'}
               fallbackText={name}
               className="object-cover"
             />
@@ -119,7 +121,7 @@ export default function ArtistDetailClient({ artist, performances }: ArtistDetai
             {/* Badges on Top */}
             <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 z-10">
               <span className="px-3 py-1 rounded-full bg-black/75 backdrop-blur-md text-white text-xs font-black uppercase tracking-wider border border-white/20">
-                {artist.genre || 'ARTIST'}
+                {getArtistGenreLabel(artist.genre, language)}
               </span>
               {origin && (
                 <span className="px-3 py-1 rounded-full bg-[#E6007E] text-white text-xs font-bold shadow-xs">
@@ -258,8 +260,8 @@ export default function ArtistDetailClient({ artist, performances }: ArtistDetai
                       >
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
-                            <span className="px-2 py-0.5 rounded bg-pink-100 text-[#E6007E] text-[10px] font-black uppercase">
-                              {perf.genre}
+                            <span className="px-2 py-0.5 rounded bg-pink-100 text-[#E6007E] text-[10px] font-bold">
+                              {getPerformanceGenreText(perf, language) || getArtistGenreLabel(perf.artist?.genre || artist.genre, language)}
                             </span>
                             {perfVenue && (
                               <span className="text-xs text-slate-500 font-medium truncate flex items-center gap-1">

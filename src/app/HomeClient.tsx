@@ -26,8 +26,8 @@ export default function HomeClient({
   const { t, getText } = useLanguage();
   const [selectedPerformance, setSelectedPerformance] = useState<Performance | null>(null);
 
-  // Smart selection for 3 featured shows
-  const displayPerformances = selectFeaturedPerformances(performances, 3);
+  // Smart selection for up to 6 featured shows (excludes ended shows)
+  const displayPerformances = selectFeaturedPerformances(performances, 6);
 
   const aboutTitle = getText(siteInfo.aboutTitle, siteInfo.aboutTitleEn);
   const aboutText = getText(siteInfo.aboutText, siteInfo.aboutTextEn);
@@ -37,39 +37,41 @@ export default function HomeClient({
       {/* Hero Section */}
       <HomeHeroClient siteInfo={siteInfo} />
 
-      {/* Featured / Pick Up Shows */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-pink-100 pb-5">
-          <div className="space-y-1.5">
-            <div className="text-[#E6007E] font-black text-xs uppercase tracking-wider">
-              <span>{t('pickUpShows')}</span>
+      {/* Featured / Pick Up Shows (Only show if at least 1 show is available) */}
+      {displayPerformances.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-pink-100 pb-5">
+            <div className="space-y-1.5">
+              <div className="text-[#E6007E] font-black text-xs uppercase tracking-wider">
+                <span>{t('pickUpShows')}</span>
+              </div>
+              <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                {t('pickUpTitle')}
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                {t('pickUpSubtitle')}
+              </p>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              {t('pickUpTitle')}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-500 font-medium">
-              {t('pickUpSubtitle')}
-            </p>
+            <Link
+              href="/audience"
+              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-black text-[#E6007E] hover:text-[#c4006b] bg-pink-50 hover:bg-pink-100/70 px-4 py-2 rounded-full transition-colors self-start sm:self-auto cursor-pointer"
+            >
+              <span>{t('viewAllAudience')}</span>
+              <ArrowRightIcon className="w-4 h-4" />
+            </Link>
           </div>
-          <Link
-            href="/audience"
-            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-black text-[#E6007E] hover:text-[#c4006b] bg-pink-50 hover:bg-pink-100/70 px-4 py-2 rounded-full transition-colors self-start sm:self-auto cursor-pointer"
-          >
-            <span>{t('viewAllAudience')}</span>
-            <ArrowRightIcon className="w-4 h-4" />
-          </Link>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {displayPerformances.map((perf) => (
-            <PerformanceCard 
-              key={perf.id} 
-              performance={perf} 
-              onSelect={(p) => setSelectedPerformance(p)}
-            />
-          ))}
-        </div>
-      </section>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {displayPerformances.map((perf) => (
+              <PerformanceCard 
+                key={perf.id} 
+                performance={perf} 
+                onSelect={(p) => setSelectedPerformance(p)}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Audience App CTA Banner */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
