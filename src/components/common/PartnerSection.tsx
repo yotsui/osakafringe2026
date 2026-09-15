@@ -78,13 +78,20 @@ export default function PartnerSection({ partners = [] }: PartnerSectionProps) {
                     <div className="group bg-white rounded-xl border border-slate-200/90 hover:border-[#E6007E] transition-all p-4 space-y-3 h-full flex flex-col justify-between shadow-2xs hover:shadow-sm">
                       <div className="space-y-3">
                         {/* Logo Image Area */}
-                        <div className="relative aspect-16/9 w-full rounded-lg bg-slate-50 border border-slate-100 overflow-hidden flex items-center justify-center p-2">
+                        <div
+                          className={`relative aspect-16/9 w-full rounded-lg overflow-hidden flex items-center justify-center ${
+                            partner.image
+                              ? 'bg-transparent'
+                              : 'bg-slate-50 border border-slate-100 p-2'
+                          }`}
+                        >
                           {partner.image ? (
                             <Image
                               src={partner.image}
                               alt={name}
                               fill
-                              className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                              className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
                               unoptimized
                             />
                           ) : (
