@@ -67,7 +67,7 @@ export default function PartnerSection({ partners = [] }: PartnerSectionProps) {
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
                 {group.list.map((partner) => {
                   const name = getText(partner.name, partner.nameEn);
                   const desc = getText(partner.description, partner.descriptionEn);
@@ -90,8 +90,8 @@ export default function PartnerSection({ partners = [] }: PartnerSectionProps) {
                               src={partner.image}
                               alt={name}
                               fill
-                              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                              className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                              sizes="(max-width: 640px) 50vw, 33vw"
+                              className="object-contain object-center group-hover:scale-105 transition-transform duration-300"
                               unoptimized
                             />
                           ) : (
