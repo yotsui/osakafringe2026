@@ -3,6 +3,7 @@ import './globals.css';
 import { LanguageProvider } from '@/context/LanguageContext';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import { Analytics } from '@vercel/analytics/next';
 
 export const viewport: Viewport = {
   themeColor: '#E6007E',
@@ -73,6 +74,7 @@ export default function RootLayout({
           </main>
           <Footer />
         </LanguageProvider>
+        <Analytics />
       </body>
     </html>
   );
