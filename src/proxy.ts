@@ -18,6 +18,8 @@ const PUBLIC_FILE_EXTENSIONS = [
   '.js',
   '.map',
   '.webmanifest',
+  '.html',
+  '.pdf',
 ];
 
 export async function proxy(request: NextRequest) {
