@@ -83,15 +83,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
   // - フェスティバル開催前：すべての日程
   // - 開催期間中：今日
   // - 開催終了後：すべての日程
-  const initialFilterMode = useMemo(() => {
-    if (allFestivalDates.length === 0) return 'all';
-    const minDate = allFestivalDates[0];
-    const maxDate = allFestivalDates[allFestivalDates.length - 1];
-    if (todayStr >= minDate && todayStr <= maxDate) {
-      return 'today';
-    }
-    return 'all';
-  }, [allFestivalDates, todayStr]);
+  const initialFilterMode = 'all';
 
   const [filterMode, setFilterMode] = useState<'today' | 'tomorrow' | 'pick_date' | 'all'>(initialFilterMode);
   const [customDate, setCustomDate] = useState<string>(
@@ -171,6 +163,22 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {/* すべての日程 (All Dates) */}
+          <button
+            type="button"
+            onClick={() => setFilterMode('all')}
+            className={`px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
+              filterMode === 'all'
+                ? 'bg-[#E6007E] text-white shadow-sm ring-2 ring-[#E6007E]/30 font-black'
+                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+            }`}
+          >
+            <span>{t('venueFilterAllDates')}</span>
+            <span className={`text-[10px] ${filterMode === 'all' ? 'text-pink-100' : 'text-slate-400'}`}>
+              {language === 'en' ? 'Entire Festival' : '全期間・次回順'}
+            </span>
+          </button>
+
           {/* 今日 (Today) */}
           <button
             type="button"
@@ -234,22 +242,6 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
               <ChevronDown className="w-3.5 h-3.5" />
             </div>
           </div>
-
-          {/* すべての日程 (All Dates) */}
-          <button
-            type="button"
-            onClick={() => setFilterMode('all')}
-            className={`px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
-              filterMode === 'all'
-                ? 'bg-[#E6007E] text-white shadow-sm ring-2 ring-[#E6007E]/30 font-black'
-                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
-            }`}
-          >
-            <span>{t('venueFilterAllDates')}</span>
-            <span className={`text-[10px] ${filterMode === 'all' ? 'text-pink-100' : 'text-slate-400'}`}>
-              {language === 'en' ? 'Entire Festival' : '全期間・次回順'}
-            </span>
-          </button>
         </div>
       </div>
 
