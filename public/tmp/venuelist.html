@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会場データビューア</title>
+    
+    <!-- CSVパーサー -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <!-- Leaflet (OSMマップ用) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .header-info {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #7f8c8d;
+            font-size: 0.95em;
+        }
+        #loading {
+            text-align: center;
+            font-size: 1.2em;
+            color: #e74c3c;
+            font-weight: bold;
+            margin: 40px 0;
+        }
+        
+        /* 全体マップエリアのスタイル */
+        #global-map-container {
+            width: 100%;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background: #fff;
+            border: 2px solid #e74c3c;
+            display: none;
+        }
+        .map-title {
+            background: #e74c3c;
+            color: white;
+            margin: 0;
+            padding: 10px 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #global-map {
+            width: 100%;
+            height: 450px;
+            z-index: 1;
+        }
+
+        /* 【追加】背景地図タイルのみをグレースケール（モノクロ）化 */
+        .leaflet-tile-pane {
+            filter: grayscale(100%) contrast(90%);
+        }
+
+        #container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .card-header {
+            border-bottom: 2px solid #e74c3c;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .entry-no {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .card-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #c0392b;
+            margin: 0 0 5px 0;
+        }
+        .card-subtitle {
+            font-size: 1.1em;
+            color: #555;
+            margin: 0 0 10px 0;
+        }
+        .badge {
+            display: inline-block;
+            background-color: #f39c12;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+        }
+        .map-container {
+            width: 100%;
+            height: 220px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            background-color: #eee;
+        }
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        .field {
+            margin-bottom: 12px;
+            font-size: 0.95em;
+        }
+        .field-label {
+            font-weight: bold;
+            color: #7f8c8d;
+            font-size: 0.85em;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .field-value {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background: #f9f9f9;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+        .field-value a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        .clamped {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            white-space: pre-line;
+        }
+        .clamped-5 {
+            display: -webkit-box;
+            -webkit-line-clamp: 5;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            white-space: pre-wrap;
+        }
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: #3498db;
+            cursor: pointer;
+            padding: 5px 0 0 0;
+            font-size: 0.85em;
+            font-weight: bold;
+            display: inline-block;
+            text-align: left;
+        }
+        .toggle-btn:hover {
+            text-decoration: underline;
+        }
+        .image-gallery {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .thumb-container {
+            width: 80px;
+            height: 80px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fafafa;
+        }
+        .thumb-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.2s;
+        }
+        .thumb-container:hover img {
+            opacity: 0.7;
+        }
+        .highlight-fields {
+            background-color: #fdf2e9;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border-left: 4px solid #e67e22;
+        }
+        .highlight-fields .field { margin-bottom: 8px; }
+        .highlight-fields .field:last-child { margin-bottom: 0; }
+        .highlight-fields .field-value {
+            background: transparent;
+            border: none;
+            padding: 0;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        #imageModal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            align-items: center;
+            justify-content: center;
+        }
+        #modalImg {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>会場データビューア</h1>
+    <div class="header-info">
+        Googleスプレッドシートの最新データを自動同期中
+    </div>
+
+    <!-- 1. 全体マップ (OSMグレースケール) -->
+    <div id="global-map-container">
+        <h2 class="map-title">📍 全体会場マップ</h2>
+        <div id="global-map"></div>
+    </div>
+
+    <!-- ローディング表示 -->
+    <div id="loading">会場データを読み込み中...</div>
+
+    <!-- 2. カード一覧コンテナ -->
+    <div id="container"></div>
+
+    <!-- 3. 画像拡大モーダル -->
+    <div id="imageModal">
+        <span class="close-btn" id="closeModal">×</span>
+        <img id="modalImg" src="" alt="拡大画像">
+    </div>
+
+    <script>
+        // 会場データ用のGoogleスプレッドシートCSV公開URL
+        const VENUE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR41-3-c9Ms-wAiBmMnhlIA-JtGoJP4L0qXuRl0lOGAEVP-wthnW3pY0788kFjtqouTvW10t91yVaOA/pub?output=csv";
+
+        // LeafletデフォルトマーカーアイコンのURL補正
+        delete L.Icon.Default.prototype._getIconUrl;
+        L.Icon.Default.mergeOptions({
+            iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+        });
+
+        const headerFields = ['Text Name', 'Text Campany', 'Checkbox Sanka'];
+        const imageFields = ['File 25', 'File 26', 'File 27', 'File 28'];
+        const topHighlightFields = ['Text Add', 'Textarea Eria', 'Checkbox 960', 'Textarea Sch']; 
+        
+        const fieldMap = {
+            'Text Name': '会場名',
+            'Text Campany': '運営会社・団体名',
+            'Checkbox Sanka': '参加形態',
+            'Text Add': '住所',
+            'Textarea Eria': 'エリア',
+            'Checkbox 960': '受入可能ジャンル',
+            'Textarea Sch': '日程・利用条件',
+            'Checkbox 777': '会場カテゴリ',
+            'Textarea Space': 'スペース概要',
+            'Textarea Capa': 'キャパシティ・制限',
+            'Textarea Pr': 'PR・アピールポイント',
+            'Textarea Sns': 'WEBサイト・SNS'
+        };
+
+        let globalMap = null;
+        let markersGroup = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchAndRenderVenueData();
+        });
+
+        // スプレッドシートCSVの解析と描画
+        function fetchAndRenderVenueData() {
+            Papa.parse(VENUE_CSV_URL, {
+                download: true,
+                header: false,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    const rawRows = results.data;
+                    if (!rawRows || rawRows.length < 3) {
+                        document.getElementById('loading').textContent = "表示可能な会場データが見つかりませんでした。";
+                        return;
+                    }
+
+                    const keys = rawRows[1].map(k => k ? k.trim() : '');
+
+                    const parsedData = [];
+                    for (let i = 2; i < rawRows.length; i++) {
+                        const row = rawRows[i];
+                        const rowObj = { _rawRow: row };
+
+                        keys.forEach((key, colIndex) => {
+                            if (key) {
+                                rowObj[key] = row[colIndex] || '';
+                            }
+                        });
+                        parsedData.push(rowObj);
+                    }
+
+                    document.getElementById('loading').style.display = 'none';
+                    renderCards(parsedData);
+                    initOSMMap(parsedData, keys);
+                },
+                error: function(err) {
+                    const loadingEl = document.getElementById('loading');
+                    loadingEl.style.color = "#e74c3c";
+                    loadingEl.textContent = "会場データの自動読み込みに失敗しました。URLまたはネットワークを確認してください。";
+                    console.error("CSV Parse Error:", err);
+                }
+            });
+        }
+
+        // OpenStreetMap 全体マップの初期化とプロット
+        function initOSMMap(data, keys) {
+            const mapContainer = document.getElementById('global-map-container');
+            mapContainer.style.display = 'block';
+
+            if (!globalMap) {
+                globalMap = L.map('global-map').setView([34.66, 135.50], 12);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(globalMap);
+                markersGroup = L.featureGroup().addTo(globalMap);
+            } else {
+                markersGroup.clearLayers();
+            }
+
+            const xIndex = 23; // Excel X列 (0始まりで23)
+            const yIndex = 24; // Excel Y列 (0始まりで24)
+
+            data.forEach((item, index) => {
+                const cardId = `card-entry-${data.length - index}`;
+                const venueTitle = item['Text Name'] || (item._rawRow && item._rawRow[3]) || '名称未設定';
+                const address = item['Text Add'] || '';
+
+                let rawVal1 = item._rawRow ? item._rawRow[xIndex] : '';
+                let rawVal2 = item._rawRow ? item._rawRow[yIndex] : '';
+
+                if (!rawVal1) rawVal1 = item['X'] || item['lon'] || item['lng'] || item['経度'] || item['lat'] || item['緯度'];
+                if (!rawVal2) rawVal2 = item['Y'] || item['lat'] || item['緯度'] || item['lon'] || item['lng'] || item['経度'];
+
+                const val1 = parseFloat(rawVal1);
+                const val2 = parseFloat(rawVal2);
+
+                if (!isNaN(val1) && !isNaN(val2)) {
+                    let lat, lon;
+                    if (val1 >= 20 && val1 <= 46 && val2 >= 120 && val2 <= 150) {
+                        lat = val1;
+                        lon = val2;
+                    } else if (val2 >= 20 && val2 <= 46 && val1 >= 120 && val1 <= 150) {
+                        lat = val2;
+                        lon = val1;
+                    }
+
+                    if (lat && lon) {
+                        const popupHtml = `
+                            <div style="font-size:14px; line-height:1.4;">
+                                <strong style="color:#c0392b;">${escapeHTML(venueTitle)}</strong><br>
+                                <span style="font-size:12px; color:#555;">${escapeHTML(address)}</span><br>
+                                <a href="#${cardId}" style="display:inline-block; margin-top:5px; color:#3498db; text-decoration:none; font-weight:bold;">▼ 詳細カードへ移動</a>
+                            </div>
+                        `;
+                        const marker = L.marker([lat, lon]).bindPopup(popupHtml);
+                        markersGroup.addLayer(marker);
+                    }
+                }
+            });
+
+            if (markersGroup.getLayers().length > 0) {
+                globalMap.fitBounds(markersGroup.getBounds(), { padding: [40, 40] });
+            }
+        }
+
+        function escapeHTML(str) {
+            if (typeof str !== 'string') return str;
+            return str.replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[tag] || tag));
+        }
+
+        function linkify(text) {
+            const safeText = escapeHTML(text);
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            return safeText.replace(urlRegex, url => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
+        }
+
+        function renderCards(data) {
+            const container = document.getElementById('container');
+            container.innerHTML = '';
+
+            data.forEach((row, index) => {
+                const entryNo = data.length - index; 
+                const cardId = `card-entry-${entryNo}`;
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.id = cardId;
+
+                // --- 1. ヘッダー ---
+                const header = document.createElement('div');
+                header.className = 'card-header';
+
+                const noSpan = document.createElement('span');
+                noSpan.className = 'entry-no';
+                noSpan.textContent = `エントリーNo. ${entryNo}`;
+                
+                const title = document.createElement('h2');
+                title.className = 'card-title';
+                title.textContent = row['Text Name'] || '会場名なし';
+                
+                const name = document.createElement('h3');
+                name.className = 'card-subtitle';
+                name.textContent = row['Text Campany'] || '運営会社・団体なし';
+
+                const badge = document.createElement('span');
+                badge.className = 'badge';
+                badge.textContent = row['Checkbox Sanka'] || '参加形態未指定';
+
+                header.appendChild(noSpan);
+                header.appendChild(title);
+                header.appendChild(name);
+                header.appendChild(badge);
+                card.appendChild(header);
+
+                // --- 2. 画像ギャラリー ---
+                const gallery = document.createElement('div');
+                gallery.className = 'image-gallery';
+                imageFields.forEach((key) => {
+                    const imgUrl = row[key];
+                    if (imgUrl && imgUrl.trim() !== '') {
+                        const thumbWrap = document.createElement('div');
+                        thumbWrap.className = 'thumb-container';
+                        const img = document.createElement('img');
+                        img.src = imgUrl;
+                        thumbWrap.addEventListener('click', () => openModal(imgUrl));
+                        thumbWrap.appendChild(img);
+                        gallery.appendChild(thumbWrap);
+                    }
+                });
+                if (gallery.children.length > 0) card.appendChild(gallery);
+
+                // --- 3. 個別 Google Map ---
+                const address = row['Text Add'];
+                if (address && address.trim() !== '') {
+                    const mapDiv = document.createElement('div');
+                    mapDiv.className = 'map-container';
+                    const iframe = document.createElement('iframe');
+                    iframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(address)}&output=embed&t=m&z=15`;
+                    iframe.loading = "lazy";
+                    iframe.allowFullscreen = true;
+                    mapDiv.appendChild(iframe);
+                    card.appendChild(mapDiv);
+                }
+
+                // --- 4. ハイライトエリア ---
+                const highlightDiv = document.createElement('div');
+                highlightDiv.className = 'highlight-fields';
+                let hasHighlight = false;
+                topHighlightFields.forEach(key => {
+                    const value = row[key];
+                    if (value && value.trim() !== '') {
+                        hasHighlight = true;
+                        const fDiv = document.createElement('div');
+                        fDiv.className = 'field';
+                        fDiv.innerHTML = `<span class="field-label">${fieldMap[key]}</span><div class="field-value">${linkify(value)}</div>`;
+                        highlightDiv.appendChild(fDiv);
+                    }
+                });
+                if (hasHighlight) card.appendChild(highlightDiv);
+
+                // --- 5. その他のテキスト項目 ---
+                for (const [key, label] of Object.entries(fieldMap)) {
+                    if (headerFields.includes(key) || topHighlightFields.includes(key)) continue;
+
+                    const value = row[key];
+                    if (value && value.trim() !== '') {
+                        const fieldDiv = document.createElement('div');
+                        fieldDiv.className = 'field';
+                        
+                        const labelSpan = document.createElement('span');
+                        labelSpan.className = 'field-label';
+                        labelSpan.textContent = label;
+                        
+                        const valueDiv = document.createElement('div');
+                        valueDiv.className = 'field-value';
+                        valueDiv.innerHTML = linkify(value);
+                        
+                        fieldDiv.appendChild(labelSpan);
+                        fieldDiv.appendChild(valueDiv);
+
+                        const isWebSNS = (key === 'Textarea Sns');
+                        const isLongText = (key === 'Textarea Space' || key === 'Textarea Pr' || key === 'Textarea Capa');
+                        
+                        let shouldClamp = false;
+                        let clampClass = '';
+
+                        if (isWebSNS) {
+                            if (value.split('\n').length > 5) {
+                                shouldClamp = true;
+                                clampClass = 'clamped-5';
+                            }
+                        } else if (isLongText) {
+                            if (value.length > 80 || value.split('\n').length > 3) {
+                                shouldClamp = true;
+                                clampClass = 'clamped';
+                            }
+                        }
+
+                        if (shouldClamp) {
+                            valueDiv.classList.add(clampClass);
+                            const toggleBtn = document.createElement('button');
+                            toggleBtn.className = 'toggle-btn';
+                            toggleBtn.textContent = '▼ 続きを読む';
+                            toggleBtn.onclick = () => {
+                                if (valueDiv.classList.contains(clampClass)) {
+                                    valueDiv.classList.remove(clampClass);
+                                    valueDiv.style.whiteSpace = 'pre-wrap';
+                                    toggleBtn.textContent = '▲ 閉じる';
+                                } else {
+                                    valueDiv.classList.add(clampClass);
+                                    valueDiv.style.whiteSpace = '';
+                                    toggleBtn.textContent = '▼ 続きを読む';
+                                }
+                            };
+                            fieldDiv.appendChild(toggleBtn);
+                        }
+                        
+                        card.appendChild(fieldDiv);
+                    }
+                }
+                container.appendChild(card);
+            });
+        }
+
+        // モーダル制御
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImg');
+        const closeModalBtn = document.getElementById('closeModal');
+
+        function openModal(src) {
+            modalImg.src = src;
+            modal.style.display = 'flex';
+        }
+        function closeModal() {
+            modal.style.display = 'none';
+            modalImg.src = '';
+        }
+
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener('click', closeModal);
+        }
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) closeModal();
+            });
+        }
+    </script>
+</body>
+</html>
