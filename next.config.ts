@@ -29,6 +29,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/reception',
+        destination: 'https://docs.google.com/forms/d/e/1FAIpQLSeZXFfqWX8xf_laUlFMgj9KqPXUUp8tk62Yx9f-dCl1F9ro_A/viewform?usp=pp_url&entry.857453513=1%25E5%2590%258D%25EF%25BC%2588%25E6%259C%25AC%25E4%25BA%25BA%25E3%2581%25AE%25E3%2581%25BF%25EF%25BC%2589',
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
