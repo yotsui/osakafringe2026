@@ -149,14 +149,14 @@ export default function ArtistsClient({ artists, performances }: ArtistsClientPr
 
                   {/* Artist Name */}
                   <Link href={artistUrl} className="block group">
-                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-[#E6007E] transition-colors leading-tight">
+                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-[#E6007E] transition-colors leading-tight line-clamp-2">
                       {artistName}
                     </h3>
                   </Link>
 
                   {/* Profile Bio */}
                   {profile && (
-                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium line-clamp-3 whitespace-pre-line">
+                    <p className="text-sm text-slate-600 leading-relaxed font-medium line-clamp-4 whitespace-pre-line">
                       {profile}
                     </p>
                   )}

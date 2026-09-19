@@ -9,33 +9,99 @@ import PerformanceCard from '@/components/audience/PerformanceCard';
 import PerformanceModal from '@/components/audience/PerformanceModal';
 import PartnerSection from '@/components/common/PartnerSection';
 import { ArrowRightIcon } from '@/components/common/CustomIcons';
-import { selectFeaturedPerformances } from '@/utils/performanceUtils';
+import { selectFeaturedPerformances, getFestivalStatus } from '@/utils/performanceUtils';
+import { NewsItem } from '@/lib/microcms';
 
 interface HomeClientProps {
   venues?: unknown[];
   performances: Performance[];
   partners?: Partner[];
   siteInfo: SiteInfo;
+  news?: NewsItem[];
 }
 
 export default function HomeClient({
   performances,
   partners = [],
   siteInfo,
+  news = [],
 }: HomeClientProps) {
-  const { t, getText } = useLanguage();
+  const { t, getText, language } = useLanguage();
   const [selectedPerformance, setSelectedPerformance] = useState<Performance | null>(null);
 
-  // Smart selection for up to 6 featured shows (excludes ended shows)
-  const displayPerformances = selectFeaturedPerformances(performances, 6);
+  // Smart selection for up to 4 featured shows (excludes ended shows)
+  const displayPerformances = selectFeaturedPerformances(performances, 4);
 
   const aboutTitle = getText(siteInfo.aboutTitle, siteInfo.aboutTitleEn);
   const aboutText = getText(siteInfo.aboutText, siteInfo.aboutTextEn);
+
+  const festivalStatus = getFestivalStatus();
+  let pickUpTitle = '';
+  let pickUpLabel = '';
+  let pickUpDesc = '';
+
+  if (festivalStatus === 'before') {
+    pickUpLabel = 'PICK UP PROGRAMS';
+    pickUpTitle = language === 'en' ? 'Featured Programs' : '注目の公演・プログラム';
+    pickUpDesc = language === 'en' 
+      ? 'Introducing featured performances and exhibitions leading up to the opening on October 8.'
+      : '10月8日の開幕に向け、注目の公演や展示をご紹介します。';
+  } else if (festivalStatus === 'during') {
+    pickUpLabel = 'PICK UP SHOWS';
+    pickUpTitle = language === 'en' ? 'Upcoming Featured Shows' : '今週の注目公演';
+    pickUpDesc = language === 'en'
+      ? 'Featured performances coming up soon.'
+      : 'まもなく開催される注目のパフォーマンス';
+  } else {
+    pickUpLabel = 'PROGRAM ARCHIVE';
+    pickUpTitle = language === 'en' ? 'Programs Archive' : '開催プログラム';
+    pickUpDesc = language === 'en'
+      ? 'Introducing past performances and exhibitions held at Osaka Fringe 2026.'
+      : 'Osaka Fringe 2026で開催された公演や展示をご紹介します。';
+  }
 
   return (
     <div className="space-y-20 pb-20 bg-[#fef9fc]">
       {/* Hero Section */}
       <HomeHeroClient siteInfo={siteInfo} />
+
+      {/* News Section */}
+      {news && news.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+          <div className="border-b border-pink-100 pb-2 mb-4">
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              NEWS
+            </h2>
+          </div>
+          <div className="space-y-3">
+            {news.map((item) => (
+              <a
+                key={item.id}
+                href={item.linkUrl || '#'}
+                target={item.linkUrl ? "_blank" : undefined}
+                rel="noopener noreferrer"
+                className={`block bg-white border border-slate-100 p-4 rounded-xl shadow-sm hover:border-[#E6007E] transition-colors ${item.linkUrl ? 'cursor-pointer' : 'cursor-default pointer-events-none'}`}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-sm font-bold text-slate-500">
+                      {new Date(item.publishedAt).toLocaleDateString(language === 'en' ? 'en-US' : 'ja-JP')}
+                    </span>
+                    {item.isImportant && (
+                      <span className="px-2 py-0.5 bg-[#E6007E] text-white text-[10px] font-bold rounded">
+                        IMPORTANT
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-sm sm:text-base font-bold text-slate-900 flex-1">
+                    {getText(item.title, item.titleEn)}
+                  </h3>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Featured / Pick Up Shows (Only show if at least 1 show is available) */}
       {displayPerformances.length > 0 && (
@@ -43,18 +109,18 @@ export default function HomeClient({
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-pink-100 pb-5">
             <div className="space-y-1.5">
               <div className="text-[#E6007E] font-black text-xs uppercase tracking-wider">
-                <span>{t('pickUpShows')}</span>
+                <span>{pickUpLabel}</span>
               </div>
               <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                {t('pickUpTitle')}
+                {pickUpTitle}
               </h2>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                {t('pickUpSubtitle')}
+              <p className="text-sm text-slate-600 font-medium">
+                {pickUpDesc}
               </p>
             </div>
             <Link
               href="/audience"
-              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-black text-[#E6007E] hover:text-[#c4006b] bg-pink-50 hover:bg-pink-100/70 px-4 py-2 rounded-full transition-colors self-start sm:self-auto cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-sm font-black text-[#E6007E] hover:text-[#c4006b] bg-pink-50 hover:bg-pink-100/70 px-5 py-2.5 rounded-full transition-colors self-start sm:self-auto cursor-pointer"
             >
               <span>{t('viewAllAudience')}</span>
               <ArrowRightIcon className="w-4 h-4" />

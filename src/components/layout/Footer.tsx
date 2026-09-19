@@ -20,18 +20,20 @@ export default function Footer() {
             <div className="w-52 sm:w-60 filter brightness-0 invert">
               <BrandLogo variant="main-date" />
             </div>
-            <div className="text-xs text-white font-bold space-y-1 pt-1">
-              <p>主催：大阪文化フリンジ機構設立準備室</p>
-              <p className="pt-1">
-                後援：
-                <a href="https://octb.osaka-info.jp/" target="_blank" rel="noopener noreferrer" className="hover:text-gray-200 transition-colors">
-                  公益財団法人大阪観光局
-                </a>
-                {' ｜'}
-                <a href="https://art-flavor.osaka-info.jp/" target="_blank" rel="noopener noreferrer" className="hover:text-gray-200 transition-colors">
-                  Art Flavor Osaka
-                </a>
-              </p>
+            <div className="text-sm text-white font-bold space-y-2 pt-1">
+              <p>主催：大阪文化万博 Osaka Fringe 2026 準備室</p>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                <span className="shrink-0">後援：</span>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0">
+                  <a href="https://octb.osaka-info.jp/" target="_blank" rel="noopener noreferrer" className="hover:text-gray-200 transition-colors inline-block py-1 sm:py-0">
+                    公益財団法人大阪観光局
+                  </a>
+                  <span className="hidden sm:inline mx-2 text-white/50">｜</span>
+                  <a href="https://art-flavor.osaka-info.jp/" target="_blank" rel="noopener noreferrer" className="hover:text-gray-200 transition-colors inline-block py-1 sm:py-0">
+                    Art Flavor Osaka
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -40,44 +42,44 @@ export default function Footer() {
             <h4 className="text-xs font-black text-[#FFF100] uppercase tracking-widest border-b border-white/20 pb-2">
               Navigation
             </h4>
-            <ul className="space-y-2.5 text-xs font-bold">
+            <ul className="space-y-1 text-sm font-bold">
               <li>
-                <Link href="/" className="text-white/90 hover:text-white transition-colors">
+                <Link href="/" className="inline-block py-2 text-white/90 hover:text-white transition-colors">
                   {t('navHome')}
                 </Link>
               </li>
               <li>
-                <Link href="/audience" className="text-[#FFF100] hover:text-white font-black">
+                <Link href="/audience" className="inline-block py-2 text-[#FFF100] hover:text-white font-black">
                   {t('navAudience')}
                 </Link>
               </li>
               <li>
-                <Link href="/venues" className="text-white/90 hover:text-white transition-colors">
+                <Link href="/venues" className="inline-block py-2 text-white/90 hover:text-white transition-colors">
                   {t('navVenues')}
                 </Link>
               </li>
               <li>
-                <Link href="/artists" className="text-white/90 hover:text-white transition-colors">
+                <Link href="/artists" className="inline-block py-2 text-white/90 hover:text-white transition-colors">
                   {t('navArtists')}
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="text-white/90 hover:text-white transition-colors">
+                <Link href="/about" className="inline-block py-2 text-white/90 hover:text-white transition-colors">
                   {t('navAbout')}
                 </Link>
               </li>
               <li>
-                <Link href="/logo_download" className="text-white/90 hover:text-white transition-colors">
+                <Link href="/logo_download" className="inline-block py-2 text-white/90 hover:text-white transition-colors">
                   {t('navBrandAssets')}
                 </Link>
               </li>
               <li>
-                <Link href="/donate" className="text-white/90 hover:text-white transition-colors">
+                <Link href="/donate" className="inline-block py-2 text-white/90 hover:text-white transition-colors">
                   {t('navDonate')}
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-white/90 hover:text-white transition-colors">
+                <Link href="/contact" className="inline-block py-2 text-white/90 hover:text-white transition-colors">
                   {t('navContact')}
                 </Link>
               </li>
@@ -94,11 +96,11 @@ export default function Footer() {
                 href="https://www.instagram.com/osaka_fringe/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2.5 p-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition-all group"
+                className="flex items-center gap-2.5 p-3 min-h-[44px] rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm border border-white/20 transition-all group"
               >
-                <InstagramIcon className="w-4 h-4 text-[#FFF100]" />
+                <InstagramIcon className="w-5 h-5 text-[#FFF100]" />
                 <span>Instagram @osaka_fringe</span>
-                <ExternalLink className="w-3.5 h-3.5 ml-auto text-white/60 group-hover:text-white" />
+                <ExternalLink className="w-4 h-4 ml-auto text-white/60 group-hover:text-white" />
               </a>
 
 
@@ -109,7 +111,7 @@ export default function Footer() {
 
         {/* Bottom copyright */}
         <div className="pt-8 border-t border-white/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-bold text-white/80">
-          <p>© 2026 Osaka Fringe 2026 Executive Committee. All rights reserved.</p>
+          <p>© 2026 大阪文化万博 Osaka Fringe 2026 準備室 All rights reserved.</p>
           <div className="flex items-center gap-4 text-xs font-black">
 
           </div>

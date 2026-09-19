@@ -112,10 +112,75 @@ export default function PerformanceCard({
 
       {/* Card Content */}
       <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-        <div className="space-y-2">
+        <div className="space-y-3">
+          {/* Title - Priority #1 */}
+          <Link 
+            href={performanceUrl}
+            className="block text-lg font-black text-slate-900 line-clamp-2 leading-snug group-hover:text-[#E6007E] transition-colors"
+          >
+            {title}
+          </Link>
+          
+          {/* Schedule & Venue Meta (Priority #2) */}
+          <div className="space-y-2 text-sm font-medium pt-1">
+            {allSchedules.length > 0 ? (
+              <div className="space-y-1.5">
+                {allSchedules.map((schedule, idx) => {
+                  const sVenueName = getText(schedule.venueName, schedule.venueNameEn);
+                  const sVenueId = schedule.venueId || schedule.venue?.id;
+                  const formattedDate = formatScheduleCompact(schedule, language);
+                  return (
+                    <div key={idx} className="flex items-start gap-2 text-slate-700">
+                      <CalendarIcon className="w-4 h-4 shrink-0 text-[#E6007E] mt-0.5" />
+                      <div className="min-w-0 flex-1 flex flex-wrap items-center gap-x-2">
+                        <span className="font-bold">{formattedDate}</span>
+                        {isMultiVenues && sVenueName && (
+                          <span className="text-slate-500 text-xs truncate">
+                            @{sVenueId ? (
+                              <Link href={`/venues/${sVenueId}`} className="hover:text-[#E6007E] hover:underline">
+                                {sVenueName}
+                              </Link>
+                            ) : (
+                              sVenueName
+                            )}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : null}
+
+            {/* 単一会場の場合は会場名を1回のみ下部に表示 */}
+            {!isMultiVenues && singleVenueName && (
+              <div className="flex items-center gap-2 text-slate-700 pt-1">
+                <MapPinIcon className="w-4 h-4 shrink-0 text-[#E6007E]" color="#E6007E" />
+                {performance.venue?.id || performance.venueId ? (
+                  <Link
+                    href={`/venues/${performance.venue?.id || performance.venueId}`}
+                    className="truncate font-bold hover:text-[#E6007E] hover:underline"
+                  >
+                    {singleVenueName}
+                  </Link>
+                ) : (
+                  <span className="truncate font-bold">{singleVenueName}</span>
+                )}
+              </div>
+            )}
+            
+            {/* Price Info */}
+            <div className="flex items-center gap-2 text-slate-700 pt-1">
+              <TicketIcon className="w-4 h-4 shrink-0 text-slate-400" />
+              <span className="font-bold">{priceDisplay}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-3">
           {/* Artist Name & Optional Work Genre */}
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-bold text-[#E6007E] truncate">
+          <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
+            <p className="text-sm font-bold text-[#E6007E] truncate">
               {performance.artist?.id ? (
                 <Link href={`/artists/${performance.artist.id}`} className="hover:underline">
                   {artistName}
@@ -125,91 +190,29 @@ export default function PerformanceCard({
               )}
             </p>
             {workGenreText && (
-              <span className="shrink-0 px-2 py-0.5 rounded-md bg-pink-50 border border-pink-200/80 text-[#E6007E] text-[10px] font-bold tracking-tight max-w-[50%] truncate">
+              <span className="shrink-0 px-2 py-0.5 rounded-md bg-pink-50 border border-pink-200/80 text-[#E6007E] text-xs font-bold tracking-tight max-w-[40%] truncate">
                 {workGenreText}
               </span>
             )}
           </div>
-
-          {/* Title - Priority #1 */}
-          <Link 
-            href={performanceUrl}
-            className="block text-base sm:text-lg font-black text-slate-900 line-clamp-2 leading-snug group-hover:text-[#E6007E] transition-colors"
-          >
-            {title}
-          </Link>
           
           {/* Description */}
           {description && (
-            <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed font-medium">
+            <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed font-medium">
               {description}
             </p>
           )}
-        </div>
 
-        {/* Schedule & Venue Meta (全日程表示) */}
-        <div className="space-y-1.5 text-xs font-medium pt-1">
-          {allSchedules.length > 0 ? (
-            <div className="space-y-1">
-              {allSchedules.map((schedule, idx) => {
-                const sVenueName = getText(schedule.venueName, schedule.venueNameEn);
-                const sVenueId = schedule.venueId || schedule.venue?.id;
-                const formattedDate = formatScheduleCompact(schedule, language);
-                return (
-                  <div key={idx} className="flex items-start gap-1.5 text-slate-600">
-                    <CalendarIcon className="w-3.5 h-3.5 shrink-0 text-[#E6007E] mt-0.5" />
-                    <div className="min-w-0 flex-1 flex flex-wrap items-center gap-x-2">
-                      <span className="font-bold text-slate-800">{formattedDate}</span>
-                      {isMultiVenues && sVenueName && (
-                        <span className="text-slate-500 text-[11px] truncate">
-                          @{sVenueId ? (
-                            <Link href={`/venues/${sVenueId}`} className="hover:text-[#E6007E] hover:underline">
-                              {sVenueName}
-                            </Link>
-                          ) : (
-                            sVenueName
-                          )}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : null}
-
-          {/* 単一会場の場合は会場名を1回のみ下部に表示 */}
-          {!isMultiVenues && singleVenueName && (
-            <div className="flex items-center gap-1.5 text-slate-600 pt-0.5">
-              <MapPinIcon className="w-3.5 h-3.5 shrink-0 text-[#E6007E]" color="#E6007E" />
-              {performance.venue?.id || performance.venueId ? (
-                <Link
-                  href={`/venues/${performance.venue?.id || performance.venueId}`}
-                  className="truncate font-medium hover:text-[#E6007E] hover:underline"
-                >
-                  {singleVenueName}
-                </Link>
-              ) : (
-                <span className="truncate font-medium">{singleVenueName}</span>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Price & Action Footer */}
-        <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900">
-            <TicketIcon className="w-4 h-4 text-slate-400" />
-            <span>{priceDisplay}</span>
+          {/* Action Footer */}
+          <div className="pt-2 flex items-center justify-end gap-2">
+            <Link
+              href={performanceUrl}
+              className="flex items-center gap-1.5 text-sm font-black text-[#E6007E] hover:underline group-hover:translate-x-1 transition-all"
+            >
+              <span>{t('cardDetails')}</span>
+              <ArrowRightIcon className="w-4 h-4" />
+            </Link>
           </div>
-
-          <Link
-            href={performanceUrl}
-            className="flex items-center gap-1 text-xs font-black text-[#E6007E] hover:underline group-hover:translate-x-0.5 transition-all"
-          >
-            <span>{t('cardDetails')}</span>
-            <ArrowRightIcon className="w-3.5 h-3.5" />
-          </Link>
         </div>
       </div>
     </div>

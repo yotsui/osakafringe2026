@@ -14,6 +14,7 @@ import {
   sortVenuesForDate,
   sortVenuesForAllDates,
   getNextAvailableDate,
+  getFestivalStatus,
 } from '@/utils/performanceUtils';
 import { formatDatePart } from '@/utils/dateFormat';
 
@@ -125,17 +126,19 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
     return getNextAvailableDate(allFestivalDates, activeTargetDate);
   }, [allFestivalDates, activeTargetDate]);
 
+  const festivalStatus = getFestivalStatus();
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
       {/* 3-Step Editorial Header */}
       <div className="border-l-4 border-[#E6007E] pl-4 sm:pl-6 space-y-2 py-2">
-        <div className="text-xs font-black tracking-widest text-[#E6007E] uppercase">
+        <div className="text-sm font-black tracking-widest text-[#E6007E] uppercase">
           VENUES & SCHEDULE
         </div>
         <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
           {t('venuesPageTitle')}
         </h1>
-        <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-2xl leading-relaxed">
+        <p className="text-sm sm:text-base text-slate-600 font-medium max-w-2xl leading-relaxed">
           {t('venuesPageSubtitle')}
         </p>
         {isDemoMode && (
@@ -146,12 +149,33 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
         )}
       </div>
 
+      {/* Information Banner */}
+      {festivalStatus === 'before' ? (
+        <div className="bg-pink-50 border border-pink-100 rounded-xl p-4 flex items-start gap-3">
+          <Sparkles className="w-5 h-5 text-pink-500 shrink-0 mt-0.5" />
+          <p className="text-sm font-medium text-pink-900">
+            {language === 'en' 
+              ? 'Performance and venue information is being updated continuously. New information will be added sequentially.'
+              : '公演・会場情報は随時更新しています。最新情報は順次追加されます。'}
+          </p>
+        </div>
+      ) : festivalStatus === 'during' ? (
+        <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 flex items-start gap-3">
+          <Sparkles className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+          <p className="text-sm font-medium text-amber-900">
+            {language === 'en'
+              ? 'Performance contents and times may change. Please check the details of each performance before visiting.'
+              : '公演内容や開催時間は変更になる場合があります。ご来場前に各公演の詳細をご確認ください。'}
+          </p>
+        </div>
+      ) : null}
+
       {/* Date Filter Tabs (Placed directly before the map) */}
       <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-[#E6007E]" />
-            <span className="text-xs font-black text-slate-800 uppercase tracking-wider">
+            <span className="text-sm font-black text-slate-800 uppercase tracking-wider">
               {language === 'en' ? 'Select Date' : '日程で会場を探す'}
             </span>
           </div>
@@ -167,7 +191,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
           <button
             type="button"
             onClick={() => setFilterMode('all')}
-            className={`px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
+            className={`px-4 py-3 rounded-xl text-sm font-bold transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer min-h-[52px] ${
               filterMode === 'all'
                 ? 'bg-[#E6007E] text-white shadow-sm ring-2 ring-[#E6007E]/30 font-black'
                 : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
@@ -179,40 +203,44 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
             </span>
           </button>
 
-          {/* 今日 (Today) */}
-          <button
-            type="button"
-            onClick={() => setFilterMode('today')}
-            className={`px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
-              filterMode === 'today'
-                ? 'bg-[#E6007E] text-white shadow-sm ring-2 ring-[#E6007E]/30 font-black'
-                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
-            }`}
-          >
-            <span>{t('venueFilterToday')}</span>
-            <span className={`text-[10px] ${filterMode === 'today' ? 'text-pink-100' : 'text-slate-400'}`}>
-              {formatDatePart(todayStr, language)}
-            </span>
-          </button>
+          {festivalStatus === 'during' && (
+            <>
+              {/* 今日 (Today) */}
+              <button
+                type="button"
+                onClick={() => setFilterMode('today')}
+                className={`px-4 py-3 rounded-xl text-sm font-bold transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer min-h-[52px] ${
+                  filterMode === 'today'
+                    ? 'bg-[#E6007E] text-white shadow-sm ring-2 ring-[#E6007E]/30 font-black'
+                    : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+                }`}
+              >
+                <span>{t('venueFilterToday')}</span>
+                <span className={`text-[10px] ${filterMode === 'today' ? 'text-pink-100' : 'text-slate-400'}`}>
+                  {formatDatePart(todayStr, language)}
+                </span>
+              </button>
 
-          {/* 明日 (Tomorrow) */}
-          <button
-            type="button"
-            onClick={() => setFilterMode('tomorrow')}
-            className={`px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
-              filterMode === 'tomorrow'
-                ? 'bg-[#E6007E] text-white shadow-sm ring-2 ring-[#E6007E]/30 font-black'
-                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
-            }`}
-          >
-            <span>{t('venueFilterTomorrow')}</span>
-            <span className={`text-[10px] ${filterMode === 'tomorrow' ? 'text-pink-100' : 'text-slate-400'}`}>
-              {formatDatePart(tomorrowStr, language)}
-            </span>
-          </button>
+              {/* 明日 (Tomorrow) */}
+              <button
+                type="button"
+                onClick={() => setFilterMode('tomorrow')}
+                className={`px-4 py-3 rounded-xl text-sm font-bold transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer min-h-[52px] ${
+                  filterMode === 'tomorrow'
+                    ? 'bg-[#E6007E] text-white shadow-sm ring-2 ring-[#E6007E]/30 font-black'
+                    : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+                }`}
+              >
+                <span>{t('venueFilterTomorrow')}</span>
+                <span className={`text-[10px] ${filterMode === 'tomorrow' ? 'text-pink-100' : 'text-slate-400'}`}>
+                  {formatDatePart(tomorrowStr, language)}
+                </span>
+              </button>
+            </>
+          )}
 
           {/* 日付を選ぶ (Pick Date Dropdown) */}
-          <div className="relative">
+          <div className={`relative ${festivalStatus !== 'during' ? 'col-span-1 sm:col-span-3' : ''}`}>
             <select
               value={filterMode === 'pick_date' ? customDate : ''}
               onChange={(e) => {

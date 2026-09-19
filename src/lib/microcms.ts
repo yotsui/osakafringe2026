@@ -779,6 +779,36 @@ export const getPartners = cache(async (): Promise<Partner[]> => {
   return rawList.map(normalizePartner);
 });
 
+export interface NewsItem {
+  id: string;
+  title: string;
+  titleEn?: string;
+  publishedAt: string;
+  body: string;
+  bodyEn?: string;
+  category?: string;
+  linkUrl?: string;
+  isImportant?: boolean;
+}
+
+/**
+ * お知らせ一覧を取得 (React cache & ISR 300s)
+ */
+export const getNews = cache(async (limit: number = 3): Promise<NewsItem[]> => {
+  if (!client) return [];
+  try {
+    const data = await client.getList<NewsItem>({
+      endpoint: 'news',
+      queries: { limit, orders: '-publishedAt' },
+      customRequestInit: { next: { revalidate: REVALIDATE_TIME } },
+    });
+    return data.contents || [];
+  } catch (error) {
+    console.warn('[MicroCMS] Failed to fetch news, likely endpoint does not exist yet.', error);
+    return [];
+  }
+});
+
 /**
  * バナー一覧を取得 (React cache & ISR 300s)
  */

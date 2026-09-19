@@ -104,15 +104,15 @@ export default function PartnerSection({ partners = [] }: PartnerSectionProps) {
                         {/* Partner Name & Desc */}
                         <div className="space-y-1">
                           <div className="flex items-start justify-between gap-1.5">
-                            <h5 className="font-bold text-xs sm:text-sm text-slate-900 group-hover:text-[#E6007E] transition-colors line-clamp-2 leading-snug">
+                            <h5 className="font-bold text-sm text-slate-900 group-hover:text-[#E6007E] transition-colors line-clamp-2 leading-snug">
                               {name}
                             </h5>
                             {isExternal && (
-                              <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-[#E6007E] shrink-0 mt-0.5 transition-colors" />
+                              <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-[#E6007E] shrink-0 mt-0.5 transition-colors" />
                             )}
                           </div>
                           {desc && (
-                            <p className="text-[11px] text-slate-500 font-medium leading-relaxed line-clamp-2">
+                            <p className="text-sm text-slate-600 font-medium leading-relaxed line-clamp-4">
                               {desc}
                             </p>
                           )}

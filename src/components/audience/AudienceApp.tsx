@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { Performance, Venue, PerformanceSortOption } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
-import { sortPerformances } from '@/utils/performanceUtils';
+import { sortPerformances, getFestivalStatus } from '@/utils/performanceUtils';
 import { getArtistGenreLabel } from '@/utils/genre';
 import dynamic from 'next/dynamic';
 import PerformanceCard from './PerformanceCard';
@@ -210,17 +210,19 @@ export default function AudienceApp({
     { id: 'other', label: t('genre_other') },
   ];
 
+  const festivalStatus = getFestivalStatus();
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* 3-Step Editorial Header */}
       <div className="border-l-4 border-[#E6007E] pl-4 sm:pl-6 space-y-2 py-2">
-        <div className="text-xs font-black tracking-widest text-[#E6007E] uppercase">
+        <div className="text-sm font-black tracking-widest text-[#E6007E] uppercase">
           SHOWS
         </div>
         <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
           公演を探す
         </h1>
-        <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-2xl leading-relaxed">
+        <p className="text-sm sm:text-base text-slate-600 font-medium max-w-2xl leading-relaxed">
           WHAT 何を見る？ / WHERE どこで見る？ / WHEN いつ見る？ 街を歩いて楽しむフェスティバルガイド。
         </p>
       </div>
@@ -230,37 +232,37 @@ export default function AudienceApp({
         <div className="flex p-1.5 rounded-2xl bg-slate-100 border border-slate-200 shadow-inner max-w-md w-full">
           <button
             onClick={() => setActiveTab('search')}
-            className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all ${
+            className={`flex-1 py-2.5 px-3 rounded-xl text-sm font-black flex items-center justify-center gap-1.5 transition-all min-h-[44px] ${
               activeTab === 'search'
                 ? 'bg-white text-pink-600 shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Layers className="w-3.5 h-3.5" />
+            <Layers className="w-4 h-4" />
             <span>{t('tabSearch')}</span>
           </button>
 
           <button
             onClick={() => setActiveTab('map')}
-            className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all ${
+            className={`flex-1 py-2.5 px-3 rounded-xl text-sm font-black flex items-center justify-center gap-1.5 transition-all min-h-[44px] ${
               activeTab === 'map'
                 ? 'bg-white text-pink-600 shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <MapIcon className="w-3.5 h-3.5" />
+            <MapIcon className="w-4 h-4" />
             <span>{t('tabMap')}</span>
           </button>
 
           <button
             onClick={() => setActiveTab('favorites')}
-            className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all ${
+            className={`flex-1 py-2.5 px-3 rounded-xl text-sm font-black flex items-center justify-center gap-1.5 transition-all min-h-[44px] ${
               activeTab === 'favorites'
                 ? 'bg-pink-600 text-white shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Heart className="w-3.5 h-3.5" />
+            <Heart className="w-4 h-4" />
             <span>{t('tabFavorites')} ({favorites.length})</span>
           </button>
         </div>
@@ -279,6 +281,27 @@ export default function AudienceApp({
         /* Search / List / Favorites View */
         <div className="space-y-8">
           
+          {/* Information Banner */}
+          {festivalStatus === 'before' ? (
+            <div className="bg-pink-50 border border-pink-100 rounded-xl p-4 flex items-start gap-3">
+              <Sparkles className="w-5 h-5 text-pink-500 shrink-0 mt-0.5" />
+              <p className="text-sm font-medium text-pink-900">
+                {language === 'en' 
+                  ? 'Performance and venue information is being updated continuously. New information will be added sequentially.'
+                  : '公演・会場情報は随時更新しています。最新情報は順次追加されます。'}
+              </p>
+            </div>
+          ) : festivalStatus === 'during' ? (
+            <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 flex items-start gap-3">
+              <Sparkles className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+              <p className="text-sm font-medium text-amber-900">
+                {language === 'en'
+                  ? 'Performance contents and times may change. Please check the details of each performance before visiting.'
+                  : '公演内容や開催時間は変更になる場合があります。ご来場前に各公演の詳細をご確認ください。'}
+              </p>
+            </div>
+          ) : null}
+
           {/* WHAT / WHERE / WHEN Filter Control Panel */}
           <div className="bg-slate-50 border border-pink-100 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
             {/* Search Input */}
@@ -289,12 +312,12 @@ export default function AudienceApp({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t('searchPlaceholder')}
-                className="w-full bg-white border border-slate-200 rounded-2xl pl-12 pr-4 py-3.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 shadow-2xs transition-colors"
+                className="w-full bg-white border border-slate-200 rounded-2xl pl-12 pr-4 py-3.5 text-base text-slate-900 placeholder-slate-400 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 shadow-2xs transition-colors min-h-[44px]"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 hover:text-slate-600"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400 hover:text-slate-600 min-h-[44px] min-w-[44px] flex items-center justify-center"
                 >
                   クリア
                 </button>
@@ -306,14 +329,14 @@ export default function AudienceApp({
               
               {/* WHAT: Genre */}
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-700 flex items-center gap-1">
-                  <Sparkles className="w-3.5 h-3.5 text-pink-600" />
+                <label className="text-sm font-black text-slate-700 flex items-center gap-1">
+                  <Sparkles className="w-4 h-4 text-pink-600" />
                   <span>{t('filterWhat')}</span>
                 </label>
                 <select
                   value={selectedGenre}
                   onChange={(e) => setSelectedGenre(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-pink-500 shadow-2xs"
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-800 focus:outline-none focus:border-pink-500 shadow-2xs min-h-[44px]"
                 >
                   {genres.map((g) => (
                     <option key={g.id} value={g.id}>
@@ -325,14 +348,14 @@ export default function AudienceApp({
 
               {/* WHERE: Venue */}
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-700 flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-pink-600" />
+                <label className="text-sm font-black text-slate-700 flex items-center gap-1">
+                  <MapPin className="w-4 h-4 text-pink-600" />
                   <span>{t('filterWhere')}</span>
                 </label>
                 <select
                   value={selectedVenueId}
                   onChange={(e) => setSelectedVenueId(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-pink-500 shadow-2xs"
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-800 focus:outline-none focus:border-pink-500 shadow-2xs min-h-[44px]"
                 >
                   <option value="all">{t('allVenues')}</option>
                   {activeVenues.map((v) => (
@@ -345,16 +368,22 @@ export default function AudienceApp({
 
               {/* WHEN: Date */}
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-700 flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5 text-pink-600" />
+                <label className="text-sm font-black text-slate-700 flex items-center gap-1">
+                  <Calendar className="w-4 h-4 text-pink-600" />
                   <span>{t('filterWhen')}</span>
                 </label>
                 <select
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-pink-500 shadow-2xs"
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-800 focus:outline-none focus:border-pink-500 shadow-2xs min-h-[44px]"
                 >
                   <option value="all">{t('allDates')}</option>
+                  {festivalStatus === 'during' && (
+                    <>
+                      <option value="today">{language === 'en' ? 'Today' : '今日'}</option>
+                      <option value="tomorrow">{language === 'en' ? 'Tomorrow' : '明日'}</option>
+                    </>
+                  )}
                   {festivalDates.map((date) => (
                     <option key={date} value={date}>
                       {date}
@@ -365,14 +394,14 @@ export default function AudienceApp({
 
               {/* SORT: Sort By */}
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-700 flex items-center gap-1">
-                  <ArrowUpDown className="w-3.5 h-3.5 text-pink-600" />
+                <label className="text-sm font-black text-slate-700 flex items-center gap-1">
+                  <ArrowUpDown className="w-4 h-4 text-pink-600" />
                   <span>{t('sortBy')}</span>
                 </label>
                 <select
                   value={sortOption}
                   onChange={(e) => setSortOption(e.target.value as PerformanceSortOption)}
-                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-pink-500 shadow-2xs"
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-800 focus:outline-none focus:border-pink-500 shadow-2xs min-h-[44px]"
                 >
                   <option value="date">{t('sortDate')}</option>
                   <option value="featured">{t('sortFeatured')}</option>
@@ -388,9 +417,9 @@ export default function AudienceApp({
               <div className="flex justify-end pt-2">
                 <button
                   onClick={resetFilters}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-200/80 hover:bg-slate-300 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-slate-200/80 hover:bg-slate-300 text-slate-700 text-sm font-bold transition-colors cursor-pointer min-h-[44px]"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
+                  <RotateCcw className="w-4 h-4" />
                   <span>{t('resetFilters')}</span>
                 </button>
               </div>
@@ -399,18 +428,18 @@ export default function AudienceApp({
 
           {/* Results Summary */}
           <div className="flex items-center justify-between px-2">
-            <p className="text-xs font-black text-slate-600 uppercase tracking-wider">
-              {t('resultsCount')}: <span className="text-pink-600 text-sm">{filteredPerformances.length}</span> {t('showsUnit')}
+            <p className="text-sm font-black text-slate-600 uppercase tracking-wider">
+              {t('resultsCount')}: <span className="text-pink-600 text-base">{filteredPerformances.length}</span> {t('showsUnit')}
             </p>
           </div>
 
           {/* Performances Grid */}
           {filteredPerformances.length === 0 ? (
             <div className="py-20 text-center space-y-4 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
-              <p className="text-sm font-bold text-slate-500">{t('noResults')}</p>
+              <p className="text-base font-bold text-slate-500">{t('noResults')}</p>
               <button
                 onClick={resetFilters}
-                className="px-6 py-2.5 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs shadow-sm transition-colors"
+                className="px-6 py-3 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-bold text-sm shadow-sm transition-colors min-h-[44px]"
               >
                 {t('showAllShows')}
               </button>

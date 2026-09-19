@@ -6,6 +6,25 @@ import type {
 } from '../types';
 
 /**
+ * Festival centralized dates
+ */
+export const FESTIVAL_START_DATE = '2026-10-08';
+export const FESTIVAL_END_DATE = '2026-11-08';
+
+/**
+ * Returns the current festival status based on Asia/Tokyo time.
+ * @param nowMs optional timestamp, defaults to Date.now()
+ */
+export function getFestivalStatus(nowMs: number = Date.now()): 'before' | 'during' | 'after' {
+  const startMs = parseJstDateTime(FESTIVAL_START_DATE, '00:00', 'start');
+  const endMs = parseJstDateTime(FESTIVAL_END_DATE, '23:59', 'end');
+  
+  if (nowMs < startMs) return 'before';
+  if (nowMs > endMs) return 'after';
+  return 'during';
+}
+
+/**
  * 日本時間（Asia/Tokyo: UTC+09:00）で日時文字列を安全にミリ秒タイムスタンプへ変換する
  * VercelのUTC環境やクライアントのローカルタイムゾーンに依存しません。
  */

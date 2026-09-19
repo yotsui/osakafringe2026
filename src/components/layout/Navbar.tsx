@@ -44,7 +44,7 @@ export default function Navbar() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="px-4 py-2 rounded-xl bg-white text-[#E6007E] hover:bg-[#FFF100] hover:text-black font-black text-xs transition-all duration-200 ml-2 mr-1 cursor-pointer shadow-md"
+                    className="px-4 py-2.5 rounded-xl bg-white text-[#E6007E] hover:bg-[#FFF100] hover:text-black font-black text-sm transition-all duration-200 ml-2 mr-1 cursor-pointer shadow-md"
                   >
                     <span>{item.label}</span>
                   </Link>
@@ -55,7 +55,7 @@ export default function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                  className={`px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all ${
                     isActive
                       ? 'bg-white/20 text-white font-black shadow-inner'
                       : 'text-white hover:text-white hover:bg-white/10'
@@ -70,7 +70,7 @@ export default function Navbar() {
             <div className="flex items-center bg-black/25 p-1 rounded-xl ml-3 border border-white/20">
               <button
                 onClick={() => setLanguage('ja')}
-                className={`px-3 py-1 rounded-lg text-xs font-black transition-all ${
+                className={`px-4 py-2 min-h-[44px] rounded-lg text-sm font-black transition-all ${
                   language === 'ja'
                     ? 'bg-white text-black shadow-sm'
                     : 'text-white hover:text-[#FFF100]'
@@ -80,7 +80,7 @@ export default function Navbar() {
               </button>
               <button
                 onClick={() => setLanguage('en')}
-                className={`px-3 py-1 rounded-lg text-xs font-black transition-all ${
+                className={`px-4 py-2 min-h-[44px] rounded-lg text-sm font-black transition-all ${
                   language === 'en'
                     ? 'bg-white text-black shadow-sm'
                     : 'text-white hover:text-[#FFF100]'
@@ -95,7 +95,7 @@ export default function Navbar() {
           <div className="flex lg:hidden items-center gap-2">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2.5 rounded-xl bg-white text-[#E6007E] font-bold shadow-sm transition-all cursor-pointer"
+              className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl bg-white text-[#E6007E] font-bold shadow-sm transition-all cursor-pointer"
               aria-label="Toggle Menu"
             >
               {isOpen ? <X className="w-6 h-6 stroke-[2.5]" /> : <Menu className="w-6 h-6 stroke-[2.5]" />}
@@ -112,7 +112,7 @@ export default function Navbar() {
               key={item.href}
               href={item.href}
               onClick={() => setIsOpen(false)}
-              className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-colors ${
+              className={`flex items-center justify-between px-4 py-3.5 min-h-[44px] rounded-xl text-sm font-bold transition-colors ${
                 item.highlight
                   ? 'bg-white text-[#E6007E] font-black shadow-sm'
                   : pathname === item.href
@@ -127,7 +127,7 @@ export default function Navbar() {
           <div className="pt-3 flex items-center justify-center gap-3 border-t border-white/20">
             <button
               onClick={() => { setLanguage('ja'); setIsOpen(false); }}
-              className={`flex-1 py-2.5 rounded-xl font-black text-xs ${
+              className={`flex-1 py-3 min-h-[44px] rounded-xl font-black text-sm ${
                 language === 'ja' ? 'bg-white text-black' : 'bg-white/20 text-white'
               }`}
             >
@@ -135,7 +135,7 @@ export default function Navbar() {
             </button>
             <button
               onClick={() => { setLanguage('en'); setIsOpen(false); }}
-              className={`flex-1 py-2.5 rounded-xl font-black text-xs ${
+              className={`flex-1 py-3 min-h-[44px] rounded-xl font-black text-sm ${
                 language === 'en' ? 'bg-white text-black' : 'bg-white/20 text-white'
               }`}
             >

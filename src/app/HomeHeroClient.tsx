@@ -6,13 +6,15 @@ import Link from 'next/link';
 import { SiteInfo } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import { ArrowRightIcon } from '@/components/common/CustomIcons';
+import { getFestivalStatus } from '@/utils/performanceUtils';
 
 interface HomeHeroClientProps {
   siteInfo?: SiteInfo;
 }
 
 export default function HomeHeroClient({}: HomeHeroClientProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const festivalStatus = getFestivalStatus();
 
   return (
     <section className="relative overflow-hidden bg-[#E6007E] text-white">
@@ -81,12 +83,38 @@ export default function HomeHeroClient({}: HomeHeroClientProps) {
               <div className="relative w-full aspect-[440.57/147.26]">
                 <Image
                   src="/images/date.svg"
-                  alt="2026 10.8 THU - 11.8 SUN 南大阪エリア・阿倍野・天王寺・新世界・西成"
+                  alt="2026 10.8 THU - 11.8 SUN 大阪市内各所"
                   fill
                   className="object-contain object-center lg:object-left"
                 />
               </div>
             </div>
+
+            {/* Pre-festival Notification Banner */}
+            {festivalStatus === 'before' && (
+              <div className="w-full bg-black/30 border border-white/20 rounded-xl p-4 text-center lg:text-left backdrop-blur-sm">
+                <div className="flex flex-col gap-1.5">
+                  <div className="inline-flex items-center justify-center lg:justify-start gap-2">
+                    <span className="bg-[#FFF100] text-black text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">
+                      {language === 'en' ? 'COMING SOON' : '開催前'}
+                    </span>
+                    <p className="font-bold text-sm tracking-tight text-white/95">
+                      2026年10月8日〜11月8日開催
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-bold text-sm tracking-tight text-white/95">
+                      大阪市内各所
+                    </p>
+                    <p className="text-xs font-medium text-white/80">
+                      {language === 'en' 
+                        ? 'Performance and venue information is being updated sequentially.' 
+                        : '公演・会場情報は順次更新中'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* CTA Buttons */}
             <div className="w-full flex flex-col sm:flex-row gap-3.5 pt-2">
@@ -94,7 +122,7 @@ export default function HomeHeroClient({}: HomeHeroClientProps) {
                 href="/audience"
                 className="flex-1 px-8 py-4.5 rounded-2xl bg-white hover:bg-[#FFF100] text-[#E6007E] hover:text-black font-black text-base shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2.5 cursor-pointer group"
               >
-                <span>{t('heroOpenAudience')}</span>
+                <span>{language === 'en' ? 'Find Performances' : '公演を探す'}</span>
                 <ArrowRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
 
