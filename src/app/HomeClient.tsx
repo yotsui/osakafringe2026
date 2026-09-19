@@ -10,21 +10,18 @@ import PerformanceModal from '@/components/audience/PerformanceModal';
 import PartnerSection from '@/components/common/PartnerSection';
 import { ArrowRightIcon } from '@/components/common/CustomIcons';
 import { selectFeaturedPerformances, getFestivalStatus } from '@/utils/performanceUtils';
-import { NewsItem } from '@/lib/microcms';
 
 interface HomeClientProps {
   venues?: unknown[];
   performances: Performance[];
   partners?: Partner[];
   siteInfo: SiteInfo;
-  news?: NewsItem[];
 }
 
 export default function HomeClient({
   performances,
   partners = [],
   siteInfo,
-  news = [],
 }: HomeClientProps) {
   const { t, getText, language } = useLanguage();
   const [selectedPerformance, setSelectedPerformance] = useState<Performance | null>(null);
@@ -64,44 +61,6 @@ export default function HomeClient({
     <div className="space-y-20 pb-20 bg-[#fef9fc]">
       {/* Hero Section */}
       <HomeHeroClient siteInfo={siteInfo} />
-
-      {/* News Section */}
-      {news && news.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
-          <div className="border-b border-pink-100 pb-2 mb-4">
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-              NEWS
-            </h2>
-          </div>
-          <div className="space-y-3">
-            {news.map((item) => (
-              <a
-                key={item.id}
-                href={item.linkUrl || '#'}
-                target={item.linkUrl ? "_blank" : undefined}
-                rel="noopener noreferrer"
-                className={`block bg-white border border-slate-100 p-4 rounded-xl shadow-sm hover:border-[#E6007E] transition-colors ${item.linkUrl ? 'cursor-pointer' : 'cursor-default pointer-events-none'}`}
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-sm font-bold text-slate-500">
-                      {new Date(item.publishedAt).toLocaleDateString(language === 'en' ? 'en-US' : 'ja-JP')}
-                    </span>
-                    {item.isImportant && (
-                      <span className="px-2 py-0.5 bg-[#E6007E] text-white text-[10px] font-bold rounded">
-                        IMPORTANT
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="text-sm sm:text-base font-bold text-slate-900 flex-1">
-                    {getText(item.title, item.titleEn)}
-                  </h3>
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
-      )}
 
       {/* Featured / Pick Up Shows (Only show if at least 1 show is available) */}
       {displayPerformances.length > 0 && (
