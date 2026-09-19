@@ -16,7 +16,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/api/', '/svgmapgenerator', '/donate/success', '/password'],
+      disallow: ['/api/', '/svgmapgenerator', '/donate/success', '/password', '/tmp/'],
     },
     sitemap: 'https://osakafringe.com/sitemap.xml',
   };
