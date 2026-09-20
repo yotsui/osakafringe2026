@@ -16,7 +16,7 @@ import {
   getNextAvailableDate,
   getFestivalStatus,
 } from '@/utils/performanceUtils';
-import { formatDatePart } from '@/utils/dateFormat';
+import { formatDatePart, formatScheduleCompact } from '@/utils/dateFormat';
 
 const FestivalMap = dynamic(() => import('@/components/audience/FestivalMap'), {
   ssr: false,
@@ -553,7 +553,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
         {/* 3. 「すべての日程」選択時の会場カード一覧 */}
         {!activeTargetDate && allDatesVenueItems.length > 0 && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
-            {allDatesVenueItems.map(({ venue, nextShows }) => {
+            {allDatesVenueItems.map(({ venue, allShows }) => {
               const venueName = getText(venue.name, venue.nameEn);
               const venueArea = getText(venue.area, venue.areaEn);
               const venueAddress = getText(venue.address, venue.addressEn);
@@ -689,13 +689,13 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                     </div>
                   </div>
 
-                  {/* Next Shows at Venue */}
+                  {/* Shows at Venue */}
                   <div className="p-6 pt-0 space-y-3">
                     <div className="pt-3 border-t border-slate-100 space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                           <Sparkles className="w-3.5 h-3.5 text-[#E6007E]" />
-                          <span>{t('nextShowsTitle')}</span>
+                          <span>{t('venuePerformancesTitle')}</span>
                         </span>
                         <a
                           href={googleMapsUrl}
@@ -708,9 +708,9 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                         </a>
                       </div>
 
-                      {nextShows.length > 0 ? (
+                      {allShows.length > 0 ? (
                         <div className="space-y-2">
-                          {nextShows.map((item) => (
+                          {allShows.map((item) => (
                             <Link
                               key={item.performance.id}
                               href={`/performances/${item.performance.id}`}
@@ -722,7 +722,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                                     ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                                     : 'bg-[#E6007E]/10 text-[#E6007E]'
                                 }`}>
-                                  {item.isOngoing ? '開催中' : item.displayDateTime}
+                                  {item.isOngoing ? '開催中' : (item.schedule ? formatScheduleCompact(item.schedule, language) : t('tbd'))}
                                 </span>
                                 <div className="truncate">
                                   <p className="text-xs font-bold text-slate-900 group-hover:text-[#E6007E] truncate">

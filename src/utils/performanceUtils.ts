@@ -620,29 +620,37 @@ export function getVenuePerformancesForDate(
 }
 
 /**
- * 「すべての日程」表示時用：各会場の次回公演（最大maxCount件）を取得
+ * 「すべての日程」表示時用：各会場の全公演（過去・現在・未来）を重複なしで取得
  */
-export interface VenueUpcomingPerformanceItem {
+export interface VenuePerformanceSummaryItem {
   performance: Performance;
   schedule?: PerformanceSchedule;
-  displayDateTime: string; // e.g. "10/01 14:00" or "10/01〜10/08"
   startMs: number;
   isOngoing: boolean;
   isUpcoming: boolean;
   isEnded: boolean;
 }
 
-export function getVenueUpcomingPerformances(
+export function getVenuePerformancesForAllDates(
   venueId: string,
   performances: Performance[],
-  nowMs: number = Date.now(),
-  maxCount: number = 3
-): VenueUpcomingPerformanceItem[] {
+  nowMs: number = Date.now()
+): VenuePerformanceSummaryItem[] {
   const venueShows = performances.filter((p) => isPerformanceAtVenue(p, venueId));
-  const candidateItems: VenueUpcomingPerformanceItem[] = [];
+  const candidateItems: VenuePerformanceSummaryItem[] = [];
 
   for (const perf of venueShows) {
-    if (!perf.schedules || perf.schedules.length === 0) continue;
+    if (!perf.schedules || perf.schedules.length === 0) {
+      // 日程未登録
+      candidateItems.push({
+        performance: perf,
+        startMs: Number.MAX_SAFE_INTEGER,
+        isOngoing: false,
+        isUpcoming: false,
+        isEnded: false,
+      });
+      continue;
+    }
 
     for (const s of perf.schedules) {
       const schedVenueId = s.venueId || s.venue?.id || perf.venueId || perf.venue?.id;
@@ -653,19 +661,9 @@ export function getVenueUpcomingPerformances(
       const isUpcoming = nowMs < startMs;
       const isEnded = nowMs > endMs;
 
-      // 日時表示文字列
-      let displayDateTime = s.date || '';
-      if (s.endDate && s.endDate !== s.date) {
-        displayDateTime = `${s.date}〜${s.endDate}`;
-      }
-      if (s.startTime) {
-        displayDateTime += ` ${s.startTime}`;
-      }
-
       candidateItems.push({
         performance: perf,
         schedule: s,
-        displayDateTime,
         startMs,
         isOngoing,
         isUpcoming,
@@ -674,39 +672,19 @@ export function getVenueUpcomingPerformances(
     }
   }
 
-  // 1. 開催中・開催前（startMs 昇順）
-  const activeOrUpcoming = candidateItems
-    .filter((item) => item.isOngoing || item.isUpcoming)
-    .sort((a, b) => {
-      if (a.isOngoing && !b.isOngoing) return -1;
-      if (!a.isOngoing && b.isOngoing) return 1;
-      return a.startMs - b.startMs;
-    });
+  // 1. 開催日（startMs）昇順。日程未登録は最後。
+  candidateItems.sort((a, b) => {
+    return a.startMs - b.startMs;
+  });
 
-  // 公演IDで重複排除
+  // 公演IDで重複排除（一番早い日程を残す）
   const seenPerfIds = new Set<string>();
-  const results: VenueUpcomingPerformanceItem[] = [];
+  const results: VenuePerformanceSummaryItem[] = [];
 
-  for (const item of activeOrUpcoming) {
+  for (const item of candidateItems) {
     if (!seenPerfIds.has(item.performance.id)) {
       seenPerfIds.add(item.performance.id);
       results.push(item);
-      if (results.length >= maxCount) break;
-    }
-  }
-
-  // 開催中・開催前が足りない場合、直近の終了済み公演を補完
-  if (results.length < maxCount) {
-    const endedItems = candidateItems
-      .filter((item) => item.isEnded)
-      .sort((a, b) => b.startMs - a.startMs);
-
-    for (const item of endedItems) {
-      if (!seenPerfIds.has(item.performance.id)) {
-        seenPerfIds.add(item.performance.id);
-        results.push(item);
-        if (results.length >= maxCount) break;
-      }
     }
   }
 
@@ -770,33 +748,34 @@ export function sortVenuesForAllDates<T extends { id: string }>(
   performances: Performance[],
   nowMs: number = Date.now(),
   isDemoMode: boolean = false
-): { venue: T; nextShows: VenueUpcomingPerformanceItem[]; status: 'ongoing' | 'upcoming' | 'ended' | 'none'; nextStartMs: number }[] {
+): { venue: T; allShows: VenuePerformanceSummaryItem[]; status: 'ongoing' | 'upcoming' | 'ended' | 'none'; nextStartMs: number }[] {
   const enriched = venues.map((v) => {
-    const nextShows = getVenueUpcomingPerformances(v.id, performances, nowMs, 3);
-    const hasOngoing = nextShows.some((s) => s.isOngoing);
-    const hasUpcoming = nextShows.some((s) => s.isUpcoming);
-    const hasEnded = nextShows.some((s) => s.isEnded);
+    const allShows = getVenuePerformancesForAllDates(v.id, performances, nowMs);
+    const hasOngoing = allShows.some((s) => s.isOngoing);
+    const hasUpcoming = allShows.some((s) => s.isUpcoming);
+    const hasEnded = allShows.some((s) => s.isEnded);
 
     let status: 'ongoing' | 'upcoming' | 'ended' | 'none' = 'none';
     let nextStartMs = Number.MAX_SAFE_INTEGER;
 
     if (hasOngoing) {
       status = 'ongoing';
-      const ongoing = nextShows.find((s) => s.isOngoing);
+      const ongoing = allShows.find((s) => s.isOngoing);
       if (ongoing) nextStartMs = ongoing.startMs;
     } else if (hasUpcoming) {
       status = 'upcoming';
-      const upcoming = nextShows.find((s) => s.isUpcoming);
+      const upcoming = allShows.find((s) => s.isUpcoming);
       if (upcoming) nextStartMs = upcoming.startMs;
     } else if (hasEnded) {
       status = 'ended';
-      const ended = nextShows.find((s) => s.isEnded);
-      if (ended) nextStartMs = ended.startMs;
+      // endedの場合は最も最近のもの（startMs降順で最新）
+      const endedShows = allShows.filter((s) => s.isEnded).sort((a,b) => b.startMs - a.startMs);
+      if (endedShows.length > 0) nextStartMs = endedShows[0].startMs;
     }
 
     return {
       venue: v,
-      nextShows,
+      allShows,
       status,
       nextStartMs,
       hasPerformances: performances.some((p) => isPerformanceAtVenue(p, v.id)),

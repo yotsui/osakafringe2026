@@ -223,9 +223,11 @@ export const translations: Dictionary = {
   noShowsOnThisDate: { ja: 'この日の公演はありません', en: 'No performances scheduled for this date' },
   viewNextShowDate: { ja: '次の公演日を見る', en: 'View next show date' },
   nextShowsTitle: { ja: '次回の公演', en: 'Next Performances' },
+  venuePerformancesTitle: { ja: 'この場所の公演', en: 'Performances at This Venue' },
   showsTodayTitle: { ja: 'この日の公演', en: 'Performances on this date' },
   allDayShow: { ja: '終日', en: 'All Day' },
   noShowsScheduled: { ja: '現在予定されている公演はありません', en: 'No scheduled shows at this venue' },
+  tbd: { ja: '日程未定', en: 'TBD' },
   photosCount: { ja: '枚の写真', en: 'photos' },
   
   // Artists Page

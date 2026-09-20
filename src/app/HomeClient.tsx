@@ -26,8 +26,8 @@ export default function HomeClient({
   const { t, getText, language } = useLanguage();
   const [selectedPerformance, setSelectedPerformance] = useState<Performance | null>(null);
 
-  // Smart selection for up to 4 featured shows (excludes ended shows)
-  const displayPerformances = selectFeaturedPerformances(performances, 4);
+  // Smart selection for up to 6 featured shows (excludes ended shows)
+  const displayPerformances = selectFeaturedPerformances(performances, 6);
 
   const aboutTitle = getText(siteInfo.aboutTitle, siteInfo.aboutTitleEn);
   const aboutText = getText(siteInfo.aboutText, siteInfo.aboutTextEn);
