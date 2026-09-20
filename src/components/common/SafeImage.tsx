@@ -94,6 +94,18 @@ function optimizeCdnImageUrl(url: string, quality: number = 75): string {
   return url;
 }
 
+type CmsImageSource = string | { url?: unknown } | null | undefined;
+
+function resolveImageSrc(src: CmsImageSource): string {
+  if (typeof src === 'string') {
+    return src.trim();
+  }
+  if (src && typeof src === 'object' && typeof src.url === 'string') {
+    return src.url.trim();
+  }
+  return '';
+}
+
 export default function SafeImage({
   src,
   alt,
@@ -110,8 +122,10 @@ export default function SafeImage({
 }: SafeImageProps) {
   const [hasError, setHasError] = useState(false);
 
+  const normalizedSrc = resolveImageSrc(src as CmsImageSource);
+
   // If no source or error occurred, render styled modern fallback
-  if (!src || hasError || src.trim() === '') {
+  if (!normalizedSrc || hasError) {
     const genreKey = fallbackGenre || (fallbackType === 'venue' ? 'venue' : 'theater');
     const style = GENRE_STYLES[genreKey] || {
       bg: 'from-pink-600 via-fuchsia-600 to-purple-800',
@@ -146,7 +160,7 @@ export default function SafeImage({
     );
   }
 
-  const optimizedSrc = optimizeCdnImageUrl(src, Number(quality) || 75);
+  const optimizedSrc = optimizeCdnImageUrl(normalizedSrc, Number(quality) || 75);
 
   return (
     <Image
