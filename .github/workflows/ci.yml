@@ -34,8 +34,7 @@ jobs:
     name: Production Build (SSG with microCMS)
     needs: lint-and-test
     runs-on: ubuntu-latest
-    # Secrets が利用可能な場合のみ実行（forkからのPR等でSecretsが渡らない場合は安全にスキップ）
-    if: ${{ secrets.MICROCMS_API_KEY != '' && secrets.MICROCMS_SERVICE_DOMAIN != '' }}
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout code
@@ -47,6 +46,17 @@ jobs:
           node-version: 22
           cache: 'npm'
 
+      - name: Check microCMS configuration
+        shell: bash
+        env:
+          MICROCMS_SERVICE_DOMAIN: ${{ secrets.MICROCMS_SERVICE_DOMAIN }}
+          MICROCMS_API_KEY: ${{ secrets.MICROCMS_API_KEY }}
+        run: |
+          if [[ -z "$MICROCMS_SERVICE_DOMAIN" || -z "$MICROCMS_API_KEY" ]]; then
+            echo "::error::Set MICROCMS_SERVICE_DOMAIN and MICROCMS_API_KEY in GitHub Actions Secrets."
+            exit 1
+          fi
+
       - name: Install dependencies
         run: npm ci
 
@@ -56,4 +66,3 @@ jobs:
           NEXT_TELEMETRY_DISABLED: 1
           MICROCMS_SERVICE_DOMAIN: ${{ secrets.MICROCMS_SERVICE_DOMAIN }}
           MICROCMS_API_KEY: ${{ secrets.MICROCMS_API_KEY }}
-
