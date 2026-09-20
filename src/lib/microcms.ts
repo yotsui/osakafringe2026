@@ -215,11 +215,18 @@ interface RawSiteInfoData {
 /**
  * microCMSのメディア型 { url: string } または文字列から画像URLを抽出
  */
-function extractImageUrl(media: unknown): string | undefined {
+export function extractImageUrl(media: unknown): string | undefined {
   if (!media) return undefined;
-  if (typeof media === 'string') return media;
+  if (typeof media === 'string') {
+    const trimmed = media.trim();
+    return trimmed === '' ? undefined : trimmed;
+  }
   if (typeof media === 'object' && media !== null && 'url' in media) {
-    return (media as { url: string }).url;
+    const url = (media as { url?: unknown }).url;
+    if (typeof url === 'string') {
+      const trimmed = url.trim();
+      return trimmed === '' ? undefined : trimmed;
+    }
   }
   return undefined;
 }
@@ -258,54 +265,86 @@ const DEFAULT_COORDINATES: Record<string, { lat: number; lng: number }> = {
   'tennoji-warehouse': { lat: 34.6515, lng: 135.5135 },
 };
 
+
+/**
+ * 全件取得する共通処理 (limit: 100, page: 50 max)
+ */
+async function fetchAllMicroCMSItems<T>(endpoint: string): Promise<T[]> {
+  if (!client) return [];
+  const allContents: T[] = [];
+  const pageSize = 100;
+  let offset = 0;
+  let totalCount = Infinity;
+  const MAX_PAGES = 50; // 最大5,000件
+  let page = 0;
+
+  while (offset < totalCount && page < MAX_PAGES) {
+    page++;
+    const data = await client.getList<T>({
+      endpoint,
+      queries: { limit: pageSize, offset },
+      customRequestInit: { next: { revalidate: REVALIDATE_TIME } },
+    });
+
+    if (data.contents && data.contents.length > 0) {
+      allContents.push(...data.contents);
+    }
+
+    totalCount = typeof data.totalCount === 'number' ? data.totalCount : allContents.length;
+    offset += pageSize;
+
+    if (!data.contents || data.contents.length < pageSize) {
+      break;
+    }
+  }
+
+  return allContents;
+}
+
+export function normalizeVenue(v: RawVenueData): Venue {
+  const imgUrl = extractImageUrl(v.image);
+  const lat = v.lat != null && v.lat !== '' ? Number(v.lat) : (v.location?.lat ?? DEFAULT_COORDINATES[v.id]?.lat ?? 34.6937);
+  const lng = v.lng != null && v.lng !== '' ? Number(v.lng) : (v.location?.lng ?? DEFAULT_COORDINATES[v.id]?.lng ?? 135.5023);
+  const coords = { lat, lng };
+
+  const images = Array.isArray(v.images)
+    ? (v.images.map(extractImageUrl).filter(Boolean) as string[])
+    : (imgUrl ? [imgUrl] : []);
+
+  return {
+    id: v.id,
+    name: v.name,
+    nameEn: v.nameEn || v.name,
+    area: v.area,
+    areaEn: v.areaEn || v.area,
+    address: v.address,
+    addressEn: v.addressEn || v.address,
+    access: v.access || '',
+    accessEn: v.accessEn || v.access || '',
+    description: v.description || '',
+    descriptionEn: v.descriptionEn || v.description || '',
+    venueType: v.venueType || undefined,
+    websiteUrl: cleanUrl(v.websiteUrl),
+    snsTwitter: cleanUrl(v.snsTwitter),
+    snsInstagram: cleanUrl(v.snsInstagram),
+    lat,
+    lng,
+    image: imgUrl || '',
+    location: coords,
+    images,
+  };
+}
+
 /**
  * 会場一覧を取得 (React cache & ISR 300s)
  */
 export const getVenues = cache(async (): Promise<Venue[]> => {
-  const normalizeVenue = (v: RawVenueData): Venue => {
-    const imgUrl = extractImageUrl(v.image);
-    const lat = v.lat != null && v.lat !== '' ? Number(v.lat) : (v.location?.lat ?? DEFAULT_COORDINATES[v.id]?.lat ?? 34.6937);
-    const lng = v.lng != null && v.lng !== '' ? Number(v.lng) : (v.location?.lng ?? DEFAULT_COORDINATES[v.id]?.lng ?? 135.5023);
-    const coords = { lat, lng };
-
-    const images = Array.isArray(v.images)
-      ? (v.images.map(extractImageUrl).filter(Boolean) as string[])
-      : (imgUrl ? [imgUrl] : []);
-
-    return {
-      id: v.id,
-      name: v.name,
-      nameEn: v.nameEn || v.name,
-      area: v.area,
-      areaEn: v.areaEn || v.area,
-      address: v.address,
-      addressEn: v.addressEn || v.address,
-      access: v.access || '',
-      accessEn: v.accessEn || v.access || '',
-      description: v.description || '',
-      descriptionEn: v.descriptionEn || v.description || '',
-      venueType: v.venueType || undefined,
-      websiteUrl: cleanUrl(v.websiteUrl),
-      snsTwitter: cleanUrl(v.snsTwitter),
-      snsInstagram: cleanUrl(v.snsInstagram),
-      lat,
-      lng,
-      image: imgUrl,
-      location: coords,
-      images,
-    };
-  };
-
   let rawList: RawVenueData[] = mockVenues;
   if (client) {
     try {
-      const data = await client.getList<RawVenueData>({
-        endpoint: 'venues',
-        queries: { limit: 100 },
-        customRequestInit: { next: { revalidate: REVALIDATE_TIME } },
-      });
-      if (data.contents && data.contents.length > 0) {
-        rawList = data.contents;
+      const data = await fetchAllMicroCMSItems<RawVenueData>('venues');
+      if (data.length > 0) {
+        rawList = data;
       }
     } catch (error) {
       console.warn('[MicroCMS] Failed to fetch venues, using mock data:', error);
@@ -358,13 +397,9 @@ export const getArtists = cache(async (): Promise<Artist[]> => {
   let rawList: RawArtistData[] = mockArtists;
   if (client) {
     try {
-      const data = await client.getList<RawArtistData>({
-        endpoint: 'artists',
-        queries: { limit: 100 },
-        customRequestInit: { next: { revalidate: REVALIDATE_TIME } },
-      });
-      if (data.contents && data.contents.length > 0) {
-        rawList = data.contents;
+      const data = await fetchAllMicroCMSItems<RawArtistData>('artists');
+      if (data.length > 0) {
+        rawList = data;
       }
     } catch (error) {
       console.warn('[MicroCMS] Failed to fetch artists, using mock data:', error);
@@ -399,13 +434,13 @@ export function normalizePerformance(
   let resolvedArtistId = '';
 
     if (perf.artists && typeof perf.artists === 'object' && 'id' in perf.artists) {
-      resolvedArtist = artistMap.get(perf.artists.id) || (perf.artists as Artist);
+      resolvedArtist = artistMap.get(perf.artists.id) || normalizeArtist(perf.artists as RawArtistData);
       resolvedArtistId = perf.artists.id;
     } else if (typeof perf.artists === 'string' && perf.artists.trim()) {
       resolvedArtist = artistMap.get(perf.artists.trim());
       resolvedArtistId = perf.artists.trim();
     } else if (perf.artist && typeof perf.artist === 'object' && 'id' in perf.artist) {
-      resolvedArtist = artistMap.get(perf.artist.id) || (perf.artist as Artist);
+      resolvedArtist = artistMap.get(perf.artist.id) || normalizeArtist(perf.artist as RawArtistData);
       resolvedArtistId = perf.artist.id;
     } else if (typeof perf.artistId === 'string' && perf.artistId.trim()) {
       resolvedArtist = artistMap.get(perf.artistId.trim());
@@ -420,7 +455,7 @@ export function normalizePerformance(
     let mainVenueId = '';
 
     if (perf.venue && typeof perf.venue === 'object' && 'id' in perf.venue) {
-      mainVenue = venueMap.get(perf.venue.id) || (perf.venue as Venue);
+      mainVenue = venueMap.get(perf.venue.id) || normalizeVenue(perf.venue as RawVenueData);
       mainVenueId = perf.venue.id;
     } else if (typeof perf.venue === 'string' && perf.venue.trim()) {
       mainVenue = venueMap.get(perf.venue.trim());
@@ -502,7 +537,7 @@ export function normalizePerformance(
 
         const rawItemVenue = item.venue || item.venueId;
         if (rawItemVenue && typeof rawItemVenue === 'object' && 'id' in rawItemVenue) {
-          scheduleVenue = venueMap.get(rawItemVenue.id) || (rawItemVenue as Venue);
+          scheduleVenue = venueMap.get(rawItemVenue.id) || normalizeVenue(rawItemVenue as RawVenueData);
           sVenueId = rawItemVenue.id;
         } else if (typeof rawItemVenue === 'string' && rawItemVenue.trim()) {
           scheduleVenue = venueMap.get(rawItemVenue.trim());
@@ -655,7 +690,7 @@ export function normalizePerformance(
       schedules: enrichedSchedules,
       partner: resolvedPartner,
       partnerId: resolvedPartnerId || undefined,
-      image: imgUrl || resolvedArtist?.image || mainVenue?.image || '',
+      image: imgUrl || extractImageUrl(resolvedArtist?.image) || extractImageUrl(mainVenue?.image) || '',
       images,
       publishedAt: perf.publishedAt,
       createdAt: perf.createdAt,
@@ -679,36 +714,9 @@ export const getPerformances = cache(async (): Promise<Performance[]> => {
   let rawList: RawPerformanceData[] = mockPerformances as unknown as RawPerformanceData[];
   if (client) {
     try {
-      const allContents: RawPerformanceData[] = [];
-      const pageSize = 100;
-      let offset = 0;
-      let totalCount = Infinity;
-      const MAX_PAGES = 50; // 最大5,000件までの安全ガード（無限ループ防止）
-      let page = 0;
-
-      while (offset < totalCount && page < MAX_PAGES) {
-        page++;
-        const data = await client.getList<RawPerformanceData>({
-          endpoint: 'performances',
-          queries: { limit: pageSize, offset },
-          customRequestInit: { next: { revalidate: REVALIDATE_TIME } },
-        });
-
-        if (data.contents && data.contents.length > 0) {
-          allContents.push(...data.contents);
-        }
-
-        totalCount = typeof data.totalCount === 'number' ? data.totalCount : allContents.length;
-        offset += pageSize;
-
-        // 取得件数がlimit未満なら最後のページと判定
-        if (!data.contents || data.contents.length < pageSize) {
-          break;
-        }
-      }
-
-      if (allContents.length > 0) {
-        rawList = allContents;
+      const data = await fetchAllMicroCMSItems<RawPerformanceData>('performances');
+      if (data.length > 0) {
+        rawList = data;
       }
     } catch (error) {
       console.warn('[MicroCMS] Failed to fetch performances, using mock data:', error);
@@ -750,25 +758,15 @@ export const getPartners = cache(async (): Promise<Partner[]> => {
   let rawList: RawPartnerData[] = mockPartners;
   if (client) {
     try {
-      // 1. まず 'partner' エンドポイントを試行
-      const data = await client.getList<RawPartnerData>({
-        endpoint: 'partner',
-        queries: { limit: 100 },
-        customRequestInit: { next: { revalidate: REVALIDATE_TIME } },
-      });
-      if (data && Array.isArray(data.contents)) {
-        rawList = data.contents;
+      const data = await fetchAllMicroCMSItems<RawPartnerData>('partner');
+      if (data.length > 0) {
+        rawList = data;
       }
     } catch (error) {
-      // 2. 失敗時は 'partners' エンドポイントも試行
       try {
-        const dataFallback = await client.getList<RawPartnerData>({
-          endpoint: 'partners',
-          queries: { limit: 100 },
-          customRequestInit: { next: { revalidate: REVALIDATE_TIME } },
-        });
-        if (dataFallback && Array.isArray(dataFallback.contents)) {
-          rawList = dataFallback.contents;
+        const dataFallback = await fetchAllMicroCMSItems<RawPartnerData>('partners');
+        if (dataFallback.length > 0) {
+          rawList = dataFallback;
         }
       } catch (err2) {
         console.warn('[MicroCMS] Failed to fetch partners from both "partner" and "partners" endpoints, using mock data:', { error, err2 });
