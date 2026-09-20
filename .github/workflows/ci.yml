@@ -7,7 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  build-and-test:
+  lint-and-test:
+    name: Lint & Unit Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -29,7 +30,30 @@ jobs:
       - name: Run Unit Tests
         run: npm test
 
+  build:
+    name: Production Build (SSG with microCMS)
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    # Secrets が利用可能な場合のみ実行（forkからのPR等でSecretsが渡らない場合は安全にスキップ）
+    if: ${{ secrets.MICROCMS_API_KEY != '' && secrets.MICROCMS_SERVICE_DOMAIN != '' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Build Next.js application
         run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: 1
+          MICROCMS_SERVICE_DOMAIN: ${{ secrets.MICROCMS_SERVICE_DOMAIN }}
+          MICROCMS_API_KEY: ${{ secrets.MICROCMS_API_KEY }}
+
