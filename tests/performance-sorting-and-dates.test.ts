@@ -550,9 +550,11 @@ describe('formatScheduleDetailed', () => {
 import { getVenuePerformancesForAllDates } from '../src/utils/performanceUtils.ts';
 
 describe('getVenuePerformancesForAllDates', () => {
-  const dummyPerformances2 = [
+  const dummyPerformances2: Performance[] = [
     {
       id: 'p1',
+      title: 'P1',
+      description: 'Desc 1',
       schedules: [
         { id: 's1', date: '2026-10-03', startTime: '10:00', endTime: '12:00', venueId: 'v1' }, // past
         { id: 's2', date: '2026-10-04', startTime: '10:00', endTime: '12:00', venueId: 'v1' }, // future
@@ -560,23 +562,29 @@ describe('getVenuePerformancesForAllDates', () => {
     },
     {
       id: 'p2',
+      title: 'P2',
+      description: 'Desc 2',
       schedules: [
         { id: 's3', date: '2026-10-03', startTime: '15:00', endTime: '17:00', venueId: 'v1' }, // past
       ]
     },
     {
       id: 'p3',
+      title: 'P3',
+      description: 'Desc 3',
       schedules: [
         { id: 's4', date: '2026-10-05', startTime: '10:00', endTime: '12:00', venueId: 'v1' }, // future
       ]
     },
     {
       id: 'p4',
+      title: 'P4',
+      description: 'Desc 4',
       schedules: [
         { id: 's5', date: '2026-10-04', startTime: '09:00', endTime: '11:00', venueId: 'v1' }, // ongoing
       ]
     }
-  ] 
+  ];
 
   it('returns all performances (past, ongoing, future) up to all available shows and deduplicates by performance ID', () => {
     // Current time: 2026-10-04 10:00 JST (01:00 UTC)
