@@ -523,11 +523,11 @@ describe('formatScheduleDetailed', () => {
     
     // Japanese
     const resultJa = formatScheduleDetailed(schedule, 'ja');
-    assert.strictEqual(resultJa, '10/21（水）\n開場 18:30 ／ 開演 19:00');
+    assert.strictEqual(resultJa, '10/21（水）19:00〜　開場18:30');
     
     // English
     const resultEn = formatScheduleDetailed(schedule, 'en');
-    assert.strictEqual(resultEn, 'Oct 21 (Wed) Open 18:30 / Start 19:00');
+    assert.strictEqual(resultEn, 'Oct 21 (Wed) 19:00 (Open 18:30)');
   });
 
   it('displays only start time when open time is not available in detailed view', () => {
@@ -539,10 +539,10 @@ describe('formatScheduleDetailed', () => {
     
     // Japanese
     const resultJa = formatScheduleDetailed(schedule, 'ja');
-    assert.strictEqual(resultJa, '10/21（水）\n開演 19:00');
+    assert.strictEqual(resultJa, '10/21（水）19:00〜');
     
     // English
     const resultEn = formatScheduleDetailed(schedule, 'en');
-    assert.strictEqual(resultEn, 'Oct 21 (Wed) Start 19:00');
+    assert.strictEqual(resultEn, 'Oct 21 (Wed) 19:00');
   });
 });

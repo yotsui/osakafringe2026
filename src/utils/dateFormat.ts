@@ -126,28 +126,31 @@ export function formatScheduleDetailed(
 
   // 同日公演（Compact と同様）
   if (lang === 'en') {
-    let timeDisplay = '';
-    if (cleanOpen && cleanStart) {
-      timeDisplay = `Open ${cleanOpen} / Start ${cleanStart}`;
-    } else if (cleanStart && cleanEnd && cleanStart !== cleanEnd) {
-      timeDisplay = `${cleanStart} - ${cleanEnd}`;
+    let base = startFormattedDate;
+    if (cleanStart && cleanEnd && cleanStart !== cleanEnd) {
+      base = `${startFormattedDate} ${cleanStart} - ${cleanEnd}`;
     } else if (cleanStart) {
-      timeDisplay = `Start ${cleanStart}`;
+      base = `${startFormattedDate} ${cleanStart}`;
     }
-    return timeDisplay ? `${startFormattedDate} ${timeDisplay}`.trim() : startFormattedDate;
+    
+    if (cleanOpen) {
+      return `${base} (Open ${cleanOpen})`.trim();
+    }
+    return base.trim();
   }
 
   // 日本語
-  let timeDisplay = '';
-  if (cleanOpen && cleanStart) {
-    timeDisplay = `開場 ${cleanOpen} ／ 開演 ${cleanStart}`;
-  } else if (cleanStart && cleanEnd && cleanStart !== cleanEnd) {
-    timeDisplay = `開演 ${cleanStart}〜${cleanEnd}`;
+  let base = startFormattedDate;
+  if (cleanStart && cleanEnd && cleanStart !== cleanEnd) {
+    base = `${startFormattedDate}${cleanStart}〜${cleanEnd}`;
   } else if (cleanStart) {
-    timeDisplay = `開演 ${cleanStart}`;
+    base = `${startFormattedDate}${cleanStart}〜`;
   }
   
-  return timeDisplay ? `${startFormattedDate}\n${timeDisplay}`.trim() : startFormattedDate;
+  if (cleanOpen) {
+    return `${base}　開場${cleanOpen}`.trim();
+  }
+  return base.trim();
 }
 
 /**
