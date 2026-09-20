@@ -103,6 +103,11 @@ interface RawDateItem {
   endDate?: string;
   end_date?: string;
   time?: string;
+  open_date?: string;
+  openDate?: string;
+  openTime?: string;
+  open_time?: string;
+  open?: string;
   ticketPrice?: string;
   ticketUrl?: string;
   venueId?: string | { id: string };
@@ -123,6 +128,7 @@ interface RawPerformanceData {
   ticketPrice?: string;
   ticketPriceEn?: string;
   ticketUrl?: string;
+  flyer?: string | MicroCMSMedia;
   durationMinutes?: number;
   isFeatured?: boolean;
   artists?: Artist | string | { id: string };
@@ -134,6 +140,11 @@ interface RawPerformanceData {
   venueId?: string;
   venueName?: string;
   venueNameEn?: string;
+  open?: string;
+  open_date?: string;
+  openDate?: string;
+  openTime?: string;
+  open_time?: string;
   date?: string;
   date_end?: string;
   datetime?: string;
@@ -553,6 +564,27 @@ export function normalizePerformance(
         const directStartTime = (item.startTime || item.start_time || item.time || '').trim();
         const directEndTime = (item.endTime || item.end_time || '').trim();
 
+        // 開場時刻の抽出 (item.open_date またはトップレベルの perf.open_date 等フォールバック)
+        const rawOpen = (item.open_date || item.openDate || item.openTime || item.open_time || item.open || '').trim();
+        // トップレベルフォールバックは1件のみの場合のみ
+        const fallbackOpen = (perf.open_date || perf.openDate || perf.openTime || perf.open_time || perf.open || '').trim();
+        let directOpenTime = '';
+        if (rawOpen) {
+          const openDateObj = new Date(rawOpen);
+          if (!isNaN(openDateObj.getTime())) {
+            directOpenTime = formatJST(openDateObj).timeStr;
+          } else if (/^\d{1,2}:\d{2}/.test(rawOpen)) {
+            directOpenTime = rawOpen;
+          }
+        } else if (fallbackOpen && Array.isArray(rawDateItems) && rawDateItems.length === 1) {
+          const openDateObj = new Date(fallbackOpen);
+          if (!isNaN(openDateObj.getTime())) {
+            directOpenTime = formatJST(openDateObj).timeStr;
+          } else if (/^\d{1,2}:\d{2}/.test(fallbackOpen)) {
+            directOpenTime = fallbackOpen;
+          }
+        }
+
         if (!rawStart && !directStartTime) {
           continue;
         }
@@ -605,6 +637,7 @@ export function normalizePerformance(
           enrichedSchedules.push({
             id: item.id || `${perf.id}-${dateStr}-${sTime || '00:00'}`,
             date: dateStr,
+            openTime: directOpenTime || undefined,
             startTime: sTime,
             endDate: endDateStr,
             endTime: eTime,
@@ -675,6 +708,7 @@ export function normalizePerformance(
       ticketPrice: perf.ticketPrice || '',
       ticketPriceEn: perf.ticketPriceEn || perf.ticketPrice || '',
       ticketUrl: cleanUrl(perf.ticketUrl),
+      flyer: extractImageUrl(perf.flyer),
       durationMinutes: typeof perf.durationMinutes === 'number' && perf.durationMinutes > 0 ? perf.durationMinutes : undefined,
       isFeatured: Boolean(perf.isFeatured),
       artists: resolvedArtist || resolvedArtistId,
@@ -688,6 +722,8 @@ export function normalizePerformance(
       venueNameEn,
       dates: Array.isArray(rawDateItems) ? (rawDateItems as PerformanceDateCustomField[]) : [],
       schedules: enrichedSchedules,
+      open: perf.open || undefined,
+      open_date: perf.open_date || undefined,
       partner: resolvedPartner,
       partnerId: resolvedPartnerId || undefined,
       image: imgUrl || extractImageUrl(resolvedArtist?.image) || extractImageUrl(mainVenue?.image) || '',

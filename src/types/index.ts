@@ -68,6 +68,7 @@ export interface Artist {
 export interface PerformanceSchedule {
   id?: string;
   date: string; // YYYY-MM-DD (Asia/Tokyo)
+  openTime?: string; // HH:mm (Asia/Tokyo) - 開場時刻
   startTime: string; // HH:mm (Asia/Tokyo)
   endDate?: string; // YYYY-MM-DD (Asia/Tokyo) - 終了日
   endTime?: string; // HH:mm (Asia/Tokyo) - 終了時刻
@@ -87,6 +88,7 @@ export interface PerformanceDateCustomField {
   id?: string;
   date?: string; // ISO 8601 開始日時文字列
   date_end?: string; // ISO 8601 終了日時文字列
+  open_date?: string; // 開場日時
   venue?: Venue | string | { id: string }; // 会場参照（未指定時は null/undefined）
   venueId?: string;
   note?: string;
@@ -98,6 +100,7 @@ export interface PerformanceDateCustomField {
   endDate?: string;
   startTime?: string;
   endTime?: string;
+  openTime?: string;
   time?: string;
 }
 
@@ -135,10 +138,15 @@ export interface Performance {
   ticketPrice?: string;
   ticketPriceEn?: string;
   ticketUrl?: string;
+  flyer?: string;
   image?: string;
   images?: string[];
   isFeatured?: boolean;
   durationMinutes?: number;
+
+  // トップレベルの開場時間（フォールバック用）
+  open?: string;
+  open_date?: string;
 
   // 連携イベント・パートナー
   partner?: Partner | string;

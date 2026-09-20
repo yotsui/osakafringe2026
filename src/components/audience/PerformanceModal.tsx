@@ -358,7 +358,7 @@ export default function PerformanceModal({
                       >
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <span className="px-2.5 py-0.5 rounded-md bg-pink-100 text-pink-700 text-xs font-black">
+                            <span className="px-2.5 py-0.5 rounded-md bg-pink-100 text-pink-700 text-xs font-black whitespace-pre-line">
                               {formattedDate}
                             </span>
                           </div>
