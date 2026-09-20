@@ -30,7 +30,7 @@ describe('Site Password Protection & Proxy Flow', () => {
   });
 
   it('blocks unauthenticated API requests with 401 Unauthorized JSON when protection is enabled', async () => {
-    const req = new NextRequest('https://osakafringe.com/api/translate', {
+    const req = new NextRequest('https://osakafringe.com/api/contact', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
     });

@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { Performance, Venue, PerformanceSortOption } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
-import { sortPerformances, getFestivalStatus } from '@/utils/performanceUtils';
+import { sortPerformances, getFestivalStatus, getAllFestivalDates, isPerformanceMatchingVenueAndDate } from '@/utils/performanceUtils';
 import { getArtistGenreLabel } from '@/utils/genre';
 import dynamic from 'next/dynamic';
 import PerformanceCard from './PerformanceCard';
@@ -74,17 +74,9 @@ export default function AudienceApp({
     });
   };
 
-  // Distinct festival dates
+  // Distinct festival dates (including intermediate dates of multi-day exhibitions)
   const festivalDates = useMemo(() => {
-    const set = new Set<string>();
-    initialPerformances.forEach((p) => {
-      if (Array.isArray(p.schedules)) {
-        p.schedules.forEach((s) => {
-          if (s.date) set.add(s.date);
-        });
-      }
-    });
-    return Array.from(set).sort();
+    return getAllFestivalDates(initialPerformances);
   }, [initialPerformances]);
 
   // パフォーマンス登録がある会場IDの一覧
@@ -124,25 +116,10 @@ export default function AudienceApp({
         }
       }
 
-      // Venue filter
-      if (selectedVenueId !== 'all') {
-        const matchesDefaultVenue = perf.venueId === selectedVenueId || perf.venue?.id === selectedVenueId;
-        const matchesScheduleVenue = perf.schedules.some((s) => s.venueId === selectedVenueId || s.venue?.id === selectedVenueId);
-        if (!matchesDefaultVenue && !matchesScheduleVenue) {
-          return false;
-        }
-      }
-
-      // Date filter
-      if (selectedDate !== 'all') {
-        const matchesDate = perf.schedules.some((s) => {
-          if (s.date === selectedDate) return true;
-          if (s.endDate && selectedDate >= s.date && selectedDate <= s.endDate) return true;
-          return false;
-        });
-        if (!matchesDate) {
-          return false;
-        }
+      // Venue & Date filter (must match against the SAME schedule when both are selected)
+      // Venue & Date filter (matches against the SAME schedule when both are selected)
+      if (!isPerformanceMatchingVenueAndDate(perf, selectedVenueId, selectedDate)) {
+        return false;
       }
 
       // Search query (keyword: title, artist, description, performance genre, performance genreEn, artist genre ja/en)

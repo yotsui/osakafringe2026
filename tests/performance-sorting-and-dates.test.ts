@@ -12,6 +12,7 @@ import {
   sortVenuesForDate,
   sortVenuesForAllDates,
   getNextAvailableDate,
+  isPerformanceMatchingVenueAndDate,
 } from '../src/utils/performanceUtils.ts';
 import type { Performance, Venue } from '../src/types/index.ts';
 
@@ -557,7 +558,7 @@ describe('getVenuePerformancesForAllDates', () => {
       description: 'Desc 1',
       schedules: [
         { id: 's1', date: '2026-10-03', startTime: '10:00', endTime: '12:00', venueId: 'v1' }, // past
-        { id: 's2', date: '2026-10-04', startTime: '10:00', endTime: '12:00', venueId: 'v1' }, // future
+        { id: 's2', date: '2026-10-04', startTime: '14:00', endTime: '16:00', venueId: 'v1' }, // future
       ]
     },
     {
@@ -586,7 +587,7 @@ describe('getVenuePerformancesForAllDates', () => {
     }
   ];
 
-  it('returns all performances (past, ongoing, future) up to all available shows and deduplicates by performance ID', () => {
+  it('returns all performances with all schedules for the venue, and calculates status across all schedules', () => {
     // Current time: 2026-10-04 10:00 JST (01:00 UTC)
     const now = Date.UTC(2026, 9, 4, 1, 0, 0); 
     const shows = getVenuePerformancesForAllDates('v1', dummyPerformances2, now);
@@ -594,16 +595,89 @@ describe('getVenuePerformancesForAllDates', () => {
     // Total distinct performances at v1 is 4
     assert.strictEqual(shows.length, 4);
     
-    // Sorted by startMs
-    assert.strictEqual(shows[0].performance.id, 'p1'); // 10-03 10:00
-    assert.strictEqual(shows[1].performance.id, 'p2'); // 10-03 15:00
-    assert.strictEqual(shows[2].performance.id, 'p4'); // 10-04 09:00
-    assert.strictEqual(shows[3].performance.id, 'p3'); // 10-05 10:00
+    // p4: 10-04 09:00〜11:00 is ongoing -> status 'ongoing' (priority 1)
+    // p1: 10-03 past & 10-04 10:00 future -> status 'upcoming' (priority 2)
+    // p3: 10-05 10:00 future -> status 'upcoming' (priority 2)
+    // p2: 10-03 15:00 past only -> status 'ended' (priority 3)
+    
+    const p4 = shows.find(s => s.performance.id === 'p4');
+    assert.ok(p4);
+    assert.strictEqual(p4.status, 'ongoing');
+    assert.strictEqual(p4.schedules.length, 1);
+    assert.strictEqual(p4.schedules[0].isOngoing, true);
 
-    // Check statuses
-    assert.strictEqual(shows[0].isEnded, true);
-    assert.strictEqual(shows[1].isEnded, true);
-    assert.strictEqual(shows[2].isOngoing, true);
-    assert.strictEqual(shows[3].isUpcoming, true);
+    const p1 = shows.find(s => s.performance.id === 'p1');
+    assert.ok(p1);
+    // 過去日程と未来日程が混在しても終了扱いにならず upcoming
+    assert.strictEqual(p1.status, 'upcoming');
+    assert.strictEqual(p1.schedules.length, 2);
+    assert.strictEqual(p1.schedules[0].isEnded, true);
+    assert.strictEqual(p1.schedules[1].isUpcoming, true);
+
+    const p3 = shows.find(s => s.performance.id === 'p3');
+    assert.ok(p3);
+    assert.strictEqual(p3.status, 'upcoming');
+
+    const p2 = shows.find(s => s.performance.id === 'p2');
+    assert.ok(p2);
+    assert.strictEqual(p2.status, 'ended');
+    assert.strictEqual(p2.schedules.length, 1);
+    assert.strictEqual(p2.schedules[0].isEnded, true);
   });
 });
+
+describe('isPerformanceMatchingVenueAndDate (Venue and Date co-matching)', () => {
+  const samplePerf: Performance = {
+    id: 'perf-multi-venue-date',
+    title: 'Multi Venue Performance',
+    description: 'Description',
+    venueId: 'default-venue',
+    schedules: [
+      { id: 's1', date: '2026-10-03', startTime: '14:00', endTime: '15:00', venueId: 'venue-a' },
+      { id: 's2', date: '2026-10-10', startTime: '18:00', endTime: '19:00', venueId: 'venue-b' },
+      { id: 's3', date: '2026-10-15', endDate: '2026-10-18', startTime: '10:00', endTime: '18:00', venueId: 'venue-c' },
+    ],
+  };
+
+  it('matches when both venue and date match the exact same schedule', () => {
+    // venue-a + 2026-10-03 matches s1
+    assert.strictEqual(isPerformanceMatchingVenueAndDate(samplePerf, 'venue-a', '2026-10-03'), true);
+    // venue-b + 2026-10-10 matches s2
+    assert.strictEqual(isPerformanceMatchingVenueAndDate(samplePerf, 'venue-b', '2026-10-10'), true);
+  });
+
+  it('rejects when venue and date belong to different schedules of the same performance', () => {
+    // venue-a + 2026-10-10 (venue-a is on 10-03, 10-10 is venue-b) -> MUST NOT MATCH
+    assert.strictEqual(isPerformanceMatchingVenueAndDate(samplePerf, 'venue-a', '2026-10-10'), false);
+    // venue-b + 2026-10-03 -> MUST NOT MATCH
+    assert.strictEqual(isPerformanceMatchingVenueAndDate(samplePerf, 'venue-b', '2026-10-03'), false);
+  });
+
+  it('matches multi-day exhibition schedules on intermediate dates for the same venue', () => {
+    // venue-c is 2026-10-15 to 2026-10-18
+    assert.strictEqual(isPerformanceMatchingVenueAndDate(samplePerf, 'venue-c', '2026-10-16'), true);
+    assert.strictEqual(isPerformanceMatchingVenueAndDate(samplePerf, 'venue-a', '2026-10-16'), false);
+  });
+
+  it('matches on venue only or date only when one filter is "all"', () => {
+    assert.strictEqual(isPerformanceMatchingVenueAndDate(samplePerf, 'venue-a', 'all'), true);
+    assert.strictEqual(isPerformanceMatchingVenueAndDate(samplePerf, 'unknown-venue', 'all'), false);
+    assert.strictEqual(isPerformanceMatchingVenueAndDate(samplePerf, 'all', '2026-10-03'), true);
+    assert.strictEqual(isPerformanceMatchingVenueAndDate(samplePerf, 'all', '2026-10-04'), false);
+    assert.strictEqual(isPerformanceMatchingVenueAndDate(samplePerf, 'all', 'all'), true);
+  });
+
+  it('matches undated performance with default venue when only venue is filtered', () => {
+    const undatedPerf: Performance = {
+      id: 'perf-undated',
+      title: 'Undated Show',
+      description: 'Undated description',
+      venueId: 'default-venue',
+      schedules: [],
+    };
+    assert.strictEqual(isPerformanceMatchingVenueAndDate(undatedPerf, 'default-venue', 'all'), true);
+    assert.strictEqual(isPerformanceMatchingVenueAndDate(undatedPerf, 'venue-a', 'all'), false);
+    assert.strictEqual(isPerformanceMatchingVenueAndDate(undatedPerf, 'default-venue', '2026-10-03'), false);
+  });
+});
+

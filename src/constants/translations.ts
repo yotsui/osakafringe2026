@@ -357,6 +357,6 @@ export const translations: Dictionary = {
   tourismBannerTitle: { ja: '大阪観光局 公式ポータルサイト', en: 'Osaka Convention & Tourism Bureau' },
   footerTagline: { ja: '大阪文化万博Osaka Fringe 2026 実行委員会', en: 'Osaka Fringe 2026 Executive Committee' },
   footerDesc: { ja: '大阪の街全体が舞台になるオープンアクセス芸術祭。演劇、ダンス、大道芸、音楽、古典芸能、紙芝居、作品展示がジャンルを超えて交差するフェスティバル。', en: 'An open-access performing arts festival turning all of Osaka into a vibrant stage across theater, dance, street circus, music, traditional arts, and art exhibitions.' },
-  poweredByMicroCMS: { ja: 'Data powered by MicroCMS & Gemini AI Translation', en: 'Data powered by MicroCMS & Gemini AI Translation' },
+  poweredByMicroCMS: { ja: 'Data powered by MicroCMS', en: 'Data powered by MicroCMS' },
   allRightsReserved: { ja: '© Osaka Fringe 2026 All Rights Reserved.', en: '© Osaka Fringe 2026 All Rights Reserved.' }
 };

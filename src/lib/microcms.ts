@@ -30,6 +30,41 @@ const apiKey = (process.env.MICROCMS_API_KEY || '').trim();
 
 export const isMicroCMSConfigured = Boolean(serviceDomain && apiKey);
 
+export const allowMockData = process.env.USE_MOCK_DATA === 'true' || (process.env.NODE_ENV === 'test' && !isMicroCMSConfigured);
+
+export const SAFE_DEFAULT_SITE_INFO: SiteInfo = {
+  siteTitle: 'Osaka Fringe 2026',
+  siteTitleEn: 'Osaka Fringe 2026',
+  heroTagline: '表現が、街にあふれる。',
+  heroTaglineEn: 'Expression Floods the City.',
+  heroSubtitle: '大阪文化万博 Osaka Fringe 2026',
+  heroSubtitleEn: 'Osaka Cultural Expo - Osaka Fringe 2026',
+  festivalPeriod: '2026年10月8日（木）〜 11月8日（日）',
+  festivalPeriodEn: 'October 8 (Thu) - November 8 (Sun), 2026',
+  locationSummary: '大阪市内全域（劇場・ギャラリー・カフェ・路上など）',
+  locationSummaryEn: 'Across Osaka (Theaters, Galleries, Cafes, Streets, and more)',
+  aboutTitle: 'About Osaka Fringe 2026',
+  aboutTitleEn: 'About Osaka Fringe 2026',
+  aboutText: '',
+  aboutTextEn: '',
+  donationTitle: 'ご寄付のお願い',
+  donationTitleEn: 'Support Osaka Fringe',
+  donationText: '',
+  donationTextEn: '',
+  donationStories: [],
+  donationImpacts: [],
+  donationBankNote: '',
+  donationBankNoteEn: '',
+  donationBankInfo: '',
+  donationBankInfoEn: '',
+  newsNotice: '',
+  newsNoticeEn: '',
+  officialInstagramUrl: 'https://www.instagram.com/osakafringe',
+  officialXUrl: 'https://twitter.com/osakafringe',
+  officialWebsiteUrl: 'https://osakafringe.com',
+  contactEmail: 'info@osakafringe.com',
+};
+
 export const client = isMicroCMSConfigured
   ? createClient({
       serviceDomain,
@@ -350,19 +385,24 @@ export function normalizeVenue(v: RawVenueData): Venue {
  * 会場一覧を取得 (React cache & ISR 300s)
  */
 export const getVenues = cache(async (): Promise<Venue[]> => {
-  let rawList: RawVenueData[] = mockVenues;
-  if (client) {
-    try {
-      const data = await fetchAllMicroCMSItems<RawVenueData>('venues');
-      if (data.length > 0) {
-        rawList = data;
-      }
-    } catch (error) {
-      console.warn('[MicroCMS] Failed to fetch venues, using mock data:', error);
+  if (!client) {
+    if (allowMockData) {
+      return mockVenues.map(normalizeVenue);
     }
+    throw new Error('[MicroCMS] Configuration error: MICROCMS_SERVICE_DOMAIN or MICROCMS_API_KEY is not configured.');
   }
 
-  return rawList.map(normalizeVenue);
+  try {
+    const data = await fetchAllMicroCMSItems<RawVenueData>('venues');
+    return data.map(normalizeVenue);
+  } catch (error) {
+    if (allowMockData) {
+      console.warn('[MicroCMS] Failed to fetch venues, falling back to mock data (mock mode enabled):', error);
+      return mockVenues.map(normalizeVenue);
+    }
+    console.error('[MicroCMS] Failed to fetch venues from microCMS:', error);
+    throw error;
+  }
 });
 
 /**
@@ -405,19 +445,24 @@ export function normalizeArtist(a: RawArtistData): Artist {
  * アーティスト一覧を取得 (React cache & ISR 300s)
  */
 export const getArtists = cache(async (): Promise<Artist[]> => {
-  let rawList: RawArtistData[] = mockArtists;
-  if (client) {
-    try {
-      const data = await fetchAllMicroCMSItems<RawArtistData>('artists');
-      if (data.length > 0) {
-        rawList = data;
-      }
-    } catch (error) {
-      console.warn('[MicroCMS] Failed to fetch artists, using mock data:', error);
+  if (!client) {
+    if (allowMockData) {
+      return mockArtists.map(normalizeArtist);
     }
+    throw new Error('[MicroCMS] Configuration error: MICROCMS_SERVICE_DOMAIN or MICROCMS_API_KEY is not configured.');
   }
 
-  return rawList.map(normalizeArtist);
+  try {
+    const data = await fetchAllMicroCMSItems<RawArtistData>('artists');
+    return data.map(normalizeArtist);
+  } catch (error) {
+    if (allowMockData) {
+      console.warn('[MicroCMS] Failed to fetch artists, falling back to mock data (mock mode enabled):', error);
+      return mockArtists.map(normalizeArtist);
+    }
+    console.error('[MicroCMS] Failed to fetch artists from microCMS:', error);
+    throw error;
+  }
 });
 
 /**
@@ -737,6 +782,18 @@ export function normalizePerformance(
  * 公演一覧を取得 (会場情報およびアーティスト情報をマージ & React cache & ISR 300s)
  */
 export const getPerformances = cache(async (): Promise<Performance[]> => {
+  if (!client) {
+    if (allowMockData) {
+      const venueMap = new Map(mockVenues.map((v) => [v.id, normalizeVenue(v)]));
+      const artistMap = new Map(mockArtists.map((a) => [a.id, normalizeArtist(a)]));
+      const partnerMap = new Map(mockPartners.map((p) => [p.id, p]));
+      return (mockPerformances as unknown as RawPerformanceData[]).map((p) =>
+        normalizePerformance(p, venueMap, artistMap, partnerMap)
+      );
+    }
+    throw new Error('[MicroCMS] Configuration error: MICROCMS_SERVICE_DOMAIN or MICROCMS_API_KEY is not configured.');
+  }
+
   const [venues, artists, partners] = await Promise.all([
     getVenues(),
     getArtists(),
@@ -747,19 +804,19 @@ export const getPerformances = cache(async (): Promise<Performance[]> => {
   const artistMap = new Map(artists.map((a) => [a.id, a]));
   const partnerMap = new Map(partners.map((p) => [p.id, p]));
 
-  let rawList: RawPerformanceData[] = mockPerformances as unknown as RawPerformanceData[];
-  if (client) {
-    try {
-      const data = await fetchAllMicroCMSItems<RawPerformanceData>('performances');
-      if (data.length > 0) {
-        rawList = data;
-      }
-    } catch (error) {
-      console.warn('[MicroCMS] Failed to fetch performances, using mock data:', error);
+  try {
+    const data = await fetchAllMicroCMSItems<RawPerformanceData>('performances');
+    return data.map((p) => normalizePerformance(p, venueMap, artistMap, partnerMap));
+  } catch (error) {
+    if (allowMockData) {
+      console.warn('[MicroCMS] Failed to fetch performances, falling back to mock data (mock mode enabled):', error);
+      return (mockPerformances as unknown as RawPerformanceData[]).map((p) =>
+        normalizePerformance(p, venueMap, artistMap, partnerMap)
+      );
     }
+    console.error('[MicroCMS] Failed to fetch performances from microCMS:', error);
+    throw error;
   }
-
-  return rawList.map((p) => normalizePerformance(p, venueMap, artistMap, partnerMap));
 });
 
 /**
@@ -791,26 +848,29 @@ export const getPartners = cache(async (): Promise<Partner[]> => {
     };
   };
 
-  let rawList: RawPartnerData[] = mockPartners;
-  if (client) {
-    try {
-      const data = await fetchAllMicroCMSItems<RawPartnerData>('partner');
-      if (data.length > 0) {
-        rawList = data;
-      }
-    } catch (error) {
-      try {
-        const dataFallback = await fetchAllMicroCMSItems<RawPartnerData>('partners');
-        if (dataFallback.length > 0) {
-          rawList = dataFallback;
-        }
-      } catch (err2) {
-        console.warn('[MicroCMS] Failed to fetch partners from both "partner" and "partners" endpoints, using mock data:', { error, err2 });
-      }
+  if (!client) {
+    if (allowMockData) {
+      return mockPartners.map(normalizePartner);
     }
+    throw new Error('[MicroCMS] Configuration error: MICROCMS_SERVICE_DOMAIN or MICROCMS_API_KEY is not configured.');
   }
 
-  return rawList.map(normalizePartner);
+  try {
+    const data = await fetchAllMicroCMSItems<RawPartnerData>('partner');
+    return data.map(normalizePartner);
+  } catch (error) {
+    try {
+      const dataFallback = await fetchAllMicroCMSItems<RawPartnerData>('partners');
+      return dataFallback.map(normalizePartner);
+    } catch (err2) {
+      if (allowMockData) {
+        console.warn('[MicroCMS] Failed to fetch partners from both "partner" and "partners" endpoints, falling back to mock data (mock mode enabled):', { error, err2 });
+        return mockPartners.map(normalizePartner);
+      }
+      console.error('[MicroCMS] Failed to fetch partners from microCMS:', { error, err2 });
+      throw error;
+    }
+  }
 });
 
 /**
@@ -818,18 +878,26 @@ export const getPartners = cache(async (): Promise<Partner[]> => {
  */
 export const getBanners = cache(async (): Promise<Banner[]> => {
   if (!client) {
-    return mockBanners;
+    if (allowMockData) {
+      return mockBanners;
+    }
+    throw new Error('[MicroCMS] Configuration error: MICROCMS_SERVICE_DOMAIN or MICROCMS_API_KEY is not configured.');
   }
+
   try {
     const data = await client.getList<Banner>({
       endpoint: 'banners',
       queries: { limit: 10 },
       customRequestInit: { next: { revalidate: REVALIDATE_TIME } },
     });
-    return data.contents.length > 0 ? data.contents : mockBanners;
+    return data.contents;
   } catch (error) {
-    console.warn('[MicroCMS] Failed to fetch banners, using mock data:', error);
-    return mockBanners;
+    if (allowMockData) {
+      console.warn('[MicroCMS] Failed to fetch banners, falling back to mock data (mock mode enabled):', error);
+      return mockBanners;
+    }
+    console.error('[MicroCMS] Failed to fetch banners from microCMS:', error);
+    throw error;
   }
 });
 
@@ -870,63 +938,72 @@ export const normalizeDonationImpact = (raw: RawImpactData): DonationImpact => (
  * サイト基本情報を取得 (React cache & ISR 300s)
  */
 export const getSiteInfo = cache(async (): Promise<SiteInfo> => {
-  if (client) {
-    try {
-      const data = await client.getObject<RawSiteInfoData>({
-        endpoint: 'site_info',
-        customRequestInit: { next: { revalidate: REVALIDATE_TIME } },
-      });
-      let cmsData: RawSiteInfoData | null = null;
-      if (data && data.siteTitle) {
-        cmsData = data;
-      } else if (data && Array.isArray(data.contents) && data.contents.length > 0) {
-        cmsData = data.contents[0];
-      }
-
-      if (cmsData) {
-        const stories: DonationStory[] = Array.isArray(cmsData.donationStories)
-          ? cmsData.donationStories.map(normalizeDonationStory)
-          : [];
-        const impacts: DonationImpact[] = Array.isArray(cmsData.donationImpacts)
-          ? cmsData.donationImpacts.map(normalizeDonationImpact)
-          : [];
-
-        return {
-          ...mockSiteInfo,
-          ...cmsData,
-          donationStories: stories.length > 0 ? stories : mockSiteInfo.donationStories,
-          donationImpacts: impacts.length > 0 ? impacts : mockSiteInfo.donationImpacts,
-          siteTitle: cmsData.siteTitle || mockSiteInfo.siteTitle,
-          siteTitleEn: cmsData.siteTitleEn || cmsData.siteTitle || mockSiteInfo.siteTitleEn,
-          heroTagline: cmsData.heroTagline || mockSiteInfo.heroTagline,
-          heroTaglineEn: cmsData.heroTaglineEn || cmsData.heroTagline || mockSiteInfo.heroTaglineEn,
-          heroSubtitle: cmsData.heroSubtitle || mockSiteInfo.heroSubtitle,
-          heroSubtitleEn: cmsData.heroSubtitleEn || cmsData.heroSubtitle || mockSiteInfo.heroSubtitleEn,
-          festivalPeriod: cmsData.festivalPeriod || mockSiteInfo.festivalPeriod,
-          festivalPeriodEn: cmsData.festivalPeriodEn || cmsData.festivalPeriod || mockSiteInfo.festivalPeriodEn,
-          locationSummary: cmsData.locationSummary || mockSiteInfo.locationSummary,
-          locationSummaryEn: cmsData.locationSummaryEn || cmsData.locationSummary || mockSiteInfo.locationSummaryEn,
-          aboutTitle: cmsData.aboutTitle || mockSiteInfo.aboutTitle,
-          aboutTitleEn: cmsData.aboutTitleEn || cmsData.aboutTitle || mockSiteInfo.aboutTitleEn,
-          aboutText: cmsData.aboutText || mockSiteInfo.aboutText,
-          aboutTextEn: cmsData.aboutTextEn || cmsData.aboutText || mockSiteInfo.aboutTextEn,
-          donationTitle: cmsData.donationTitle || mockSiteInfo.donationTitle,
-          donationTitleEn: cmsData.donationTitleEn || cmsData.donationTitle || mockSiteInfo.donationTitleEn,
-          donationText: cmsData.donationText || mockSiteInfo.donationText,
-          donationTextEn: cmsData.donationTextEn || cmsData.donationText || mockSiteInfo.donationTextEn,
-          donationBankNote: cmsData.donationBankNote || mockSiteInfo.donationBankNote,
-          donationBankNoteEn: cmsData.donationBankNoteEn || cmsData.donationBankNote || mockSiteInfo.donationBankNoteEn,
-          donationBankInfo: cmsData.donationBankInfo || mockSiteInfo.donationBankInfo,
-          donationBankInfoEn: cmsData.donationBankInfoEn || cmsData.donationBankInfo || mockSiteInfo.donationBankInfoEn,
-          newsNotice: cmsData.newsNotice || mockSiteInfo.newsNotice,
-          newsNoticeEn: cmsData.newsNoticeEn || cmsData.newsNotice || mockSiteInfo.newsNoticeEn,
-        };
-      }
-    } catch (error) {
-      console.warn('[MicroCMS] Failed to fetch site_info, using mock data:', error);
+  if (!client) {
+    if (allowMockData) {
+      return mockSiteInfo;
     }
+    return SAFE_DEFAULT_SITE_INFO;
   }
 
-  // Fallback only when microCMS fetch itself fails or client is not configured
-  return mockSiteInfo;
+  try {
+    const data = await client.getObject<RawSiteInfoData>({
+      endpoint: 'site_info',
+      customRequestInit: { next: { revalidate: REVALIDATE_TIME } },
+    });
+    let cmsData: RawSiteInfoData | null = null;
+    if (data && data.siteTitle) {
+      cmsData = data;
+    } else if (data && Array.isArray(data.contents) && data.contents.length > 0) {
+      cmsData = data.contents[0];
+    }
+
+    if (cmsData) {
+      const stories: DonationStory[] = Array.isArray(cmsData.donationStories)
+        ? cmsData.donationStories.map(normalizeDonationStory)
+        : [];
+      const impacts: DonationImpact[] = Array.isArray(cmsData.donationImpacts)
+        ? cmsData.donationImpacts.map(normalizeDonationImpact)
+        : [];
+
+      return {
+        ...SAFE_DEFAULT_SITE_INFO,
+        ...cmsData,
+        donationStories: stories,
+        donationImpacts: impacts,
+        siteTitle: cmsData.siteTitle || SAFE_DEFAULT_SITE_INFO.siteTitle,
+        siteTitleEn: cmsData.siteTitleEn || cmsData.siteTitle || SAFE_DEFAULT_SITE_INFO.siteTitleEn,
+        heroTagline: cmsData.heroTagline || SAFE_DEFAULT_SITE_INFO.heroTagline,
+        heroTaglineEn: cmsData.heroTaglineEn || cmsData.heroTagline || SAFE_DEFAULT_SITE_INFO.heroTaglineEn,
+        heroSubtitle: cmsData.heroSubtitle || SAFE_DEFAULT_SITE_INFO.heroSubtitle,
+        heroSubtitleEn: cmsData.heroSubtitleEn || cmsData.heroSubtitle || SAFE_DEFAULT_SITE_INFO.heroSubtitleEn,
+        festivalPeriod: cmsData.festivalPeriod || SAFE_DEFAULT_SITE_INFO.festivalPeriod,
+        festivalPeriodEn: cmsData.festivalPeriodEn || cmsData.festivalPeriod || SAFE_DEFAULT_SITE_INFO.festivalPeriodEn,
+        locationSummary: cmsData.locationSummary || SAFE_DEFAULT_SITE_INFO.locationSummary,
+        locationSummaryEn: cmsData.locationSummaryEn || cmsData.locationSummary || SAFE_DEFAULT_SITE_INFO.locationSummaryEn,
+        aboutTitle: cmsData.aboutTitle || SAFE_DEFAULT_SITE_INFO.aboutTitle,
+        aboutTitleEn: cmsData.aboutTitleEn || cmsData.aboutTitle || SAFE_DEFAULT_SITE_INFO.aboutTitleEn,
+        aboutText: cmsData.aboutText || '',
+        aboutTextEn: cmsData.aboutTextEn || cmsData.aboutText || '',
+        donationTitle: cmsData.donationTitle || SAFE_DEFAULT_SITE_INFO.donationTitle,
+        donationTitleEn: cmsData.donationTitleEn || cmsData.donationTitle || SAFE_DEFAULT_SITE_INFO.donationTitleEn,
+        donationText: cmsData.donationText || '',
+        donationTextEn: cmsData.donationTextEn || cmsData.donationText || '',
+        donationBankNote: cmsData.donationBankNote || '',
+        donationBankNoteEn: cmsData.donationBankNoteEn || cmsData.donationBankNote || '',
+        donationBankInfo: cmsData.donationBankInfo || '',
+        donationBankInfoEn: cmsData.donationBankInfoEn || cmsData.donationBankInfo || '',
+        newsNotice: cmsData.newsNotice || '',
+        newsNoticeEn: cmsData.newsNoticeEn || cmsData.newsNotice || '',
+      };
+    }
+
+    return SAFE_DEFAULT_SITE_INFO;
+  } catch (error) {
+    if (allowMockData) {
+      console.warn('[MicroCMS] Failed to fetch site_info, falling back to mock data (mock mode enabled):', error);
+      return mockSiteInfo;
+    }
+    console.error('[MicroCMS] Failed to fetch site_info from microCMS:', error);
+    throw error;
+  }
 });

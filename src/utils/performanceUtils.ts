@@ -620,15 +620,22 @@ export function getVenuePerformancesForDate(
 }
 
 /**
- * 「すべての日程」表示時用：各会場の全公演（過去・現在・未来）を重複なしで取得
+ * 「すべての日程」表示時用：各会場の全公演（過去・現在・未来）を全日程付きで重複なく取得
  */
-export interface VenuePerformanceSummaryItem {
-  performance: Performance;
-  schedule?: PerformanceSchedule;
+export interface VenuePerformanceScheduleItem {
+  schedule: PerformanceSchedule;
   startMs: number;
+  endMs: number;
   isOngoing: boolean;
   isUpcoming: boolean;
   isEnded: boolean;
+}
+
+export interface VenuePerformanceSummaryItem {
+  performance: Performance;
+  schedules: VenuePerformanceScheduleItem[];
+  status: 'ongoing' | 'upcoming' | 'ended' | 'no_schedule';
+  nextStartMs: number;
 }
 
 export function getVenuePerformancesForAllDates(
@@ -637,56 +644,107 @@ export function getVenuePerformancesForAllDates(
   nowMs: number = Date.now()
 ): VenuePerformanceSummaryItem[] {
   const venueShows = performances.filter((p) => isPerformanceAtVenue(p, venueId));
-  const candidateItems: VenuePerformanceSummaryItem[] = [];
+  const results: VenuePerformanceSummaryItem[] = [];
 
   for (const perf of venueShows) {
-    if (!perf.schedules || perf.schedules.length === 0) {
-      // 日程未登録
-      candidateItems.push({
-        performance: perf,
-        startMs: Number.MAX_SAFE_INTEGER,
-        isOngoing: false,
-        isUpcoming: false,
-        isEnded: false,
-      });
+    // 該当会場の日程を抽出（日程側の会場指定優先、未指定なら公演既定会場）
+    const matchedSchedules: PerformanceSchedule[] = [];
+    if (perf.schedules && perf.schedules.length > 0) {
+      for (const s of perf.schedules) {
+        const schedVenueId = s.venueId || s.venue?.id || perf.venueId || perf.venue?.id;
+        if (schedVenueId === venueId) {
+          matchedSchedules.push(s);
+        }
+      }
+    }
+
+    if (matchedSchedules.length === 0) {
+      // 日程未登録（または該当会場に特定の日程がないが、既定会場がこの会場の場合）
+      if ((!perf.schedules || perf.schedules.length === 0) && (perf.venueId === venueId || perf.venue?.id === venueId)) {
+        results.push({
+          performance: perf,
+          schedules: [],
+          status: 'no_schedule',
+          nextStartMs: Number.MAX_SAFE_INTEGER,
+        });
+      }
       continue;
     }
 
-    for (const s of perf.schedules) {
-      const schedVenueId = s.venueId || s.venue?.id || perf.venueId || perf.venue?.id;
-      if (schedVenueId !== venueId) continue;
+    // 同一会場・同一日時の重複排除
+    const uniqueMap = new Map<string, PerformanceSchedule>();
+    for (const s of matchedSchedules) {
+      const key = `${s.date || ''}_${s.endDate || ''}_${s.startTime || ''}_${s.endTime || ''}`;
+      if (!uniqueMap.has(key)) {
+        uniqueMap.set(key, s);
+      }
+    }
 
+    // 各日程の開始・終了時刻とステータスを計算
+    const scheduleItems: VenuePerformanceScheduleItem[] = Array.from(uniqueMap.values()).map((s) => {
       const { startMs, endMs } = getScheduleTimestamps(s);
       const isOngoing = startMs <= nowMs && nowMs <= endMs;
       const isUpcoming = nowMs < startMs;
       const isEnded = nowMs > endMs;
-
-      candidateItems.push({
-        performance: perf,
+      return {
         schedule: s,
         startMs,
+        endMs,
         isOngoing,
         isUpcoming,
         isEnded,
-      });
+      };
+    });
+
+    // 日時昇順（startMs 昇順）でソート
+    scheduleItems.sort((a, b) => a.startMs - b.startMs);
+
+    // 公演ステータス判定
+    const hasOngoing = scheduleItems.some((s) => s.isOngoing);
+    const hasUpcoming = scheduleItems.some((s) => s.isUpcoming);
+    const allEnded = scheduleItems.every((s) => s.isEnded);
+
+    let status: 'ongoing' | 'upcoming' | 'ended' | 'no_schedule' = 'no_schedule';
+    let nextStartMs = Number.MAX_SAFE_INTEGER;
+
+    if (hasOngoing) {
+      status = 'ongoing';
+      const ongoing = scheduleItems.find((s) => s.isOngoing);
+      if (ongoing) nextStartMs = ongoing.startMs;
+    } else if (hasUpcoming) {
+      status = 'upcoming';
+      const upcoming = scheduleItems.find((s) => s.isUpcoming);
+      if (upcoming) nextStartMs = upcoming.startMs;
+    } else if (allEnded) {
+      status = 'ended';
+      // 終了済みは最後の開催日程の開始時刻
+      nextStartMs = scheduleItems[scheduleItems.length - 1].startMs;
     }
+
+    results.push({
+      performance: perf,
+      schedules: scheduleItems,
+      status,
+      nextStartMs,
+    });
   }
 
-  // 1. 開催日（startMs）昇順。日程未登録は最後。
-  candidateItems.sort((a, b) => {
-    return a.startMs - b.startMs;
+  // 公演の並び順：
+  // 1. 開催中 -> 2. 今後 -> 3. 終了済み -> 4. 日程未定
+  // 開催中・今後は nextStartMs 昇順、終了済みは nextStartMs 降順、日程未定は最後
+  results.sort((a, b) => {
+    const priority = { ongoing: 1, upcoming: 2, ended: 3, no_schedule: 4 };
+    if (priority[a.status] !== priority[b.status]) {
+      return priority[a.status] - priority[b.status];
+    }
+    if (a.status === 'ongoing' || a.status === 'upcoming') {
+      return a.nextStartMs - b.nextStartMs;
+    }
+    if (a.status === 'ended') {
+      return b.nextStartMs - a.nextStartMs;
+    }
+    return 0;
   });
-
-  // 公演IDで重複排除（一番早い日程を残す）
-  const seenPerfIds = new Set<string>();
-  const results: VenuePerformanceSummaryItem[] = [];
-
-  for (const item of candidateItems) {
-    if (!seenPerfIds.has(item.performance.id)) {
-      seenPerfIds.add(item.performance.id);
-      results.push(item);
-    }
-  }
 
   return results;
 }
@@ -740,7 +798,7 @@ export function sortVenuesForDate<T extends { id: string }>(
 
 /**
  * 「すべての日程」における会場一覧のソート・フィルタリング
- * - 次回開催日時が近い会場から並べる
+ * - 次回開催日時が近い会場から並べる（今後の会場は過去の初演日時ではなく、次回の開催日時）
  * - 終了済み公演しかない会場は今後の公演がある会場より後に表示
  */
 export function sortVenuesForAllDates<T extends { id: string }>(
@@ -751,26 +809,27 @@ export function sortVenuesForAllDates<T extends { id: string }>(
 ): { venue: T; allShows: VenuePerformanceSummaryItem[]; status: 'ongoing' | 'upcoming' | 'ended' | 'none'; nextStartMs: number }[] {
   const enriched = venues.map((v) => {
     const allShows = getVenuePerformancesForAllDates(v.id, performances, nowMs);
-    const hasOngoing = allShows.some((s) => s.isOngoing);
-    const hasUpcoming = allShows.some((s) => s.isUpcoming);
-    const hasEnded = allShows.some((s) => s.isEnded);
+    const hasOngoing = allShows.some((s) => s.status === 'ongoing');
+    const hasUpcoming = allShows.some((s) => s.status === 'upcoming');
+    const hasEnded = allShows.some((s) => s.status === 'ended');
 
     let status: 'ongoing' | 'upcoming' | 'ended' | 'none' = 'none';
     let nextStartMs = Number.MAX_SAFE_INTEGER;
 
     if (hasOngoing) {
       status = 'ongoing';
-      const ongoing = allShows.find((s) => s.isOngoing);
-      if (ongoing) nextStartMs = ongoing.startMs;
+      const ongoingShows = allShows.filter((s) => s.status === 'ongoing');
+      nextStartMs = Math.min(...ongoingShows.map((s) => s.nextStartMs));
     } else if (hasUpcoming) {
       status = 'upcoming';
-      const upcoming = allShows.find((s) => s.isUpcoming);
-      if (upcoming) nextStartMs = upcoming.startMs;
+      // 今後の会場は過去の初演日時ではなく、次回の開催日時で並べる
+      const upcomingShows = allShows.filter((s) => s.status === 'upcoming');
+      nextStartMs = Math.min(...upcomingShows.map((s) => s.nextStartMs));
     } else if (hasEnded) {
       status = 'ended';
       // endedの場合は最も最近のもの（startMs降順で最新）
-      const endedShows = allShows.filter((s) => s.isEnded).sort((a,b) => b.startMs - a.startMs);
-      if (endedShows.length > 0) nextStartMs = endedShows[0].startMs;
+      const endedShows = allShows.filter((s) => s.status === 'ended');
+      nextStartMs = Math.max(...endedShows.map((s) => s.nextStartMs));
     }
 
     return {
@@ -795,7 +854,7 @@ export function sortVenuesForAllDates<T extends { id: string }>(
       return priority[a.status] - priority[b.status];
     }
 
-    // 開催中・開催前は開始日時昇順
+    // 開催中・開催前は次回開始日時昇順
     if (a.status === 'ongoing' || a.status === 'upcoming') {
       return a.nextStartMs - b.nextStartMs;
     }
@@ -829,4 +888,56 @@ export function getNextAvailableDate(allDates: string[], currentDate: string): s
   }
 
   return null;
+}
+
+/**
+ * 公演が指定の会場および日付に一致するか判定
+ * - 会場・日付の両方が指定されている場合、同一の日程レコードが両方を満たす必要がある
+ * - 会場指定は日程側の会場を優先し、未指定の場合のみ公演の既定会場を使用
+ */
+export function isPerformanceMatchingVenueAndDate(
+  perf: Performance,
+  selectedVenueId: string,
+  selectedDate: string
+): boolean {
+  const hasVenueFilter = selectedVenueId !== 'all';
+  const hasDateFilter = selectedDate !== 'all';
+
+  if (!hasVenueFilter && !hasDateFilter) return true;
+
+  if (hasVenueFilter && hasDateFilter) {
+    return Boolean(
+      perf.schedules?.some((s) => {
+        const schedVenueId = s.venueId || s.venue?.id || perf.venueId || perf.venue?.id;
+        if (schedVenueId !== selectedVenueId) return false;
+
+        if (s.date === selectedDate) return true;
+        if (s.endDate && selectedDate >= s.date && selectedDate <= s.endDate) return true;
+        return false;
+      })
+    );
+  }
+
+  if (hasVenueFilter) {
+    const matchesScheduleVenue = perf.schedules?.some((s) => {
+      const schedVenueId = s.venueId || s.venue?.id || perf.venueId || perf.venue?.id;
+      return schedVenueId === selectedVenueId;
+    });
+    const hasNoSchedules = !perf.schedules || perf.schedules.length === 0;
+    const matchesDefaultVenue = perf.venueId === selectedVenueId || perf.venue?.id === selectedVenueId;
+
+    return Boolean(matchesScheduleVenue || (hasNoSchedules && matchesDefaultVenue));
+  }
+
+  if (hasDateFilter) {
+    return Boolean(
+      perf.schedules?.some((s) => {
+        if (s.date === selectedDate) return true;
+        if (s.endDate && selectedDate >= s.date && selectedDate <= s.endDate) return true;
+        return false;
+      })
+    );
+  }
+
+  return true;
 }

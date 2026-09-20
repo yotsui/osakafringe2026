@@ -709,21 +709,14 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                       </div>
 
                       {allShows.length > 0 ? (
-                        <div className="space-y-2">
+                        <div className="space-y-2.5">
                           {allShows.map((item) => (
                             <Link
                               key={item.performance.id}
                               href={`/performances/${item.performance.id}`}
-                              className="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-pink-50/80 border border-slate-100 hover:border-pink-200 transition-all flex items-center justify-between gap-3 group"
+                              className="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-pink-50/80 border border-slate-100 hover:border-pink-200 transition-all flex flex-col gap-2 group"
                             >
-                              <div className="flex items-start gap-2.5 truncate pr-2">
-                                <span className={`inline-flex items-center justify-center px-2 py-1 rounded text-[11px] font-black shrink-0 ${
-                                  item.isOngoing
-                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                    : 'bg-[#E6007E]/10 text-[#E6007E]'
-                                }`}>
-                                  {item.isOngoing ? '開催中' : (item.schedule ? formatScheduleCompact(item.schedule, language) : t('tbd'))}
-                                </span>
+                              <div className="flex items-start justify-between gap-2">
                                 <div className="truncate">
                                   <p className="text-xs font-bold text-slate-900 group-hover:text-[#E6007E] truncate">
                                     {getText(item.performance.title, item.performance.titleEn)}
@@ -732,10 +725,39 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                                     {getText(item.performance.artist?.name || item.performance.artistName, item.performance.artist?.nameEn || item.performance.artistNameEn)}
                                   </p>
                                 </div>
+                                <span className="text-[11px] font-bold text-[#E6007E] shrink-0">
+                                  詳細 →
+                                </span>
                               </div>
-                              <span className="text-[11px] font-bold text-[#E6007E] shrink-0">
-                                詳細 →
-                              </span>
+
+                              {/* 全日程リスト */}
+                              <div className="flex flex-wrap gap-1.5 pt-0.5">
+                                {item.schedules.length > 0 ? (
+                                  item.schedules.map((sItem, sIdx) => (
+                                    <span
+                                      key={sIdx}
+                                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium shrink-0 ${
+                                        sItem.isOngoing
+                                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold'
+                                          : sItem.isEnded
+                                          ? 'bg-slate-100 text-slate-500'
+                                          : 'bg-white text-slate-700 border border-slate-200/80'
+                                      }`}
+                                    >
+                                      {sItem.isOngoing && (
+                                        <span className="text-[9px] font-black bg-emerald-600 text-white px-1 py-0.2 rounded-xs">
+                                          開催中
+                                        </span>
+                                      )}
+                                      <span>{formatScheduleCompact(sItem.schedule, language)}</span>
+                                    </span>
+                                  ))
+                                ) : (
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">
+                                    {t('tbd')}
+                                  </span>
+                                )}
+                              </div>
                             </Link>
                           ))}
                         </div>

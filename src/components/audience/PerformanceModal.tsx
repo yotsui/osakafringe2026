@@ -44,22 +44,63 @@ export default function PerformanceModal({
     setActiveImageIndex(0);
   }
 
-  // Handle ESC key press to close modal
+  const modalRef = React.useRef<HTMLDivElement>(null);
+  const closeButtonRef = React.useRef<HTMLButtonElement>(null);
+  const previousActiveElementRef = React.useRef<HTMLElement | null>(null);
+
+  // Handle focus management, ESC key, focus trap, and body scroll lock
   useEffect(() => {
     if (!performance) return;
 
+    previousActiveElementRef.current = document.activeElement as HTMLElement | null;
+
+    // Focus close button on open
+    const timer = setTimeout(() => {
+      closeButtonRef.current?.focus();
+    }, 50);
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        e.preventDefault();
         onClose();
+        return;
+      }
+
+      if (e.key === 'Tab') {
+        if (!modalRef.current) return;
+        const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
+    const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
 
     return () => {
+      clearTimeout(timer);
       window.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = originalOverflow;
+      if (previousActiveElementRef.current && typeof previousActiveElementRef.current.focus === 'function') {
+        previousActiveElementRef.current.focus();
+      }
     };
   }, [performance, onClose]);
 
@@ -101,6 +142,10 @@ export default function PerformanceModal({
       onClick={onClose}
     >
       <div 
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="performance-modal-title"
         className="relative w-full max-w-3xl max-h-[92vh] flex flex-col bg-white rounded-3xl border border-pink-100 shadow-2xl overflow-hidden animate-scaleUp"
         onClick={(e) => e.stopPropagation()}
       >
@@ -115,9 +160,9 @@ export default function PerformanceModal({
                 {workGenreText}
               </span>
             )}
-            <span className="text-xs font-bold text-slate-700 truncate">
+            <h2 id="performance-modal-title" className="text-xs font-bold text-slate-700 truncate">
               {title}
-            </span>
+            </h2>
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0">
@@ -137,6 +182,7 @@ export default function PerformanceModal({
             )}
 
             <button
+              ref={closeButtonRef}
               onClick={onClose}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-[#E6007E] hover:text-white text-slate-700 text-xs font-black transition-all cursor-pointer"
               aria-label="Close modal"

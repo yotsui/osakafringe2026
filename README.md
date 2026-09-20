@@ -31,9 +31,10 @@ Next.js (App Router)、Tailwind CSS、MicroCMS、Google Gemini API（自動翻�
 - **ロゴデータ (/logo_download)**: 公式ロゴダウンロード
 - **公式バナー (/components/common/BannerSection)**: Instagram、大阪観光局ポータル等
 
-### 3. 多言語対応 (日本語 / 英語) & Gemini API 自動翻訳
+### 3. 多言語対応 (日本語 / 英語)
 - ヘッダー右上の言語切替（JP / EN）で即座に切り替え可能
-- コンテンツに英語が未登録の場合でも、Google Gemini API (`gemini-2.5-flash`) を通じて自然な演劇・芸術用語に自動翻訳
+- コンテンツは microCMS に登録された英語テキストを表示（未登録の場合は日本語を表示し、閲覧リクエスト時の自動翻訳呼び出しは行いません）
+- 管理・運用スクリプト `npm run translate:backfill` をローカル実行することで、未翻訳項目のみを Google Gemini API で翻訳し、microCMS へ反映可能
 
 ---
 
@@ -64,11 +65,12 @@ npm run start
 ※APIキーが未設定の場合でも、内蔵されたリアルなモックデータで全機能が完全に動作します。
 
 ```env
-# MicroCMS 連携設定
+# MicroCMS 連携設定（本番・開発共通）
 MICROCMS_SERVICE_DOMAIN=your-service-domain
 MICROCMS_API_KEY=your-microcms-api-key
 
-# Google Gemini API 連携設定（自動翻訳用）
+# Google Gemini API 設定（ローカルの翻訳バックフィルスクリプト npm run translate:backfill 実行時のみ使用）
+# ※ Vercel などの本番環境への設定は不要です。
 GEMINI_API_KEY=your-google-gemini-api-key
 ```
 
