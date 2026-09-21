@@ -57,7 +57,7 @@ export default function AwardsClient({ siteInfo }: AwardsClientProps) {
 
         {/* 2. Introduction Sections */}
         {sections.length > 0 && (
-          <section className="space-y-8" aria-label="Awards Introduction Sections">
+          <section className="space-y-8" aria-label={t('awardsSectionsAriaLabel')}>
             {sections.map((sec, idx) => {
               const secTitle = getText(sec.title, sec.titleEn);
               const secText = getText(sec.text, sec.textEn);
@@ -97,7 +97,7 @@ export default function AwardsClient({ siteInfo }: AwardsClientProps) {
                 <div className="relative w-36 h-36 sm:w-44 sm:h-44 shrink-0 rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-slate-100 mx-auto md:mx-0">
                   <Image
                     src={editor.photo}
-                    alt={getText(editor.name, editor.nameEn) || 'Editor'}
+                    alt={getText(editor.name, editor.nameEn) || t('awardsPhotoAltEditor')}
                     fill
                     sizes="(max-width: 640px) 144px, 176px"
                     className="object-cover object-center"
@@ -159,7 +159,7 @@ export default function AwardsClient({ siteInfo }: AwardsClientProps) {
                         <div className="relative w-20 h-20 shrink-0 rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
                           <Image
                             src={member.photo}
-                            alt={memName || 'Member'}
+                            alt={memName || t('awardsPhotoAltMember')}
                             fill
                             sizes="80px"
                             className="object-cover object-center"

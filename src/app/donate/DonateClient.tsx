@@ -551,7 +551,10 @@ export default function DonateClient({ siteInfo }: DonateClientProps) {
 
         <div className="p-5 sm:p-6 rounded-xl bg-white border border-slate-200 space-y-3">
           <pre className="text-xs sm:text-sm font-bold text-slate-800 whitespace-pre-wrap font-mono leading-relaxed">
-            {bankInfo || `金融機関名：大阪シティ信用金庫\n支店名：阿倍野支店\n口座種別：普通預金\n口座番号：8173108\n口座名義：オオサカブンカフリンジキコウセツリツジュンビシツ\n（大阪文化フリンジ機構設立準備室）`}
+            {bankInfo || (language === 'en'
+              ? `Bank Name: Osaka City Shinkin Bank\nBranch: Abeno Branch\nAccount Type: Ordinary (Futsu)\nAccount Number: 8173108\nAccount Name: OSAKA BUNKA FRINGE KIKOU SETSURITSU JUNBISHITSU\n(Osaka Cultural Fringe Organization Preparation Office)`
+              : `金融機関名：大阪シティ信用金庫\n支店名：阿倍野支店\n口座種別：普通預金\n口座番号：8173108\n口座名義：オオサカブンカフリンジキコウセツリツジュンビシツ\n（大阪文化フリンジ機構設立準備室）`
+            )}
           </pre>
         </div>
 

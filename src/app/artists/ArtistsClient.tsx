@@ -80,7 +80,7 @@ export default function ArtistsClient({ artists, performances }: ArtistsClientPr
         {isDemoMode && (
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold mt-2">
             <Eye className="w-3.5 h-3.5" />
-            <span>DEMO MODE（出演公演未登録アーティストを含む全件表示中）</span>
+            <span>{t('demoModeArtists')}</span>
           </div>
         )}
       </div>
@@ -90,7 +90,7 @@ export default function ArtistsClient({ artists, performances }: ArtistsClientPr
         <h2 className="text-base sm:text-lg font-bold text-slate-900">
           <span className="text-[#E6007E] font-black">{displayArtists.length}</span> {t('artistsCountUnit')}
           {!isDemoMode && artists.length > displayArtists.length && (
-            <span className="ml-1.5 text-xs text-slate-400 font-normal">（出演公演登録アーティストのみ）</span>
+            <span className="ml-1.5 text-xs text-slate-400 font-normal">{t('artistRegisteredShowsOnly')}</span>
           )}
         </h2>
         <Link
