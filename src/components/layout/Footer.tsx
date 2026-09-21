@@ -7,8 +7,13 @@ import BrandLogo from '@/components/common/BrandLogo';
 import { InstagramIcon } from '@/components/common/SnsIcons';
 import { ExternalLink } from 'lucide-react';
 
-export default function Footer() {
+interface FooterProps {
+  showAwards?: boolean;
+}
+
+export default function Footer({ showAwards = false }: FooterProps) {
   const { t } = useLanguage();
+
 
   return (
     <footer className="bg-[#E6007E] text-white transition-colors">
@@ -63,11 +68,19 @@ export default function Footer() {
                   {t('navArtists')}
                 </Link>
               </li>
+              {showAwards && (
+                <li>
+                  <Link href="/awards" className="inline-block py-2 text-white/90 hover:text-white transition-colors">
+                    {t('navAwards')}
+                  </Link>
+                </li>
+              )}
               <li>
                 <Link href="/about" className="inline-block py-2 text-white/90 hover:text-white transition-colors">
                   {t('navAbout')}
                 </Link>
               </li>
+
               <li>
                 <Link href="/logo_download" className="inline-block py-2 text-white/90 hover:text-white transition-colors">
                   {t('navBrandAssets')}

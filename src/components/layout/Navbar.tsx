@@ -7,7 +7,11 @@ import { useLanguage } from '@/context/LanguageContext';
 import BrandLogo from '@/components/common/BrandLogo';
 import { Menu, X } from 'lucide-react';
 
-export default function Navbar() {
+interface NavbarProps {
+  showAwards?: boolean;
+}
+
+export default function Navbar({ showAwards = false }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const { language, setLanguage, t } = useLanguage();
@@ -17,10 +21,12 @@ export default function Navbar() {
     { href: '/audience', label: t('navAudience'), highlight: true },
     { href: '/venues', label: t('navVenues') },
     { href: '/artists', label: t('navArtists') },
+    ...(showAwards ? [{ href: '/awards', label: t('navAwards') }] : []),
     { href: '/about', label: t('navAbout') },
     { href: '/donate', label: t('navDonate') },
     { href: '/contact', label: t('navContact') },
   ];
+
 
   return (
     <nav className="sticky top-0 z-50 bg-[#E6007E] text-white shadow-md transition-all">

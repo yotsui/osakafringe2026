@@ -294,4 +294,41 @@ export interface SiteInfo {
     youtube?: string;
     facebook?: string;
   };
+
+  // OSAKA FRINGE AWARDS 2026
+  awardsInfo?: AwardInfo;
+  awardsSections?: AwardSection[];
+  awardsEditor?: AwardPerson;
+  awardsMembers?: AwardPerson[];
+}
+
+export interface AwardInfo {
+  enabled?: boolean;
+  title?: string;
+  titleEn?: string;
+  tagline?: string;
+  taglineEn?: string;
+  summary?: string;
+  summaryEn?: string;
+  notice?: string;
+  noticeEn?: string;
+}
+
+export interface AwardSection {
+  title: string;
+  titleEn?: string;
+  text: string;
+  textEn?: string;
+}
+
+export interface AwardPerson {
+  name: string;
+  nameEn?: string;
+  role: string;
+  roleEn?: string;
+  title?: string;
+  titleEn?: string;
+  profile?: string;
+  profileEn?: string;
+  photo?: string;
 }

@@ -12,9 +12,18 @@ export const translations: Dictionary = {
   navAbout: { ja: 'Osaka Fringeとは', en: 'About' },
   navVenues: { ja: '会場', en: 'Venues' },
   navArtists: { ja: 'アーティスト', en: 'Artists' },
+  navAwards: { ja: 'アワード', en: 'Awards' },
   navDonate: { ja: '応援・連携', en: 'Support' },
   navBrandAssets: { ja: 'ロゴ・ブランド素材', en: 'Brand Assets' },
   navContact: { ja: 'お問い合わせ', en: 'Contact' },
+
+  // Awards
+  aboutAwardsBtn: { ja: 'アワードについて', en: 'About Awards' },
+  awardsEditorBadge: { ja: '編集長', en: 'Editor-in-Chief' },
+  awardsMembersTitle: { ja: '編集部メンバー', en: 'Editorial Team' },
+  awardsFindShowsBtn: { ja: '公演を探す', en: 'Find Shows' },
+  awardsUpcomingTitle: { ja: '今後のご案内', en: 'Upcoming Information' },
+
   
   // Brand Assets & Logo Download
   aboutBrandAssetsBadge: { ja: 'BRAND ASSETS', en: 'BRAND ASSETS' },

@@ -137,8 +137,41 @@ export default function AboutClient({ siteInfo, partners = [] }: AboutClientProp
         </div>
       </div>
 
+      {/* OSAKA FRINGE AWARDS Section */}
+      {siteInfo.awardsInfo && (
+        <div className="bg-gradient-to-br from-white via-white to-pink-50/40 border border-pink-100 rounded-3xl p-8 sm:p-12 space-y-6 shadow-xs">
+          <div className="space-y-3">
+            <div className="inline-flex items-center px-3 py-1 rounded-full bg-pink-50 text-[#E6007E] text-xs font-black uppercase tracking-wide">
+              <span>OSAKA FRINGE AWARDS 2026</span>
+            </div>
+            {siteInfo.awardsInfo.tagline && (
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-snug">
+                {getText(siteInfo.awardsInfo.tagline, siteInfo.awardsInfo.taglineEn)}
+              </h2>
+            )}
+            {siteInfo.awardsInfo.summary && (
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-medium whitespace-pre-line max-w-3xl">
+                {getText(siteInfo.awardsInfo.summary, siteInfo.awardsInfo.summaryEn)}
+              </p>
+            )}
+          </div>
+          <div>
+            <Link
+              href="/awards"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#E6007E] hover:bg-[#c4006b] text-white text-sm font-black tracking-wide shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group"
+            >
+              <span>{t('aboutAwardsBtn')}</span>
+              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Venue Types Section: 3-Column Clean Border Layout */}
       <div className="bg-white border border-slate-200/90 rounded-3xl p-8 sm:p-14 space-y-10 shadow-xs">
+
         <div className="space-y-2 border-b border-slate-200/80 pb-4">
           <div className="text-xs font-black text-[#E6007E] uppercase tracking-widest">
             VENUE CATEGORIES
