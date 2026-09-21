@@ -12,9 +12,18 @@ export const translations: Dictionary = {
   navAbout: { ja: 'Osaka Fringeとは', en: 'About' },
   navVenues: { ja: '会場', en: 'Venues' },
   navArtists: { ja: 'アーティスト', en: 'Artists' },
+  navAwards: { ja: 'アワード', en: 'Awards' },
   navDonate: { ja: '応援・連携', en: 'Support' },
   navBrandAssets: { ja: 'ロゴ・ブランド素材', en: 'Brand Assets' },
   navContact: { ja: 'お問い合わせ', en: 'Contact' },
+
+  // Awards
+  aboutAwardsBtn: { ja: 'アワードについて', en: 'About Awards' },
+  awardsEditorBadge: { ja: '編集長', en: 'Editor-in-Chief' },
+  awardsMembersTitle: { ja: '編集部メンバー', en: 'Editorial Team' },
+  awardsFindShowsBtn: { ja: '公演を探す', en: 'Find Shows' },
+  awardsUpcomingTitle: { ja: '今後のご案内', en: 'Upcoming Information' },
+
   
   // Brand Assets & Logo Download
   aboutBrandAssetsBadge: { ja: 'BRAND ASSETS', en: 'BRAND ASSETS' },
@@ -358,5 +367,55 @@ export const translations: Dictionary = {
   footerTagline: { ja: '大阪文化万博Osaka Fringe 2026 実行委員会', en: 'Osaka Fringe 2026 Executive Committee' },
   footerDesc: { ja: '大阪の街全体が舞台になるオープンアクセス芸術祭。演劇、ダンス、大道芸、音楽、古典芸能、紙芝居、作品展示がジャンルを超えて交差するフェスティバル。', en: 'An open-access performing arts festival turning all of Osaka into a vibrant stage across theater, dance, street circus, music, traditional arts, and art exhibitions.' },
   poweredByMicroCMS: { ja: 'Data powered by MicroCMS', en: 'Data powered by MicroCMS' },
-  allRightsReserved: { ja: '© Osaka Fringe 2026 All Rights Reserved.', en: '© Osaka Fringe 2026 All Rights Reserved.' }
+  allRightsReserved: { ja: '© Osaka Fringe 2026 All Rights Reserved.', en: '© Osaka Fringe 2026 All Rights Reserved.' },
+
+  // Additional Bilingual UI Keys
+  demoModeVenues: { ja: 'DEMO MODE（公演未登録会場を含む全件表示中）', en: 'DEMO MODE (Displaying all venues including those without scheduled shows)' },
+  noPerformancesOnDateSuffix: { ja: ' に開催される公演はありません。', en: 'No performances scheduled for ' },
+  viewNextDatePrefix: { ja: '次の公演日（', en: 'View next performance date (' },
+  viewNextDateSuffix: { ja: '）を見る', en: ')' },
+  viewAllDatesAction: { ja: 'すべての日程を見る', en: 'View All Dates' },
+  showsOnDatePrefix: { ja: '', en: 'Performances on ' },
+  showsOnDateSuffix: { ja: ' の公演', en: '' },
+  seatsUnit: { ja: '席', en: ' seats' },
+  showDetailsArrow: { ja: '詳細 →', en: 'Details →' },
+  viewVenueDetails: { ja: '会場詳細を見る', en: 'View Venue Details' },
+
+  mapPopupVenueDetails: { ja: '会場詳細', en: 'Details' },
+  mapPopupDirections: { ja: '案内', en: 'Directions' },
+  viewVenueDetailPage: { ja: '会場詳細ページを見る', en: 'View Venue Details' },
+  googleMapsDirections: { ja: 'Google Maps でルート案内', en: 'Directions on Google Maps' },
+  selectVenuePrompt: { ja: '会場を選択してください', en: 'Please select a venue' },
+  showsAtThisVenueTitle: { ja: 'この会場で上演される公演', en: 'Performances at this venue' },
+  venuesInMapAreaLabel: { ja: '📍 地図の表示範囲内の会場: ', en: '📍 Venues in visible map area: ' },
+  outOfTotalVenuesPrefix: { ja: '（全 ', en: '(out of ' },
+  outOfTotalVenuesSuffix: { ja: ' 会場中）', en: ' total venues)' },
+  noVenuesInMapArea: { ja: '現在の地図表示範囲に会場はありません。地図をドラッグして移動するか、ズームアウトしてください。', en: 'No venues in the current map area. Drag or zoom out to explore more.' },
+
+  accessLabelPrefix: { ja: 'アクセス: ', en: 'Access: ' },
+  partnerEventInfoTitle: { ja: '連携イベント情報（Partner Event）', en: 'Partner Event Information' },
+  promotionalFlyer: { ja: '告知フライヤー', en: 'Event Flyer' },
+
+  demoModeArtists: { ja: 'DEMO MODE（出演公演未登録アーティストを含む全件表示中）', en: 'DEMO MODE (Displaying all artists including those without scheduled shows)' },
+  artistRegisteredShowsOnly: { ja: '（出演公演登録アーティストのみ）', en: '(Artists with scheduled performances only)' },
+
+  osakaCityDefault: { ja: '大阪市内', en: 'Osaka City' },
+
+  formSubjectPlaceholder: { ja: '件名・タイトルをご記入ください', en: 'Please enter a subject / title' },
+  formMessagePlaceholder: { ja: 'お問い合わせ内容を詳しくご記入ください...', en: 'Please enter your inquiry details...' },
+
+  footerOrganizerLabel: { ja: '主催：', en: 'Organized by: ' },
+  footerOrganizerName: { ja: '大阪文化万博 Osaka Fringe 2026 準備室', en: 'Osaka Cultural Expo - Osaka Fringe 2026 Preparatory Office' },
+  footerSupporterLabel: { ja: '後援：', en: 'Supported by: ' },
+  footerSupporterName: { ja: '公益財団法人大阪観光局', en: 'Osaka Convention & Tourism Bureau' },
+  footerCopyrightText: { ja: '© 2026 大阪文化万博 Osaka Fringe 2026 準備室 All rights reserved.', en: '© 2026 Osaka Cultural Expo - Osaka Fringe 2026 Preparatory Office. All rights reserved.' },
+
+  errorTitle: { ja: 'データの読み込みに失敗しました', en: 'Failed to Load Data' },
+  errorDescription: { ja: 'ネットワーク接続またはシステムの一時的な問題により、情報を取得できませんでした。しばらく経ってから再度お試しください。', en: 'Unable to retrieve information due to a network connection or temporary system issue. Please try again shortly.' },
+  errorRetry: { ja: '再読み込みする', en: 'Try Again' },
+  errorBackToHome: { ja: 'トップページへ', en: 'Back to Home' },
+
+  awardsSectionsAriaLabel: { ja: 'アワード紹介セクション', en: 'Awards Introduction Sections' },
+  awardsPhotoAltEditor: { ja: '編集長写真', en: 'Editor photo' },
+  awardsPhotoAltMember: { ja: 'メンバー写真', en: 'Member photo' }
 };

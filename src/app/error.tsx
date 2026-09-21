@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { AlertCircle, RotateCcw, Home } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function GlobalError({
   error,
@@ -11,6 +12,8 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const { t } = useLanguage();
+
   useEffect(() => {
     console.error('Application Error:', error);
   }, [error]);
@@ -24,10 +27,10 @@ export default function GlobalError({
 
         <div className="space-y-2">
           <h1 className="text-xl font-black text-slate-900">
-            データの読み込みに失敗しました
+            {t('errorTitle')}
           </h1>
           <p className="text-sm text-slate-600 leading-relaxed">
-            ネットワーク接続またはシステムの一時的な問題により、情報を取得できませんでした。しばらく経ってから再度お試しください。
+            {t('errorDescription')}
           </p>
         </div>
 
@@ -37,7 +40,7 @@ export default function GlobalError({
             className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#E6007E] text-white text-sm font-bold hover:bg-[#d00072] transition-colors shadow-sm cursor-pointer"
           >
             <RotateCcw className="w-4 h-4" />
-            <span>再読み込みする</span>
+            <span>{t('errorRetry')}</span>
           </button>
 
           <Link
@@ -45,7 +48,7 @@ export default function GlobalError({
             className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold transition-colors"
           >
             <Home className="w-4 h-4" />
-            <span>トップページへ</span>
+            <span>{t('errorBackToHome')}</span>
           </Link>
         </div>
       </div>

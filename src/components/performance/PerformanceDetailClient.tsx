@@ -521,7 +521,7 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
 
                   {performance.venue.access && (
                     <p className="text-xs text-slate-500 font-medium">
-                      アクセス: {getText(performance.venue.access, performance.venue.accessEn)}
+                      {t('accessLabelPrefix')}{getText(performance.venue.access, performance.venue.accessEn)}
                     </p>
                   )}
 
@@ -545,12 +545,12 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
               <div className="space-y-3">
                 <h2 className="text-base font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-[#E6007E]" />
-                  <span>連携イベント情報（Partner Event）</span>
+                  <span>{t('partnerEventInfoTitle')}</span>
                 </h2>
                 <div className="p-6 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-3">
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <span className="px-2.5 py-0.5 rounded-full bg-amber-200 text-amber-900 text-xs font-black">
-                      連携イベント
+                      {t('partnerEvent')}
                     </span>
                     <h3 className="text-sm font-black text-slate-900">
                       {getText(performance.partner.name, performance.partner.nameEn)}
@@ -568,7 +568,7 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 text-xs font-bold text-[#E6007E] hover:underline pt-1"
                     >
-                      <span>公式サイトを見る</span>
+                      <span>{t('viewOfficialSite')}</span>
                       <ExternalLink className="w-3.5 h-3.5" />
                     </a>
                   )}
@@ -595,7 +595,7 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
                     rel="noopener noreferrer"
                     className="px-5 py-3 rounded-2xl bg-white border border-pink-200 hover:border-[#E6007E] text-[#E6007E] font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
                   >
-                    <span>告知フライヤー</span>
+                    <span>{t('promotionalFlyer')}</span>
                     <ExternalLink className="w-4 h-4 opacity-80" />
                   </a>
                 )}

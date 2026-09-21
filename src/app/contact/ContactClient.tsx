@@ -234,7 +234,7 @@ export default function ContactClient({ siteInfo }: ContactClientProps) {
                   name="subject"
                   value={formState.subject}
                   onChange={handleChange}
-                  placeholder="件名・タイトルをご記入ください"
+                  placeholder={t('formSubjectPlaceholder')}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all shadow-2xs"
                 />
               </div>
@@ -255,7 +255,7 @@ export default function ContactClient({ siteInfo }: ContactClientProps) {
                 rows={6}
                 value={formState.message}
                 onChange={handleChange}
-                placeholder="お問い合わせ内容を詳しくご記入ください..."
+                placeholder={t('formMessagePlaceholder')}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all shadow-2xs leading-relaxed"
               ></textarea>
             </div>

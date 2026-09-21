@@ -12,6 +12,9 @@ import type {
   DonationStory,
   DonationImpact,
   DonationStoryKey,
+  AwardInfo,
+  AwardSection,
+  AwardPerson,
 } from '../types/index.ts';
 import { normalizeArtistGenre } from '../utils/genre.ts';
 import { mockVenues, mockArtists, mockPerformances, mockBanners, mockSiteInfo, mockPartners } from './mockData.ts';
@@ -63,7 +66,12 @@ export const SAFE_DEFAULT_SITE_INFO: SiteInfo = {
   officialXUrl: 'https://twitter.com/osakafringe',
   officialWebsiteUrl: 'https://osakafringe.com',
   contactEmail: 'info@osakafringe.com',
+  awardsInfo: undefined,
+  awardsSections: [],
+  awardsEditor: undefined,
+  awardsMembers: [],
 };
+
 
 export const client = isMicroCMSConfigured
   ? createClient({
@@ -228,6 +236,40 @@ interface RawImpactData {
   textEn?: string;
 }
 
+export interface RawAwardInfoData {
+  fieldId?: string;
+  enabled?: boolean;
+  title?: string;
+  titleEn?: string;
+  tagline?: string;
+  taglineEn?: string;
+  summary?: string;
+  summaryEn?: string;
+  notice?: string;
+  noticeEn?: string;
+}
+
+export interface RawAwardSectionData {
+  fieldId?: string;
+  title?: string;
+  titleEn?: string;
+  text?: string;
+  textEn?: string;
+}
+
+export interface RawAwardPersonData {
+  fieldId?: string;
+  name?: string;
+  nameEn?: string;
+  role?: string;
+  roleEn?: string;
+  title?: string;
+  titleEn?: string;
+  profile?: string;
+  profileEn?: string;
+  photo?: string | MicroCMSMedia;
+}
+
 interface RawSiteInfoData {
   siteTitle?: string;
   siteTitleEn?: string;
@@ -256,7 +298,12 @@ interface RawSiteInfoData {
   donationStories?: RawStoryData[];
   donationImpacts?: RawImpactData[];
   contents?: RawSiteInfoData[];
+  awardsInfo?: RawAwardInfoData;
+  awardsSections?: RawAwardSectionData[];
+  awardsEditor?: RawAwardPersonData;
+  awardsMembers?: RawAwardPersonData[];
 }
+
 
 /**
  * microCMSのメディア型 { url: string } または文字列から画像URLを抽出
@@ -935,6 +982,84 @@ export const normalizeDonationImpact = (raw: RawImpactData): DonationImpact => (
 });
 
 /**
+ * 文字列の安全なトリミング（空文字・空白のみは undefined）
+ */
+function cleanText(val: unknown): string | undefined {
+  if (typeof val !== 'string') return undefined;
+  const trimmed = val.trim();
+  return trimmed === '' ? undefined : trimmed;
+}
+
+/**
+ * テキストエリア用：改行を保持しつつ前後の空白をトリム
+ */
+function cleanTextArea(val: unknown): string | undefined {
+  if (typeof val !== 'string') return undefined;
+  const trimmed = val.replace(/^[\s\r\n]+|[\s\r\n]+$/g, '');
+  return trimmed === '' ? undefined : trimmed;
+}
+
+/**
+ * アワード基本情報の正規化
+ */
+export const normalizeAwardInfo = (raw?: RawAwardInfoData | null): AwardInfo | undefined => {
+  if (!raw || typeof raw !== 'object') return undefined;
+  const title = cleanText(raw.title);
+  const summary = cleanTextArea(raw.summary);
+
+  return {
+    enabled: raw.enabled === true,
+    title,
+    titleEn: cleanText(raw.titleEn),
+    tagline: cleanText(raw.tagline),
+    taglineEn: cleanText(raw.taglineEn),
+    summary,
+    summaryEn: cleanTextArea(raw.summaryEn),
+    notice: cleanTextArea(raw.notice),
+    noticeEn: cleanTextArea(raw.noticeEn),
+  };
+};
+
+/**
+ * アワード紹介本文セクションの正規化
+ */
+export const normalizeAwardSection = (raw?: RawAwardSectionData | null): AwardSection | null => {
+  if (!raw || typeof raw !== 'object') return null;
+  const title = cleanText(raw.title);
+  const text = cleanTextArea(raw.text);
+  if (!title && !text) return null;
+
+  return {
+    title: title || '',
+    titleEn: cleanText(raw.titleEn),
+    text: text || '',
+    textEn: cleanTextArea(raw.textEn),
+  };
+};
+
+/**
+ * アワード人物情報（編集長・メンバー）の正規化
+ */
+export const normalizeAwardPerson = (raw?: RawAwardPersonData | null): AwardPerson | null => {
+  if (!raw || typeof raw !== 'object') return null;
+  const name = cleanText(raw.name);
+  const role = cleanText(raw.role);
+  if (!name && !role) return null;
+
+  return {
+    name: name || '',
+    nameEn: cleanText(raw.nameEn),
+    role: role || '',
+    roleEn: cleanText(raw.roleEn),
+    title: cleanText(raw.title),
+    titleEn: cleanText(raw.titleEn),
+    profile: cleanTextArea(raw.profile),
+    profileEn: cleanTextArea(raw.profileEn),
+    photo: extractImageUrl(raw.photo),
+  };
+};
+
+/**
  * サイト基本情報を取得 (React cache & ISR 300s)
  */
 export const getSiteInfo = cache(async (): Promise<SiteInfo> => {
@@ -964,12 +1089,24 @@ export const getSiteInfo = cache(async (): Promise<SiteInfo> => {
       const impacts: DonationImpact[] = Array.isArray(cmsData.donationImpacts)
         ? cmsData.donationImpacts.map(normalizeDonationImpact)
         : [];
+      const awardsInfo = normalizeAwardInfo(cmsData.awardsInfo);
+      const awardsSections: AwardSection[] = Array.isArray(cmsData.awardsSections)
+        ? (cmsData.awardsSections.map(normalizeAwardSection).filter(Boolean) as AwardSection[])
+        : [];
+      const awardsEditor = normalizeAwardPerson(cmsData.awardsEditor) || undefined;
+      const awardsMembers: AwardPerson[] = Array.isArray(cmsData.awardsMembers)
+        ? (cmsData.awardsMembers.map(normalizeAwardPerson).filter(Boolean) as AwardPerson[])
+        : [];
 
       return {
         ...SAFE_DEFAULT_SITE_INFO,
         ...cmsData,
         donationStories: stories,
         donationImpacts: impacts,
+        awardsInfo,
+        awardsSections,
+        awardsEditor,
+        awardsMembers,
         siteTitle: cmsData.siteTitle || SAFE_DEFAULT_SITE_INFO.siteTitle,
         siteTitleEn: cmsData.siteTitleEn || cmsData.siteTitle || SAFE_DEFAULT_SITE_INFO.siteTitleEn,
         heroTagline: cmsData.heroTagline || SAFE_DEFAULT_SITE_INFO.heroTagline,
@@ -996,6 +1133,7 @@ export const getSiteInfo = cache(async (): Promise<SiteInfo> => {
         newsNoticeEn: cmsData.newsNoticeEn || cmsData.newsNotice || '',
       };
     }
+
 
     return SAFE_DEFAULT_SITE_INFO;
   } catch (error) {

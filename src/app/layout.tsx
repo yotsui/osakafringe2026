@@ -59,20 +59,26 @@ export const metadata: Metadata = {
   manifest: '/manifest.webmanifest',
 };
 
-export default function RootLayout({
+import { getSiteInfo } from '@/lib/microcms';
+import { isAwardsVisible } from '@/utils/awardsUtils';
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const siteInfo = await getSiteInfo().catch(() => null);
+  const showAwards = isAwardsVisible(siteInfo);
+
   return (
     <html lang="ja" className="scroll-smooth">
       <body className="min-h-screen flex flex-col bg-slate-950 text-slate-100">
         <LanguageProvider>
-          <Navbar />
+          <Navbar showAwards={showAwards} />
           <main className="flex-1">
             {children}
           </main>
-          <Footer />
+          <Footer showAwards={showAwards} />
         </LanguageProvider>
         <Analytics />
       </body>

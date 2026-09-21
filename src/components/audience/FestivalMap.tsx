@@ -32,11 +32,12 @@ export default function FestivalMap({
   selectedVenueId,
   onSelectVenue,
 }: FestivalMapProps) {
-  const { getText, t } = useLanguage();
+  const { getText, t, language } = useLanguage();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<{ map: MapLibreMap; maplibregl: typeof import('maplibre-gl') } | null>(null);
   const markersRef = useRef<MarkerItem[]>([]);
   const isMapReadyRef = useRef<boolean>(false);
+  const renderMarkersRef = useRef<((map: MapLibreMap, maplibregl: typeof import('maplibre-gl')) => void) | null>(null);
 
   const [activeVenue, setActiveVenue] = useState<Venue | null>(() => {
     if (venues.length === 0) return null;
@@ -234,7 +235,7 @@ export default function FestivalMap({
                 font-weight: 800;
                 text-decoration: none;
               ">
-                <span>会場詳細</span>
+                <span>${t('mapPopupVenueDetails')}</span>
                 →
               </a>
               <a href="${navUrl}" target="_blank" rel="noopener noreferrer" style="
@@ -250,7 +251,7 @@ export default function FestivalMap({
                 text-decoration: none;
                 box-shadow: 0 2px 6px rgba(230,0,126,0.3);
               ">
-                <span>案内</span>
+                <span>${t('mapPopupDirections')}</span>
                 ↗
               </a>
             </div>
@@ -293,8 +294,26 @@ export default function FestivalMap({
         markersRef.current.push({ venue: v, marker, popup, pinEl, dotEl, el });
       });
     },
-    [venues, getText, onSelectVenue, updateMarkerColors]
+    [venues, getText, onSelectVenue, updateMarkerColors, t]
   );
+
+  useEffect(() => {
+    renderMarkersRef.current = renderMarkers;
+  }, [renderMarkers]);
+
+  // 言語切り替え時にマーカーおよびポップアップを再描画（地図インスタンスは破棄しない）
+  useEffect(() => {
+    if (!isMapReadyRef.current || !mapInstanceRef.current) return;
+    const { map, maplibregl } = mapInstanceRef.current;
+    const openVenueId = markersRef.current.find((item) => item.popup.isOpen())?.venue.id;
+    renderMarkers(map, maplibregl);
+    if (openVenueId) {
+      const targetItem = markersRef.current.find((item) => item.venue.id === openVenueId);
+      if (targetItem) {
+        targetItem.marker.togglePopup();
+      }
+    }
+  }, [language, renderMarkers]);
 
   // 鉄道レイヤー（路線ライン＆駅）を追加する関数
   const addTransitLayers = useCallback((map: MapLibreMap) => {
@@ -473,7 +492,7 @@ export default function FestivalMap({
         map.resize();
 
         addTransitLayers(map);
-        renderMarkers(map, maplibregl);
+        renderMarkersRef.current?.(map, maplibregl);
 
         if (venues.length > 0) {
           const bounds = new maplibregl.LngLatBounds();
@@ -511,7 +530,7 @@ export default function FestivalMap({
         mapInstanceRef.current = null;
       }
     };
-  }, [venues, updateVisibleVenues, addTransitLayers, renderMarkers]);
+  }, [venues, updateVisibleVenues, addTransitLayers]);
 
   const handleSelectVenueCard = (v: Venue) => {
     setActiveVenue(v);
@@ -655,7 +674,7 @@ export default function FestivalMap({
                   className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-black text-xs transition-colors"
                 >
                   <Building2 className="w-4 h-4" />
-                  <span>会場詳細ページを見る</span>
+                  <span>{t('viewVenueDetailPage')}</span>
                 </Link>
 
                 <a
@@ -665,13 +684,13 @@ export default function FestivalMap({
                   className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#E6007E] hover:bg-[#c4006b] text-white font-black text-xs shadow-md transition-colors"
                 >
                   <Navigation className="w-4 h-4" />
-                  <span>Google Maps でルート案内</span>
+                  <span>{t('googleMapsDirections')}</span>
                 </a>
               </div>
             </div>
           ) : (
             <div className="text-center py-12 text-slate-400 font-bold text-sm">
-              会場を選択してください
+              {t('selectVenuePrompt')}
             </div>
           )}
 
@@ -680,7 +699,7 @@ export default function FestivalMap({
             <div className="space-y-3 pt-4 border-t border-slate-100">
               <div className="flex items-center gap-1.5 text-xs font-black text-slate-900">
                 <Calendar className="w-4 h-4 text-[#E6007E]" />
-                <span>この会場で上演される公演 ({venuePerformances.length})</span>
+                <span>{t('showsAtThisVenueTitle')} ({venuePerformances.length})</span>
               </div>
               <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
                 {venuePerformances.map((perf) => (
@@ -710,11 +729,11 @@ export default function FestivalMap({
       <div className="space-y-3">
         <div className="flex items-center justify-between px-1">
           <span className="text-xs font-bold text-slate-600">
-            📍 地図の表示範囲内の会場: <strong className="text-[#E6007E]">{visibleVenues.length}</strong> {t('venuesCountUnit')}
+            {t('venuesInMapAreaLabel')}<strong className="text-[#E6007E]">{visibleVenues.length}</strong> {t('venuesCountUnit')}
           </span>
           {visibleVenues.length < venues.length && (
             <span className="text-[11px] text-slate-400 font-medium">
-              （全 {venues.length} 会場中）
+              {t('outOfTotalVenuesPrefix')}{venues.length}{t('outOfTotalVenuesSuffix')}
             </span>
           )}
         </div>
@@ -745,7 +764,7 @@ export default function FestivalMap({
           </div>
         ) : (
           <div className="p-8 text-center bg-slate-50 border border-dashed border-slate-200 rounded-2xl text-slate-400 text-xs font-bold">
-            現在の地図表示範囲に会場はありません。地図をドラッグして移動するか、ズームアウトしてください。
+            {t('noVenuesInMapArea')}
           </div>
         )}
       </div>

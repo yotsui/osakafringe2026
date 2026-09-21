@@ -144,7 +144,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
         {isDemoMode && (
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold mt-2">
             <Eye className="w-3.5 h-3.5" />
-            <span>DEMO MODE（公演未登録会場を含む全件表示中）</span>
+            <span>{t('demoModeVenues')}</span>
           </div>
         )}
       </div>
@@ -313,7 +313,9 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                 {t('noShowsOnThisDate')}
               </h3>
               <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                {formatDatePart(activeTargetDate, language)} に開催される公演はありません。
+                {language === 'en'
+                  ? `${t('noPerformancesOnDateSuffix')}${formatDatePart(activeTargetDate, language)}.`
+                  : `${formatDatePart(activeTargetDate, language)}${t('noPerformancesOnDateSuffix')}`}
               </p>
             </div>
 
@@ -326,7 +328,11 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                 }}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#E6007E] text-white text-xs sm:text-sm font-black shadow-md hover:bg-pink-600 transition-all cursor-pointer"
               >
-                <span>次の公演日（{formatDatePart(nextAvailableDate, language)}）を見る</span>
+                <span>
+                  {t('viewNextDatePrefix')}
+                  {formatDatePart(nextAvailableDate, language)}
+                  {t('viewNextDateSuffix')}
+                </span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             ) : (
@@ -335,7 +341,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                 onClick={() => setFilterMode('all')}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#E6007E] text-white text-xs sm:text-sm font-black shadow-md hover:bg-pink-600 transition-all cursor-pointer"
               >
-                <span>{t('venueFilterAllDates')}を見る</span>
+                <span>{t('viewAllDatesAction')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             )}
@@ -419,7 +425,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                           </Link>
                           {venue.capacity && (
                             <span className="text-[11px] font-bold text-slate-500 shrink-0 bg-slate-100 px-2.5 py-0.5 rounded">
-                              {venue.capacity}席
+                              {venue.capacity}{t('seatsUnit')}
                             </span>
                           )}
                         </div>
@@ -487,7 +493,11 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                           <Clock className="w-3.5 h-3.5 text-[#E6007E]" />
-                          <span>{formatDatePart(activeTargetDate, language)} の公演 ({shows.length}{t('showsCountUnit')})</span>
+                          <span>
+                            {language === 'en'
+                              ? `${t('showsOnDatePrefix')}${formatDatePart(activeTargetDate, language)} (${shows.length} ${t('showsCountUnit')})`
+                              : `${formatDatePart(activeTargetDate, language)}${t('showsOnDateSuffix')} (${shows.length}${t('showsCountUnit')})`}
+                          </span>
                         </span>
                         <a
                           href={googleMapsUrl}
@@ -522,7 +532,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                                 </div>
                               </div>
                               <span className="text-[11px] font-bold text-[#E6007E] shrink-0">
-                                詳細 →
+                                {t('showDetailsArrow')}
                               </span>
                             </Link>
                           ))}
@@ -538,7 +548,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                           href={venueUrl}
                           className="inline-flex items-center gap-1 text-xs font-black text-[#E6007E] hover:underline"
                         >
-                          <span>会場詳細を見る</span>
+                          <span>{t('viewVenueDetails')}</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </Link>
                       </div>
@@ -627,7 +637,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                           </Link>
                           {venue.capacity && (
                             <span className="text-[11px] font-bold text-slate-500 shrink-0 bg-slate-100 px-2.5 py-0.5 rounded">
-                              {venue.capacity}席
+                              {venue.capacity}{t('seatsUnit')}
                             </span>
                           )}
                         </div>
@@ -726,7 +736,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                                   </p>
                                 </div>
                                 <span className="text-[11px] font-bold text-[#E6007E] shrink-0">
-                                  詳細 →
+                                  {t('showDetailsArrow')}
                                 </span>
                               </div>
 
@@ -746,7 +756,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                                     >
                                       {sItem.isOngoing && (
                                         <span className="text-[9px] font-black bg-emerald-600 text-white px-1 py-0.2 rounded-xs">
-                                          開催中
+                                          {t('statusOngoing')}
                                         </span>
                                       )}
                                       <span>{formatScheduleCompact(sItem.schedule, language)}</span>
@@ -772,7 +782,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                           href={venueUrl}
                           className="inline-flex items-center gap-1 text-xs font-black text-[#E6007E] hover:underline"
                         >
-                          <span>会場詳細を見る</span>
+                          <span>{t('viewVenueDetails')}</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </Link>
                       </div>

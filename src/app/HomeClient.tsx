@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Performance, SiteInfo, Partner } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import HomeHeroClient from './HomeHeroClient';
@@ -10,6 +11,7 @@ import PerformanceModal from '@/components/audience/PerformanceModal';
 import PartnerSection from '@/components/common/PartnerSection';
 import { ArrowRightIcon } from '@/components/common/CustomIcons';
 import { selectFeaturedPerformances, getFestivalStatus } from '@/utils/performanceUtils';
+
 
 interface HomeClientProps {
   venues?: unknown[];
@@ -124,8 +126,74 @@ export default function HomeClient({
         </div>
       </section>
 
+      {/* OSAKA FRINGE AWARDS Preview */}
+      {siteInfo.awardsInfo && (
+        <section id="awards-preview" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gradient-to-br from-white via-white to-pink-50/40 border border-pink-100 rounded-3xl p-8 sm:p-12 space-y-8 shadow-sm">
+
+            <div className="max-w-3xl space-y-4">
+              <div className="inline-flex items-center px-3 py-1 rounded-full bg-pink-50 text-[#E6007E] text-xs font-black uppercase tracking-wide">
+                <span>OSAKA FRINGE AWARDS 2026</span>
+              </div>
+              <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                {getText(siteInfo.awardsInfo.title, siteInfo.awardsInfo.titleEn)}
+              </h2>
+              {siteInfo.awardsInfo.tagline && (
+                <p className="text-base sm:text-xl font-bold text-[#E6007E]">
+                  {getText(siteInfo.awardsInfo.tagline, siteInfo.awardsInfo.taglineEn)}
+                </p>
+              )}
+              {siteInfo.awardsInfo.summary && (
+                <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-medium whitespace-pre-line">
+                  {getText(siteInfo.awardsInfo.summary, siteInfo.awardsInfo.summaryEn)}
+                </p>
+              )}
+
+              {/* Editor in chief highlight if available */}
+              {siteInfo.awardsEditor && (siteInfo.awardsEditor.name || siteInfo.awardsEditor.role) && (
+                <div className="pt-2 flex items-center gap-4">
+                  {siteInfo.awardsEditor.photo && (
+                    <div className="relative w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-2xl overflow-hidden border border-slate-200 bg-slate-100">
+                      <Image
+                        src={siteInfo.awardsEditor.photo}
+                        alt={getText(siteInfo.awardsEditor.name, siteInfo.awardsEditor.nameEn) || 'Editor'}
+                        fill
+                        sizes="64px"
+                        className="object-cover object-center"
+                        unoptimized
+                      />
+                    </div>
+                  )}
+                  <div className="space-y-0.5">
+                    {siteInfo.awardsEditor.role && (
+                      <div className="text-xs font-black text-[#E6007E] uppercase tracking-wide">
+                        {getText(siteInfo.awardsEditor.role, siteInfo.awardsEditor.roleEn)}
+                      </div>
+                    )}
+                    <div className="text-base sm:text-lg font-black text-slate-900">
+                      {getText(siteInfo.awardsEditor.name, siteInfo.awardsEditor.nameEn)}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="pt-2">
+                <Link
+                  href="/awards"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#E6007E] hover:bg-[#c4006b] text-white text-sm font-black tracking-wide shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group"
+                >
+                  <span>{t('aboutAwardsBtn')}</span>
+                  <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* About Osaka Fringe & Venue Categories Preview */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
         <div className="bg-white border border-pink-100 rounded-3xl p-8 sm:p-12 space-y-8 shadow-sm">
           <div className="max-w-3xl space-y-4">
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-pink-50 text-[#E6007E] text-xs font-black uppercase tracking-wide">

@@ -7,8 +7,13 @@ import BrandLogo from '@/components/common/BrandLogo';
 import { InstagramIcon } from '@/components/common/SnsIcons';
 import { ExternalLink } from 'lucide-react';
 
-export default function Footer() {
+interface FooterProps {
+  showAwards?: boolean;
+}
+
+export default function Footer({ showAwards = false }: FooterProps) {
   const { t } = useLanguage();
+
 
   return (
     <footer className="bg-[#E6007E] text-white transition-colors">
@@ -21,12 +26,12 @@ export default function Footer() {
               <BrandLogo variant="main-date" />
             </div>
             <div className="text-sm text-white font-bold space-y-2 pt-1">
-              <p>主催：大阪文化万博 Osaka Fringe 2026 準備室</p>
+              <p>{t('footerOrganizerLabel')}{t('footerOrganizerName')}</p>
               <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                <span className="shrink-0">後援：</span>
+                <span className="shrink-0">{t('footerSupporterLabel')}</span>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0">
                   <a href="https://octb.osaka-info.jp/" target="_blank" rel="noopener noreferrer" className="hover:text-gray-200 transition-colors inline-block py-1 sm:py-0">
-                    公益財団法人大阪観光局
+                    {t('footerSupporterName')}
                   </a>
                   <span className="hidden sm:inline mx-2 text-white/50">｜</span>
                   <a href="https://art-flavor.osaka-info.jp/" target="_blank" rel="noopener noreferrer" className="hover:text-gray-200 transition-colors inline-block py-1 sm:py-0">
@@ -63,11 +68,19 @@ export default function Footer() {
                   {t('navArtists')}
                 </Link>
               </li>
+              {showAwards && (
+                <li>
+                  <Link href="/awards" className="inline-block py-2 text-white/90 hover:text-white transition-colors">
+                    {t('navAwards')}
+                  </Link>
+                </li>
+              )}
               <li>
                 <Link href="/about" className="inline-block py-2 text-white/90 hover:text-white transition-colors">
                   {t('navAbout')}
                 </Link>
               </li>
+
               <li>
                 <Link href="/logo_download" className="inline-block py-2 text-white/90 hover:text-white transition-colors">
                   {t('navBrandAssets')}
@@ -111,7 +124,7 @@ export default function Footer() {
 
         {/* Bottom copyright */}
         <div className="pt-8 border-t border-white/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-bold text-white/80">
-          <p>© 2026 大阪文化万博 Osaka Fringe 2026 準備室 All rights reserved.</p>
+          <p>{t('footerCopyrightText')}</p>
           <div className="flex items-center gap-4 text-xs font-black">
 
           </div>

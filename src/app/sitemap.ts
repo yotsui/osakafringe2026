@@ -1,14 +1,17 @@
 import { MetadataRoute } from 'next';
-import { getPerformances, getArtists, getVenues } from '@/lib/microcms';
+import { getPerformances, getArtists, getVenues, getSiteInfo } from '@/lib/microcms';
+import { isAwardsVisible } from '@/utils/awardsUtils';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://osakafringe.com';
 
-  const [performances, artists, venues] = await Promise.all([
+  const [performances, artists, venues, siteInfo] = await Promise.all([
     getPerformances(),
     getArtists(),
     getVenues(),
+    getSiteInfo().catch(() => null),
   ]);
+
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
@@ -36,8 +39,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.8,
     },
+    ...(isAwardsVisible(siteInfo)
+      ? [
+          {
+            url: `${baseUrl}/awards`,
+            changeFrequency: 'weekly' as const,
+            priority: 0.8,
+          },
+        ]
+      : []),
     {
       url: `${baseUrl}/donate`,
+
       changeFrequency: 'monthly',
       priority: 0.6,
     },

@@ -139,7 +139,7 @@ export default function VenueDetailClient({ venue, performances }: VenueDetailCl
 
                 {venue.capacity && (
                   <span className="px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-bold">
-                    {venue.capacity}席
+                    {venue.capacity}{t('seatsUnit')}
                   </span>
                 )}
               </div>
@@ -263,7 +263,7 @@ export default function VenueDetailClient({ venue, performances }: VenueDetailCl
                   </span>
                   <p className="text-sm font-bold text-slate-900 flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-[#E6007E] shrink-0" />
-                    <span>{address || '大阪市内'}</span>
+                    <span>{address || t('osakaCityDefault')}</span>
                   </p>
                 </div>
 

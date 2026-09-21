@@ -541,7 +541,45 @@ Account Name: OSAKA BUNKA FRINGE KIKOU SETSURITSU JUNBISHITSU`,
   officialXUrl: 'https://twitter.com/osakafringe',
   officialWebsiteUrl: 'https://osakafringe.com',
   contactEmail: 'info@osakafringe.com',
+  awardsInfo: {
+    enabled: true,
+    title: 'OSAKA FRINGE AWARDS 2026',
+    titleEn: 'OSAKA FRINGE AWARDS 2026',
+    tagline: '大阪フリンジの新しい表現を称えるアワードプログラム',
+    taglineEn: 'Award Program Celebrating New Artistic Expressions',
+    summary: '大阪文化万博 Osaka Fringe 2026では、参加アーティストの多彩な挑戦と街にあふれる熱気ある表現を称える「OSAKA FRINGE AWARDS」を実施します。\n批評家・クリエイター・観客の視点を交え、大阪から世界へと羽ばたく表現を発掘・発信します。',
+    summaryEn: 'Osaka Cultural Expo - Osaka Fringe 2026 presents the OSAKA FRINGE AWARDS to celebrate diverse challenges and vibrant expressions by participating artists.\nBringing together critics, creators, and audiences, we discover and share expressions emerging from Osaka to the world.',
+    notice: '各賞の詳細、選考方法、発表スケジュールについては順次公式サイトにてお知らせいたします。',
+    noticeEn: 'Details about award categories, selection criteria, and announcement schedules will be published in due course.',
+  },
+  awardsSections: [
+    {
+      title: 'アワードの理念と目的',
+      titleEn: 'Philosophy & Purpose',
+      text: '大阪フリンジは「すべての表現者に開かれた舞台」です。\nアワードは優劣を競うためだけのものではなく、独自の視点や実験的な試み、街との化学反応を生み出した作品に光をあて、次のステップへとつなぐプラットフォームを目指します。',
+      textEn: 'Osaka Fringe is an open stage for all creators.\nThe awards are not merely for competition, but to illuminate original perspectives, experimental ventures, and chemical reactions with the city.',
+    },
+    {
+      title: '多様な表現と出会う場',
+      titleEn: 'Meeting Diverse Expressions',
+      text: '演劇、ダンス、音楽、現代美術、ストリートパフォーマンスなど、ジャンルを越境する多彩な作品が集結します。観客の皆様の熱い応援と投票も、アワードの大切な一部となります。',
+      textEn: 'Diverse cross-genre works gather here—theater, dance, music, contemporary art, and street performance. Audience votes and cheers form a vital part of the awards.',
+    },
+  ],
+  awardsEditor: {
+    name: '服部 滋樹',
+    nameEn: 'Shigeki Hattori',
+    role: '編集長',
+    roleEn: 'Editor-in-Chief',
+    title: 'クリエイティブディレクター / graf代表',
+    titleEn: 'Creative Director / graf Representative',
+    profile: '1970年生まれ。graf代表、クリエイティブディレクター。空間、家具、食、アートなど多岐にわたるプロジェクトを手がけ、地域やカルチャーの編集・発信に携わる。\n大阪フリンジにおけるアワードプログラムの編集長として、街と表現をつなぐ視点を提案する。',
+    profileEn: 'Born in 1970. Creative Director and representative of graf. Directs a wide range of projects across space, furniture, food, and art.',
+    photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+  },
+  awardsMembers: [],
 };
+
 
 export const mockPartners: Partner[] = [
   {
