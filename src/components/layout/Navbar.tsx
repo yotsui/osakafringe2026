@@ -17,32 +17,34 @@ export default function Navbar({ showAwards = false }: NavbarProps) {
   const { language, setLanguage, t } = useLanguage();
 
   const navItems = [
-    { href: '/', label: t('navHome') },
+    { href: '/', label: t('navHome'), hideOnDesktop: true },
     { href: '/audience', label: t('navAudience'), highlight: true },
     { href: '/venues', label: t('navVenues') },
     { href: '/artists', label: t('navArtists') },
     ...(showAwards ? [{ href: '/awards', label: t('navAwards') }] : []),
     { href: '/about', label: t('navAbout') },
     { href: '/donate', label: t('navDonate') },
-    { href: '/contact', label: t('navContact') },
+    { href: '/contact', label: t('navContact'), hideOnDesktop: true },
   ];
 
+  const desktopNavItems = navItems.filter((item) => !item.hideOnDesktop);
 
   return (
     <nav className="sticky top-0 z-50 bg-[#E6007E] text-white shadow-md transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           
-          {/* Main Vector Logo (White On Pink Background) */}
-          <div className="flex items-center">
+          {/* Main Vector Logo (Clickable to Home) */}
+          <Link href="/" className="flex items-center hover:opacity-90 transition-opacity">
             <div className="w-48 sm:w-56 md:w-64 filter brightness-0 invert">
               <BrandLogo variant="main-date" />
             </div>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-1.5">
-            {navItems.map((item) => {
+            {desktopNavItems.map((item) => {
+
               const isActive = pathname === item.href;
               
               if (item.highlight) {
