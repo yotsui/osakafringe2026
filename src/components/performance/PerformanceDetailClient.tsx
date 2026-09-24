@@ -25,6 +25,7 @@ import { TwitterIcon, InstagramIcon, YoutubeIcon } from '@/components/common/Sns
 import { formatScheduleDetailed, sortSchedules, deduplicateSchedules } from '@/utils/dateFormat';
 import { formatTicketPrice } from '@/utils/priceFormat';
 import { getArtistGenreLabel, getPerformanceGenreText } from '@/utils/genre';
+import { isPreFestivalSchedule, getPerformancePreFestivalStatus } from '@/utils/performanceUtils';
 
 interface PerformanceDetailClientProps {
   performance: Performance;
@@ -136,6 +137,7 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
   const snsYoutube = performance.artist?.snsYoutube;
 
   const sortedSchedules = deduplicateSchedules(sortSchedules(performance.schedules || []));
+  const preFestStatus = getPerformancePreFestivalStatus(performance);
 
   return (
     <div className="min-h-screen bg-[#fef9fc] py-8 sm:py-12">
@@ -193,10 +195,19 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
 
             {/* Badges on Top */}
             <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 z-10">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="px-3 py-1 rounded-full bg-black/75 backdrop-blur-md text-white text-xs font-black uppercase tracking-wider border border-white/20">
                   {categoryLabel}
                 </span>
+                {preFestStatus.isAllPre ? (
+                  <span className="px-3 py-1 rounded-full bg-purple-600 text-white text-xs font-black uppercase tracking-wider shadow-sm">
+                    {t('preFestival')}
+                  </span>
+                ) : preFestStatus.hasPreFestival ? (
+                  <span className="px-3 py-1 rounded-full bg-purple-600 text-white text-xs font-black uppercase tracking-wider shadow-sm">
+                    {t('hasPreFestival')}
+                  </span>
+                ) : null}
                 {workGenreText && (
                   <span className="px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-slate-900 text-[11px] font-bold">
                     {workGenreText}
@@ -438,7 +449,12 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
                         className="p-5 rounded-2xl border border-pink-100 bg-white hover:border-pink-300 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs"
                       >
                         <div className="space-y-1.5">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {isPreFestivalSchedule(schedule) && (
+                              <span className="px-2 py-0.5 rounded-md bg-purple-600 text-white text-[11px] font-black uppercase tracking-wider">
+                                {t('preFestival')}
+                              </span>
+                            )}
                             <span className="px-3 py-1 rounded-lg bg-pink-100 text-[#E6007E] text-xs font-black whitespace-pre-line">
                               {formattedDate}
                             </span>

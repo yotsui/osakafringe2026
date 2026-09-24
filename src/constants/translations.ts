@@ -181,6 +181,16 @@ export const translations: Dictionary = {
   statusToday: { ja: '本日開催', en: 'Today' },
   statusNextDate: { ja: '次回開催日', en: 'Next Date' },
   statusNoSchedule: { ja: '日程未登録', en: 'No Schedule' },
+
+  // Pre-festival Badges
+  preFestival: { ja: 'プレ企画', en: 'Pre-festival' },
+  hasPreFestival: { ja: 'プレ企画あり', en: 'Includes pre-festival dates' },
+
+  // Event Count (延べ開催数)
+  totalSessionsCount: { ja: '延べ開催数', en: 'Total Sessions' },
+  totalSessionsDesc: { ja: '上演は開催回ごと、展示は1企画につき1件で集計', en: 'Counted per staging for performances and per project for exhibitions' },
+  unscheduledCountLabel: { ja: '日程未定', en: 'Schedule TBD' },
+  unscheduledProjectsUnit: { ja: '企画', en: 'projects' },
   
   // 8 Major Genres (User Specified)
   genre_street: { ja: '大道芸・サーカス', en: 'Street & Circus' },

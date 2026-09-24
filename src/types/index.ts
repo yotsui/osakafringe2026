@@ -152,6 +152,9 @@ export interface Performance {
   partner?: Partner | string;
   partnerId?: string;
 
+  // 集計方式（任意: 上演は開催回ごと、展示は1企画につき1件）
+  countMode?: 'performance' | 'exhibition';
+
   // microCMS 日時メタデータ（新着順ソート用）
   publishedAt?: string;
   createdAt?: string;

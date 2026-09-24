@@ -21,6 +21,7 @@ import { TwitterIcon, InstagramIcon, YoutubeIcon } from '@/components/common/Sns
 import { formatScheduleDetailed, sortSchedules, deduplicateSchedules } from '@/utils/dateFormat';
 import { formatTicketPrice } from '@/utils/priceFormat';
 import { getArtistGenreLabel, getPerformanceGenreText } from '@/utils/genre';
+import { isPreFestivalSchedule, getPerformancePreFestivalStatus } from '@/utils/performanceUtils';
 
 interface PerformanceModalProps {
   performance: Performance | null;
@@ -135,6 +136,7 @@ export default function PerformanceModal({
   const snsYoutube = performance.artist?.snsYoutube;
 
   const sortedSchedules = deduplicateSchedules(sortSchedules(performance.schedules || []));
+  const preFestStatus = getPerformancePreFestivalStatus(performance);
 
   return (
     <div 
@@ -155,6 +157,15 @@ export default function PerformanceModal({
             <span className="px-2.5 py-0.5 rounded-full bg-pink-50 border border-pink-200 text-[#E6007E] text-[11px] font-black uppercase">
               {categoryLabel}
             </span>
+            {preFestStatus.isAllPre ? (
+              <span className="px-2.5 py-0.5 rounded-full bg-purple-600 text-white text-[11px] font-black uppercase shadow-xs">
+                {t('preFestival')}
+              </span>
+            ) : preFestStatus.hasPreFestival ? (
+              <span className="px-2.5 py-0.5 rounded-full bg-purple-600 text-white text-[11px] font-black uppercase shadow-xs">
+                {t('hasPreFestival')}
+              </span>
+            ) : null}
             {workGenreText && (
               <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold">
                 {workGenreText}
@@ -403,7 +414,12 @@ export default function PerformanceModal({
                         className="p-4 rounded-2xl border border-pink-100 bg-white hover:border-pink-300 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs"
                       >
                         <div className="space-y-1">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {isPreFestivalSchedule(schedule) && (
+                              <span className="px-2 py-0.5 rounded-md bg-purple-600 text-white text-[11px] font-black uppercase tracking-wider">
+                                {t('preFestival')}
+                              </span>
+                            )}
                             <span className="px-2.5 py-0.5 rounded-md bg-pink-100 text-pink-700 text-xs font-black whitespace-pre-line">
                               {formattedDate}
                             </span>

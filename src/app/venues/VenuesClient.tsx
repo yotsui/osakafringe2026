@@ -15,6 +15,7 @@ import {
   sortVenuesForAllDates,
   getNextAvailableDate,
   getFestivalStatus,
+  isPreFestivalSchedule,
 } from '@/utils/performanceUtils';
 import { formatDatePart, formatScheduleCompact } from '@/utils/dateFormat';
 
@@ -519,9 +520,16 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                               className="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-pink-50/80 border border-slate-100 hover:border-pink-200 transition-all flex items-center justify-between gap-3 group"
                             >
                               <div className="flex items-start gap-2.5 truncate pr-2">
-                                <span className="inline-flex items-center justify-center px-2 py-1 rounded bg-[#E6007E]/10 text-[#E6007E] text-[11px] font-black shrink-0">
-                                  {item.displayTime || t('allDayShow')}
-                                </span>
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 shrink-0">
+                                  {item.schedule && isPreFestivalSchedule(item.schedule) && (
+                                    <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-purple-600 text-white text-[10px] font-black shrink-0">
+                                      {t('preFestival')}
+                                    </span>
+                                  )}
+                                  <span className="inline-flex items-center justify-center px-2 py-1 rounded bg-[#E6007E]/10 text-[#E6007E] text-[11px] font-black shrink-0">
+                                    {item.displayTime || t('allDayShow')}
+                                  </span>
+                                </div>
                                 <div className="truncate">
                                   <p className="text-xs font-bold text-slate-900 group-hover:text-[#E6007E] truncate">
                                     {getText(item.performance.title, item.performance.titleEn)}
@@ -754,6 +762,11 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                                           : 'bg-white text-slate-700 border border-slate-200/80'
                                       }`}
                                     >
+                                      {isPreFestivalSchedule(sItem.schedule) && (
+                                        <span className="text-[9px] font-black bg-purple-600 text-white px-1.5 py-0.5 rounded-xs">
+                                          {t('preFestival')}
+                                        </span>
+                                      )}
                                       {sItem.isOngoing && (
                                         <span className="text-[9px] font-black bg-emerald-600 text-white px-1 py-0.2 rounded-xs">
                                           {t('statusOngoing')}

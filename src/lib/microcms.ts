@@ -199,6 +199,7 @@ interface RawPerformanceData {
   schedules?: RawDateItem[] | RawDateItem | string;
   partner?: Partner | string | { id: string };
   partnerId?: string;
+  countMode?: string | string[];
   image?: string | MicroCMSMedia;
   images?: Array<string | MicroCMSMedia>;
   publishedAt?: string;
@@ -787,6 +788,12 @@ export function normalizePerformance(
       ? (perf.images.map(extractImageUrl).filter(Boolean) as string[])
       : (imgUrl ? [imgUrl] : []);
 
+    let countMode: 'performance' | 'exhibition' | undefined = undefined;
+    const rawCountMode = Array.isArray(perf.countMode) ? perf.countMode[0] : perf.countMode;
+    if (rawCountMode === 'performance' || rawCountMode === 'exhibition') {
+      countMode = rawCountMode;
+    }
+
     return {
       id: perf.id,
       title: perf.title,
@@ -818,6 +825,7 @@ export function normalizePerformance(
       open_date: perf.open_date || undefined,
       partner: resolvedPartner,
       partnerId: resolvedPartnerId || undefined,
+      countMode,
       image: imgUrl || extractImageUrl(resolvedArtist?.image) || extractImageUrl(mainVenue?.image) || '',
       images,
       publishedAt: perf.publishedAt,

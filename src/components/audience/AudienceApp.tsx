@@ -3,7 +3,14 @@
 import React, { useState, useMemo } from 'react';
 import { Performance, Venue, PerformanceSortOption } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
-import { sortPerformances, getFestivalStatus, getAllFestivalDates, isPerformanceMatchingVenueAndDate } from '@/utils/performanceUtils';
+import { 
+  sortPerformances, 
+  getFestivalStatus, 
+  getAllFestivalDates, 
+  isPerformanceMatchingVenueAndDate,
+  resolveTargetDate,
+  calculateEventCount,
+} from '@/utils/performanceUtils';
 import { getArtistGenreLabel } from '@/utils/genre';
 import dynamic from 'next/dynamic';
 import PerformanceCard from './PerformanceCard';
@@ -100,6 +107,11 @@ export default function AudienceApp({
     return venues.filter((v) => performanceVenueIds.has(v.id));
   }, [venues, performanceVenueIds]);
 
+  // 'today' / 'tomorrow' 等の指定を日本時間 (JST) の YYYY-MM-DD に解決
+  const effectiveDate = useMemo(() => {
+    return resolveTargetDate(selectedDate);
+  }, [selectedDate]);
+
   // Filter & Sort logic
   const filteredPerformances = useMemo(() => {
     const filtered = initialPerformances.filter((perf) => {
@@ -116,9 +128,8 @@ export default function AudienceApp({
         }
       }
 
-      // Venue & Date filter (must match against the SAME schedule when both are selected)
       // Venue & Date filter (matches against the SAME schedule when both are selected)
-      if (!isPerformanceMatchingVenueAndDate(perf, selectedVenueId, selectedDate)) {
+      if (!isPerformanceMatchingVenueAndDate(perf, selectedVenueId, effectiveDate)) {
         return false;
       }
 
@@ -154,18 +165,23 @@ export default function AudienceApp({
       return true;
     });
 
-    return sortPerformances(filtered, sortOption, language, selectedDate);
+    return sortPerformances(filtered, sortOption, language, effectiveDate);
   }, [
     initialPerformances,
     selectedGenre,
     selectedVenueId,
-    selectedDate,
+    effectiveDate,
     searchQuery,
     sortOption,
     language,
     activeTab,
     favorites,
   ]);
+
+  // 延べ開催数の集計（上演は開催回ごと、展示は1企画につき1件）
+  const eventCount = useMemo(() => {
+    return calculateEventCount(filteredPerformances, selectedVenueId, effectiveDate);
+  }, [filteredPerformances, selectedVenueId, effectiveDate]);
 
   const resetFilters = () => {
     setSelectedGenre('all');
@@ -404,9 +420,21 @@ export default function AudienceApp({
           </div>
 
           {/* Results Summary */}
-          <div className="flex items-center justify-between px-2">
-            <p className="text-sm font-black text-slate-600 uppercase tracking-wider">
-              {t('resultsCount')}: <span className="text-pink-600 text-base">{filteredPerformances.length}</span> {t('showsUnit')}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 px-2">
+            <div className="flex flex-wrap items-baseline gap-2">
+              <p className="text-sm font-black text-slate-800">
+                <span>{t('totalSessionsCount')}: </span>
+                <span className="text-[#E6007E] text-lg font-black">{eventCount.totalCount}</span>
+                <span className="text-slate-600 font-bold ml-1">{t('showsUnit')}</span>
+              </p>
+              {eventCount.unscheduledCount > 0 && (
+                <span className="text-xs font-bold text-slate-500">
+                  ({t('unscheduledCountLabel')} {eventCount.unscheduledCount}{t('unscheduledProjectsUnit')})
+                </span>
+              )}
+            </div>
+            <p className="text-xs font-medium text-slate-500">
+              ※ {t('totalSessionsDesc')}
             </p>
           </div>
 

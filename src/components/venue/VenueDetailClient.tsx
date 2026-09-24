@@ -20,6 +20,8 @@ import {
 import { TwitterIcon, InstagramIcon } from '@/components/common/SnsIcons';
 import { formatTicketPrice } from '@/utils/priceFormat';
 import { getArtistGenreLabel, getPerformanceGenreText } from '@/utils/genre';
+import { formatScheduleCompact, sortSchedules, deduplicateSchedules } from '@/utils/dateFormat';
+import { isPreFestivalSchedule } from '@/utils/performanceUtils';
 
 interface VenueDetailClientProps {
   venue: Venue;
@@ -314,6 +316,13 @@ export default function VenueDetailClient({ venue, performances }: VenueDetailCl
                     const perfTitle = getText(perf.title, perf.titleEn);
                     const perfArtist = getText(perf.artistName, perf.artistNameEn);
                     const perfPrice = formatTicketPrice(perf.ticketPrice, perf.ticketPriceEn, language);
+                    const matchingSchedules = (perf.schedules || []).filter((s) => {
+                      const sVenueId = s.venueId || s.venue?.id || perf.venueId || perf.venue?.id;
+                      return !sVenueId || sVenueId === venue.id;
+                    });
+                    const venueSchedules = deduplicateSchedules(
+                      sortSchedules(matchingSchedules.length > 0 ? matchingSchedules : (perf.schedules || []))
+                    );
 
                     return (
                       <Link
@@ -333,6 +342,23 @@ export default function VenueDetailClient({ venue, performances }: VenueDetailCl
                           <h3 className="text-sm font-black text-slate-900 group-hover:text-[#E6007E] line-clamp-2 leading-snug transition-colors">
                             {perfTitle}
                           </h3>
+                          {venueSchedules.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 pt-1">
+                              {venueSchedules.map((s, sIdx) => (
+                                <span
+                                  key={sIdx}
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-slate-50 text-slate-700 border border-slate-200/80"
+                                >
+                                  {isPreFestivalSchedule(s) && (
+                                    <span className="text-[9px] font-black bg-purple-600 text-white px-1.5 py-0.2 rounded-xs">
+                                      {t('preFestival')}
+                                    </span>
+                                  )}
+                                  <span>{formatScheduleCompact(s, language)}</span>
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
 
                         <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">

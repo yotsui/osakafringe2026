@@ -8,7 +8,7 @@ import SafeImage from '@/components/common/SafeImage';
 import { CalendarIcon, MapPinIcon, TicketIcon, ArrowRightIcon } from '@/components/common/CustomIcons';
 import { formatScheduleCompact, sortSchedules, deduplicateSchedules, hasMultipleVenues } from '@/utils/dateFormat';
 import { formatTicketPrice } from '@/utils/priceFormat';
-import { getPerformanceTimingInfo } from '@/utils/performanceUtils';
+import { getPerformanceTimingInfo, getPerformancePreFestivalStatus, isPreFestivalSchedule } from '@/utils/performanceUtils';
 import { getArtistGenreLabel, getPerformanceGenreText } from '@/utils/genre';
 import { Heart } from 'lucide-react';
 
@@ -45,6 +45,7 @@ export default function PerformanceCard({
 
   const performanceUrl = `/performances/${performance.id}`;
   const timingInfo = getPerformanceTimingInfo(performance);
+  const preFestStatus = getPerformancePreFestivalStatus(performance);
 
   return (
     <div className="group relative bg-white rounded-2xl overflow-hidden border border-slate-200/90 hover:border-[#E6007E] shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between">
@@ -68,6 +69,15 @@ export default function PerformanceCard({
           <span className="px-2.5 py-0.5 rounded bg-black/75 backdrop-blur-xs text-white text-[10px] font-bold tracking-wider uppercase border border-white/10">
             {categoryLabel}
           </span>
+          {preFestStatus.isAllPre ? (
+            <span className="px-2.5 py-0.5 rounded-full bg-purple-600 text-white text-[10px] font-black tracking-wider uppercase shadow-sm border border-purple-400/40">
+              {t('preFestival')}
+            </span>
+          ) : preFestStatus.hasPreFestival ? (
+            <span className="px-2.5 py-0.5 rounded-full bg-purple-600 text-white text-[10px] font-black tracking-wider uppercase shadow-sm border border-purple-400/40">
+              {t('hasPreFestival')}
+            </span>
+          ) : null}
           {timingInfo.status === 'ongoing' ? (
             <span className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black tracking-wider uppercase flex items-center gap-1 shadow-sm border border-emerald-400/40">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-200 animate-ping" />
@@ -132,7 +142,12 @@ export default function PerformanceCard({
                   return (
                     <div key={idx} className="flex items-start gap-2 text-slate-700">
                       <CalendarIcon className="w-4 h-4 shrink-0 text-[#E6007E] mt-0.5" />
-                      <div className="min-w-0 flex-1 flex flex-wrap items-center gap-x-2">
+                      <div className="min-w-0 flex-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                        {isPreFestivalSchedule(schedule) && (
+                          <span className="px-1.5 py-0.2 rounded bg-purple-100 text-purple-700 text-[10px] font-black tracking-tight shrink-0">
+                            {t('preFestival')}
+                          </span>
+                        )}
                         <span className="font-bold">{formattedDate}</span>
                         {isMultiVenues && sVenueName && (
                           <span className="text-slate-500 text-xs truncate">

@@ -941,3 +941,215 @@ export function isPerformanceMatchingVenueAndDate(
 
   return true;
 }
+
+/**
+ * フィルター用の日付指定（'today', 'tomorrow', 'all', 'YYYY-MM-DD'）を
+ * 日本時間（JST）の具体的な YYYY-MM-DD 文字列に解決する
+ */
+export function resolveTargetDate(dateFilter?: string | null, nowMs: number = Date.now()): string {
+  if (!dateFilter || dateFilter === 'all') return 'all';
+  if (dateFilter === 'today') {
+    return getJstDateString(nowMs);
+  }
+  if (dateFilter === 'tomorrow') {
+    return getJstDateString(nowMs + 24 * 60 * 60 * 1000);
+  }
+  return dateFilter.trim().replace(/\//g, '-');
+}
+
+/**
+ * 個別の日程（スケジュール）がフェスティバル本会期前の「プレ企画」か判定
+ * 日本時間で FESTIVAL_START_DATE ('2026-10-08') より前の日程をプレ企画とする
+ */
+export function isPreFestivalSchedule(schedule: PerformanceSchedule): boolean {
+  if (!schedule.date) return false;
+  const cleanDate = schedule.date.trim().replace(/\//g, '-');
+  return cleanDate < FESTIVAL_START_DATE;
+}
+
+export interface PerformancePreFestivalStatus {
+  isAllPre: boolean;
+  hasPreFestival: boolean;
+  hasMainFestival: boolean;
+  isSpanning: boolean;
+}
+
+/**
+ * 公演全体のプレ企画ステータスを判定
+ * - isAllPre: 全日程が開幕前
+ * - hasPreFestival: 開幕前の日程を含む
+ * - hasMainFestival: 本会期以降の日程を含む（期間展示のまたぎを含む）
+ * - isSpanning: 期間展示が開幕をまたぐ
+ */
+export function getPerformancePreFestivalStatus(perf: Performance): PerformancePreFestivalStatus {
+  const schedules = perf.schedules || [];
+  if (schedules.length === 0) {
+    return {
+      isAllPre: false,
+      hasPreFestival: false,
+      hasMainFestival: false,
+      isSpanning: false,
+    };
+  }
+
+  let hasPre = false;
+  let hasMain = false;
+  let isSpanning = false;
+
+  for (const s of schedules) {
+    if (!s.date) continue;
+    const cleanDate = s.date.trim().replace(/\//g, '-');
+    const cleanEndDate = s.endDate ? s.endDate.trim().replace(/\//g, '-') : undefined;
+
+    const startIsPre = cleanDate < FESTIVAL_START_DATE;
+    const endIsMain = cleanEndDate ? cleanEndDate >= FESTIVAL_START_DATE : false;
+
+    if (startIsPre) {
+      hasPre = true;
+      if (endIsMain) {
+        isSpanning = true;
+        hasMain = true;
+      }
+    } else {
+      hasMain = true;
+    }
+  }
+
+  const isAllPre = hasPre && !hasMain;
+
+  return {
+    isAllPre,
+    hasPreFestival: hasPre,
+    hasMainFestival: hasMain,
+    isSpanning,
+  };
+}
+
+/**
+ * 公演が展示企画かどうかの判定
+ * - countMode が明示的に指定されている場合は最優先 ('exhibition' | 'performance')
+ * - 未指定時はアーティスト分類 (artist.genre === 'exhibition') を使用
+ */
+export function isExhibitionPerformance(perf: Performance): boolean {
+  if (perf.countMode === 'exhibition') return true;
+  if (perf.countMode === 'performance') return false;
+  return perf.artist?.genre === 'exhibition';
+}
+
+export interface EventCountResult {
+  totalCount: number; // 延べ開催数
+  performanceCount: number; // 上演回数
+  exhibitionCount: number; // 展示企画数
+  unscheduledCount: number; // 日程未定企画数
+  invalidDateCount: number; // 不正な日付の数
+}
+
+/**
+ * 延べ開催数の集計
+ * - パフォーマンス：開催回ごとに1件（同日3回なら3件、2日間各3回なら6件）
+ * - 展示：同じ公演IDにつき1件（30日間展示でも1件、日別に複数日程があっても1件）
+ * - 日程未登録の公演：開催数に加算せず、unscheduledCount として集計
+ * - 不正な日付：件数に含めず除外（警告ログ出力）
+ * - 日付・会場指定時は、同一日程レコードで一致する回のみを集計
+ */
+export function calculateEventCount(
+  performances: Performance[],
+  selectedVenueId: string = 'all',
+  selectedDate: string = 'all'
+): EventCountResult {
+  const resolvedDate = resolveTargetDate(selectedDate);
+  const hasVenueFilter = selectedVenueId !== 'all';
+  const hasDateFilter = resolvedDate !== 'all';
+
+  let performanceCount = 0;
+  let exhibitionCount = 0;
+  let unscheduledCount = 0;
+  let invalidDateCount = 0;
+
+  for (const perf of performances) {
+    const isExhibition = isExhibitionPerformance(perf);
+    const rawSchedules = perf.schedules || [];
+    // 同一日時・同一会場の二重計上防止
+    const seenScheduleKeys = new Set<string>();
+    const schedules = rawSchedules.filter((s) => {
+      const key = `${s.date || ''}_${s.startTime || ''}_${s.endDate || ''}_${s.endTime || ''}_${s.venueId || s.venue?.id || ''}`;
+      if (seenScheduleKeys.has(key)) return false;
+      seenScheduleKeys.add(key);
+      return true;
+    });
+
+    // 日程未登録の判定
+    if (schedules.length === 0) {
+      if (!hasDateFilter) {
+        // 日付フィルタがない場合、会場フィルタに合致していれば日程未定としてカウント
+        if (!hasVenueFilter) {
+          unscheduledCount++;
+        } else {
+          const matchesDefaultVenue = perf.venueId === selectedVenueId || perf.venue?.id === selectedVenueId;
+          if (matchesDefaultVenue) {
+            unscheduledCount++;
+          }
+        }
+      }
+      continue;
+    }
+
+    // 有効な日程の抽出＆不正日付の検出
+    const validMatchingSchedules: PerformanceSchedule[] = [];
+
+    for (const s of schedules) {
+      if (!s.date || !s.date.trim()) {
+        invalidDateCount++;
+        console.warn(`[calculateEventCount] Performance ${perf.id} has invalid empty date in schedule`);
+        continue;
+      }
+      const cleanDate = s.date.trim().replace(/\//g, '-');
+      // 日付フォーマット簡易チェック
+      if (!cleanDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        invalidDateCount++;
+        console.warn(`[calculateEventCount] Performance ${perf.id} has malformed date: ${s.date}`);
+        continue;
+      }
+
+      // 会場チェック（日程レコード側の会場を優先、無ければ公演の既定会場）
+      const schedVenueId = s.venueId || s.venue?.id || perf.venueId || perf.venue?.id;
+      const venueMatches = !hasVenueFilter || schedVenueId === selectedVenueId;
+
+      // 日付チェック（単一日程または期間展示）
+      let dateMatches = !hasDateFilter;
+      if (hasDateFilter) {
+        if (cleanDate === resolvedDate) {
+          dateMatches = true;
+        } else if (s.endDate) {
+          const cleanEndDate = s.endDate.trim().replace(/\//g, '-');
+          if (resolvedDate >= cleanDate && resolvedDate <= cleanEndDate) {
+            dateMatches = true;
+          }
+        }
+      }
+
+      // 同一レコードで両方を満たす場合のみ対象
+      if (venueMatches && dateMatches) {
+        validMatchingSchedules.push(s);
+      }
+    }
+
+    if (isExhibition) {
+      // 展示は条件に合致する日程が1件以上あれば1企画として1カウント
+      if (validMatchingSchedules.length > 0) {
+        exhibitionCount++;
+      }
+    } else {
+      // パフォーマンスは開催回ごとに1カウント
+      performanceCount += validMatchingSchedules.length;
+    }
+  }
+
+  return {
+    totalCount: performanceCount + exhibitionCount,
+    performanceCount,
+    exhibitionCount,
+    unscheduledCount,
+    invalidDateCount,
+  };
+}
