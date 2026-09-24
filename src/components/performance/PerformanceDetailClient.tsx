@@ -25,6 +25,7 @@ import { TwitterIcon, InstagramIcon, YoutubeIcon } from '@/components/common/Sns
 import { formatScheduleDetailed, sortSchedules, deduplicateSchedules } from '@/utils/dateFormat';
 import { getArtistGenreLabel, getPerformanceGenreText } from '@/utils/genre';
 import { isPreFestivalSchedule } from '@/utils/performanceUtils';
+import { formatTicketPrice } from '@/utils/priceFormat';
 
 interface PerformanceDetailClientProps {
   performance: Performance;
