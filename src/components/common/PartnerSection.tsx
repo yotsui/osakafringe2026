@@ -8,6 +8,7 @@ import { ExternalLink } from 'lucide-react';
 
 interface PartnerSectionProps {
   partners: Partner[];
+  highlightPartnerId?: string;
 }
 
 const CATEGORY_CONFIG: Array<{ key: string; labelKey: string; descKey: string }> = [
@@ -17,7 +18,7 @@ const CATEGORY_CONFIG: Array<{ key: string; labelKey: string; descKey: string }>
   { key: 'スポンサー', labelKey: 'partnerCategorySponsorLabel', descKey: 'partnerCategorySponsorDesc' },
 ];
 
-export default function PartnerSection({ partners = [] }: PartnerSectionProps) {
+export default function PartnerSection({ partners = [], highlightPartnerId }: PartnerSectionProps) {
   const { t, getText } = useLanguage();
 
   const safePartners = Array.isArray(partners) ? partners : [];
@@ -73,10 +74,22 @@ export default function PartnerSection({ partners = [] }: PartnerSectionProps) {
                   const desc = getText(partner.description, partner.descriptionEn);
                   const targetUrl = partner.websiteUrl || partner.url;
                   const isExternal = Boolean(targetUrl && targetUrl !== '#' && targetUrl !== '/');
+                  const isHighlighted = partner.id === highlightPartnerId;
 
                   const CardContent = (
-                    <div className="group bg-white rounded-xl border border-slate-200/90 hover:border-[#E6007E] transition-all p-4 space-y-3 h-full flex flex-col justify-between shadow-2xs hover:shadow-sm">
+                    <div
+                      className={`group rounded-xl border transition-all p-4 space-y-3 h-full flex flex-col justify-between ${
+                        isHighlighted
+                          ? 'border-[#E6007E] ring-2 ring-[#E6007E]/60 shadow-md bg-pink-50/20'
+                          : 'bg-white border-slate-200/90 hover:border-[#E6007E] shadow-2xs hover:shadow-sm'
+                      }`}
+                    >
                       <div className="space-y-3">
+                        {isHighlighted && (
+                          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-[#E6007E] text-white">
+                            <span>PREVIEW ITEM</span>
+                          </div>
+                        )}
                         {/* Logo Image Area */}
                         <div
                           className={`relative aspect-16/9 w-full rounded-lg overflow-hidden flex items-center justify-center ${

@@ -883,26 +883,29 @@ export const getPerformanceById = cache(async (id: string): Promise<Performance 
 });
 
 /**
+ * パートナー/連携団体の正規化 (通常取得と下書きプレビューで共用)
+ */
+export const normalizePartner = (p: RawPartnerData): Partner => {
+  let rawCat = p.category;
+  if (Array.isArray(rawCat)) {
+    rawCat = rawCat[0];
+  }
+  return {
+    id: p.id,
+    name: p.name,
+    nameEn: p.nameEn || p.name,
+    description: p.description || '',
+    descriptionEn: p.descriptionEn || p.description || '',
+    image: extractImageUrl(p.image) || (typeof p.image === 'string' ? p.image : ''),
+    url: p.websiteUrl || p.url || p.linkUrl || '#',
+    category: rawCat || '組織（後援・協力）',
+  };
+};
+
+/**
  * パートナー/連携団体一覧を取得 (React cache & ISR 300s)
  */
 export const getPartners = cache(async (): Promise<Partner[]> => {
-  const normalizePartner = (p: RawPartnerData): Partner => {
-    let rawCat = p.category;
-    if (Array.isArray(rawCat)) {
-      rawCat = rawCat[0];
-    }
-    return {
-      id: p.id,
-      name: p.name,
-      nameEn: p.nameEn || p.name,
-      description: p.description || '',
-      descriptionEn: p.descriptionEn || p.description || '',
-      image: extractImageUrl(p.image) || (typeof p.image === 'string' ? p.image : ''),
-      url: p.websiteUrl || p.url || p.linkUrl || '#',
-      category: rawCat || '組織（後援・協力）',
-    };
-  };
-
   if (!client) {
     if (allowMockData) {
       return mockPartners.map(normalizePartner);
@@ -1175,22 +1178,42 @@ export class DraftPreviewError extends Error {
 }
 
 /**
- * 下書き公演詳細を取得（プレビュー専用・no-store・公開データとは完全分離）
- * - draftKey はこの関数内でのみ使用し、他APIや公開データ取得には持ち込まない。
- * - 取得失敗時は公開版やサンプルへ黙って差し替えない。
- * - APIキーやdraftKeyをエラーやログに含めない。
+ * プレビュー取得を許可する microCMS エンドポイントの固定ホワイトリスト
+ * （URLや外部からの任意API指定を厳格に防止）
  */
-export async function getDraftPerformanceById(
+export type DraftPreviewEndpoint = 'performances' | 'venues' | 'artists' | 'partner';
+const ALLOWED_PREVIEW_ENDPOINTS: readonly DraftPreviewEndpoint[] = [
+  'performances',
+  'venues',
+  'artists',
+  'partner',
+] as const;
+
+/**
+ * microCMS詳細APIから下書き生データを取得する共通関数（内部専用）
+ * - 取得対象エンドポイントは許可リストに固定
+ * - cache: 'no-store' で直接取得
+ * - APIキーやdraftKeyをログやエラーメッセージに露出させない
+ */
+async function fetchDraftRawItem<T>(
+  endpoint: DraftPreviewEndpoint,
   id: string,
   draftKey: string
-): Promise<Performance> {
+): Promise<T> {
+  if (!ALLOWED_PREVIEW_ENDPOINTS.includes(endpoint)) {
+    throw new DraftPreviewError(
+      'CONFIG_ERROR',
+      '指定されたプレビュー対象エンドポイントは許可されていません。'
+    );
+  }
+
   const trimmedId = typeof id === 'string' ? id.trim() : '';
   const trimmedDraftKey = typeof draftKey === 'string' ? draftKey.trim() : '';
 
   if (!trimmedId) {
     throw new DraftPreviewError(
       'NOT_FOUND',
-      '公演IDが指定されていません。microCMSの管理画面からプレビューを開き直してください。'
+      'コンテンツIDが指定されていません。microCMSの管理画面からプレビューを開き直してください。'
     );
   }
 
@@ -1218,24 +1241,35 @@ export async function getDraftPerformanceById(
     );
   }
 
-  const endpointUrl = `https://${currentServiceDomain}.microcms.io/api/v1/performances/${encodeURIComponent(
-    trimmedId
-  )}?draftKey=${encodeURIComponent(trimmedDraftKey)}`;
+  const doFetch = async (targetEndpoint: string): Promise<Response> => {
+    const endpointUrl = `https://${currentServiceDomain}.microcms.io/api/v1/${encodeURIComponent(
+      targetEndpoint
+    )}/${encodeURIComponent(trimmedId)}?draftKey=${encodeURIComponent(trimmedDraftKey)}`;
 
-  let rawData: RawPerformanceData;
-  try {
-    const res = await fetch(endpointUrl, {
+    return fetch(endpointUrl, {
       method: 'GET',
       headers: {
         'X-MICROCMS-API-KEY': currentApiKey,
       },
       cache: 'no-store',
     });
+  };
+
+  try {
+    let res = await doFetch(endpoint);
+
+    // partner エンドポイントで 404 の場合、partners へのフォールバックを試行
+    if (res.status === 404 && endpoint === 'partner') {
+      const fallbackRes = await doFetch('partners');
+      if (fallbackRes.ok) {
+        res = fallbackRes;
+      }
+    }
 
     if (res.status === 404) {
       throw new DraftPreviewError(
         'NOT_FOUND',
-        '指定された公演データが見つかりません。コンテンツIDをご確認ください。'
+        '指定されたデータが見つかりません。コンテンツIDをご確認ください。'
       );
     }
 
@@ -1253,7 +1287,7 @@ export async function getDraftPerformanceById(
       );
     }
 
-    rawData = (await res.json()) as RawPerformanceData;
+    return (await res.json()) as T;
   } catch (error) {
     if (error instanceof DraftPreviewError) {
       throw error;
@@ -1264,6 +1298,16 @@ export async function getDraftPerformanceById(
       'microCMSとの通信中にエラーが発生しました。ネットワーク状況を確認し、再度お試しください。'
     );
   }
+}
+
+/**
+ * 下書き公演詳細を取得（プレビュー専用・no-store・公開データとは完全分離）
+ */
+export async function getDraftPerformanceById(
+  id: string,
+  draftKey: string
+): Promise<Performance> {
+  const rawData = await fetchDraftRawItem<RawPerformanceData>('performances', id, draftKey);
 
   // 関連データ（会場・アーティスト・パートナー）は公開済みデータを利用して解決（公演のdraftKeyは流用しない）
   const [venues, artists, partners] = await Promise.all([
@@ -1278,5 +1322,38 @@ export async function getDraftPerformanceById(
 
   // normalizePerformance で通常詳細と同じ整形を実施（参照先が未公開でもクラッシュしない）
   return normalizePerformance(rawData, venueMap, artistMap, partnerMap);
+}
+
+/**
+ * 下書き会場詳細を取得（プレビュー専用・no-store）
+ */
+export async function getDraftVenueById(
+  id: string,
+  draftKey: string
+): Promise<Venue> {
+  const rawData = await fetchDraftRawItem<RawVenueData>('venues', id, draftKey);
+  return normalizeVenue(rawData);
+}
+
+/**
+ * 下書きアーティスト詳細を取得（プレビュー専用・no-store）
+ */
+export async function getDraftArtistById(
+  id: string,
+  draftKey: string
+): Promise<Artist> {
+  const rawData = await fetchDraftRawItem<RawArtistData>('artists', id, draftKey);
+  return normalizeArtist(rawData);
+}
+
+/**
+ * 下書きパートナー詳細を取得（プレビュー専用・no-store）
+ */
+export async function getDraftPartnerById(
+  id: string,
+  draftKey: string
+): Promise<Partner> {
+  const rawData = await fetchDraftRawItem<RawPartnerData>('partner', id, draftKey);
+  return normalizePartner(rawData);
 }
 

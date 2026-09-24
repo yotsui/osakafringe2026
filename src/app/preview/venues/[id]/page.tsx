@@ -1,22 +1,23 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import {
-  getDraftPerformanceById,
+  getDraftVenueById,
+  getPerformances,
   DraftPreviewError,
 } from '@/lib/microcms';
 import { validatePreviewAccess } from '@/lib/previewAuth';
-import PerformanceDetailClient from '@/components/performance/PerformanceDetailClient';
+import VenueDetailClient from '@/components/venue/VenueDetailClient';
 import PreviewBanner from '@/components/preview/PreviewBanner';
 import PreviewErrorView from '@/components/preview/PreviewErrorView';
+import type { Performance } from '@/types';
 
 // キャッシュ・静的生成の無効化と動的配信の強制
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
-// 検索エンジンインデックスおよびキャッシュの厳格な抑止
 export const metadata: Metadata = {
-  title: '【プレビュー】公演詳細 | 大阪文化万博Osaka Fringe 2026',
+  title: '【プレビュー】会場詳細 | 大阪文化万博Osaka Fringe 2026',
   robots: {
     index: false,
     follow: false,
@@ -25,22 +26,22 @@ export const metadata: Metadata = {
   },
 };
 
-interface PreviewPerformancePageProps {
+interface PreviewVenuePageProps {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default async function PreviewPerformancePage({
+export default async function PreviewVenuePage({
   params,
   searchParams,
-}: PreviewPerformancePageProps) {
+}: PreviewVenuePageProps) {
   const { id } = await params;
   const query = await searchParams;
 
   let draftKey = '';
   try {
     const validated = await validatePreviewAccess(
-      '/preview/performances',
+      '/preview/venues',
       id,
       query.draftKey
     );
@@ -64,24 +65,29 @@ export default async function PreviewPerformancePage({
     );
   }
 
-  // 4. 下書きデータの取得（専用関数を使用・no-store）
-  let performance: Awaited<ReturnType<typeof getDraftPerformanceById>> | null = null;
+  // 下書き会場データおよび公開公演一覧の取得
+  let venue: Awaited<ReturnType<typeof getDraftVenueById>> | null = null;
+  let allPerformances: Performance[] = [];
   let fetchError: DraftPreviewError | unknown = null;
 
   try {
-    performance = await getDraftPerformanceById(id, draftKey);
+    const [fetchedVenue, performances] = await Promise.all([
+      getDraftVenueById(id, draftKey),
+      getPerformances().catch(() => []),
+    ]);
+    venue = fetchedVenue;
+    allPerformances = performances;
   } catch (error) {
     fetchError = error;
   }
 
-  // 取得エラー時の安全なエラー画面ハンドリング
-  if (fetchError || !performance) {
+  if (fetchError || !venue) {
     if (fetchError instanceof DraftPreviewError) {
       switch (fetchError.code) {
         case 'NOT_FOUND':
           return (
             <PreviewErrorView
-              title="公演が見つかりません"
+              title="会場が見つかりません"
               message={fetchError.message}
               suggestion="microCMSの管理画面で対象のコンテンツIDが正しいかご確認ください。"
             />
@@ -92,14 +98,6 @@ export default async function PreviewPerformancePage({
               title="下書きキーが無効です"
               message={fetchError.message}
               suggestion="下書きを一度保存し直し、microCMSの管理画面からプレビューを開き直してください。"
-            />
-          );
-        case 'DRAFT_KEY_MISSING':
-          return (
-            <PreviewErrorView
-              title="下書きキーが指定されていません"
-              message={fetchError.message}
-              suggestion="microCMSの管理画面からプレビューを開き直してください。"
             />
           );
         case 'CONFIG_ERROR':
@@ -124,17 +122,50 @@ export default async function PreviewPerformancePage({
     );
   }
 
-  // 5. 成功時のプレビュー表示
-  const unresolvedArtist = !performance.artist?.name;
-  const unresolvedVenue = !performance.venue?.name;
+  // 「この会場の公演」を公開済み公演から抽出（メイン会場および日程ごとの会場参照を網羅）
+  const matchingPerformances = allPerformances.filter(
+    (p) =>
+      p.venueId === id ||
+      p.venue?.id === id ||
+      (p.schedules && p.schedules.some((s) => s.venueId === id || s.venue?.id === id))
+  );
+
+  // 会場名などを下書き変更した場合、同じ対象IDを参照する画面内の関連公演にもプレビュー表示用として反映
+  const currentVenue = venue;
+  const venuePerformances: Performance[] = matchingPerformances.map((p) => {
+    const isMainVenue = p.venueId === id || p.venue?.id === id;
+    const updatedSchedules = p.schedules?.map((s) => {
+      if (s.venueId === id || s.venue?.id === id) {
+        return {
+          ...s,
+          venueName: currentVenue.name,
+          venueNameEn: currentVenue.nameEn || currentVenue.name,
+          venue: currentVenue,
+        };
+      }
+      return s;
+    });
+
+    return {
+      ...p,
+      ...(isMainVenue
+        ? {
+            venueName: currentVenue.name,
+            venueNameEn: currentVenue.nameEn || currentVenue.name,
+            venue: currentVenue,
+          }
+        : {}),
+      schedules: updatedSchedules,
+    };
+  });
 
   return (
     <div className="min-h-screen">
-      <PreviewBanner
-        unresolvedArtist={unresolvedArtist}
-        unresolvedVenue={unresolvedVenue}
+      <PreviewBanner showRelatedNotice={true} />
+      <VenueDetailClient
+        venue={venue}
+        performances={venuePerformances}
       />
-      <PerformanceDetailClient performance={performance} />
     </div>
   );
 }

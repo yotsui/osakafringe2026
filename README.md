@@ -115,25 +115,44 @@ MicroCMS管理画面で以下のエンドポイントを作成することで、
 
 ---
 
-## 🔍 microCMS 公演下書きプレビュー設定 & 運用ガイド
+## 🔍 microCMS 下書きプレビュー設定 & 運用ガイド
 
-本サイトでは、microCMS Hobbyプランのまま、公開中の公演を下書き編集した際や新規の未公開公演を、本番公開前に安全に画面上でプレビュー確認できる「公演下書きプレビュー」機能を備えています。
+本サイトでは、microCMS Hobbyプランのまま、公開中コンテンツを下書き編集した際や新規の未公開コンテンツを、本番公開前に安全に画面上でプレビュー確認できる「下書きプレビュー」機能を備えています（対象: 公演、会場、アーティスト、パートナー）。
 
 ### 1. microCMS 管理画面でのプレビューURL設定
-microCMSの管理画面（API設定）で画面プレビューを設定します。
+microCMSの管理画面（各API設定）で画面プレビューを設定します。
 
-1. microCMS管理画面を開き、左メニューから **`performances` (公演)** APIを選択します。
-2. 右上の **「API設定」** > **「画面プレビュー」** を開きます。
-3. **「プレビューを追加」** をクリックし、以下を入力・保存します：
-   - **識別名**: `本番プレビュー`（または任意の名称）
-   - **プレビューURL**:
-     ```text
-     https://www.osakafringe.com/preview/performances/{CONTENT_ID}?draftKey={DRAFT_KEY}
-     ```
-   ※ ローカル環境で確認する場合のプレビューURL：
-     ```text
-     http://localhost:3000/preview/performances/{CONTENT_ID}?draftKey={DRAFT_KEY}
-     ```
+#### ① 公演 (`performances`)
+- **識別名**: `本番プレビュー`
+- **プレビューURL**:
+  ```text
+  https://www.osakafringe.com/preview/performances/{CONTENT_ID}?draftKey={DRAFT_KEY}
+  ```
+  ※ ローカル: `http://localhost:3000/preview/performances/{CONTENT_ID}?draftKey={DRAFT_KEY}`
+
+#### ② 会場 (`venues`)
+- **識別名**: `本番プレビュー`
+- **プレビューURL**:
+  ```text
+  https://www.osakafringe.com/preview/venues/{CONTENT_ID}?draftKey={DRAFT_KEY}
+  ```
+  ※ ローカル: `http://localhost:3000/preview/venues/{CONTENT_ID}?draftKey={DRAFT_KEY}`
+
+#### ③ アーティスト (`artists`)
+- **識別名**: `本番プレビュー`
+- **プレビューURL**:
+  ```text
+  https://www.osakafringe.com/preview/artists/{CONTENT_ID}?draftKey={DRAFT_KEY}
+  ```
+  ※ ローカル: `http://localhost:3000/preview/artists/{CONTENT_ID}?draftKey={DRAFT_KEY}`
+
+#### ④ パートナー (`partner`)
+- **識別名**: `本番プレビュー`
+- **プレビューURL**:
+  ```text
+  https://www.osakafringe.com/preview/partner/{CONTENT_ID}?draftKey={DRAFT_KEY}
+  ```
+  ※ ローカル: `http://localhost:3000/preview/partner/{CONTENT_ID}?draftKey={DRAFT_KEY}`
 
 ### 2. 環境変数の設定（本番・ステージング・ローカル）
 プレビューを利用するには、以下の環境変数を設定します（VercelのEnvironment Variablesまたは `.env.local`）。

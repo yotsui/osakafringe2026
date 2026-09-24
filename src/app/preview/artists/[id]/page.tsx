@@ -1,22 +1,23 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import {
-  getDraftPerformanceById,
+  getDraftArtistById,
+  getPerformances,
   DraftPreviewError,
 } from '@/lib/microcms';
 import { validatePreviewAccess } from '@/lib/previewAuth';
-import PerformanceDetailClient from '@/components/performance/PerformanceDetailClient';
+import ArtistDetailClient from '@/components/artist/ArtistDetailClient';
 import PreviewBanner from '@/components/preview/PreviewBanner';
 import PreviewErrorView from '@/components/preview/PreviewErrorView';
+import type { Performance } from '@/types';
 
 // キャッシュ・静的生成の無効化と動的配信の強制
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
-// 検索エンジンインデックスおよびキャッシュの厳格な抑止
 export const metadata: Metadata = {
-  title: '【プレビュー】公演詳細 | 大阪文化万博Osaka Fringe 2026',
+  title: '【プレビュー】アーティスト詳細 | 大阪文化万博Osaka Fringe 2026',
   robots: {
     index: false,
     follow: false,
@@ -25,22 +26,22 @@ export const metadata: Metadata = {
   },
 };
 
-interface PreviewPerformancePageProps {
+interface PreviewArtistPageProps {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default async function PreviewPerformancePage({
+export default async function PreviewArtistPage({
   params,
   searchParams,
-}: PreviewPerformancePageProps) {
+}: PreviewArtistPageProps) {
   const { id } = await params;
   const query = await searchParams;
 
   let draftKey = '';
   try {
     const validated = await validatePreviewAccess(
-      '/preview/performances',
+      '/preview/artists',
       id,
       query.draftKey
     );
@@ -64,24 +65,29 @@ export default async function PreviewPerformancePage({
     );
   }
 
-  // 4. 下書きデータの取得（専用関数を使用・no-store）
-  let performance: Awaited<ReturnType<typeof getDraftPerformanceById>> | null = null;
+  // 下書きアーティストデータおよび公開公演一覧の取得
+  let artist: Awaited<ReturnType<typeof getDraftArtistById>> | null = null;
+  let allPerformances: Performance[] = [];
   let fetchError: DraftPreviewError | unknown = null;
 
   try {
-    performance = await getDraftPerformanceById(id, draftKey);
+    const [fetchedArtist, performances] = await Promise.all([
+      getDraftArtistById(id, draftKey),
+      getPerformances().catch(() => []),
+    ]);
+    artist = fetchedArtist;
+    allPerformances = performances;
   } catch (error) {
     fetchError = error;
   }
 
-  // 取得エラー時の安全なエラー画面ハンドリング
-  if (fetchError || !performance) {
+  if (fetchError || !artist) {
     if (fetchError instanceof DraftPreviewError) {
       switch (fetchError.code) {
         case 'NOT_FOUND':
           return (
             <PreviewErrorView
-              title="公演が見つかりません"
+              title="アーティストが見つかりません"
               message={fetchError.message}
               suggestion="microCMSの管理画面で対象のコンテンツIDが正しいかご確認ください。"
             />
@@ -92,14 +98,6 @@ export default async function PreviewPerformancePage({
               title="下書きキーが無効です"
               message={fetchError.message}
               suggestion="下書きを一度保存し直し、microCMSの管理画面からプレビューを開き直してください。"
-            />
-          );
-        case 'DRAFT_KEY_MISSING':
-          return (
-            <PreviewErrorView
-              title="下書きキーが指定されていません"
-              message={fetchError.message}
-              suggestion="microCMSの管理画面からプレビューを開き直してください。"
             />
           );
         case 'CONFIG_ERROR':
@@ -124,17 +122,31 @@ export default async function PreviewPerformancePage({
     );
   }
 
-  // 5. 成功時のプレビュー表示
-  const unresolvedArtist = !performance.artist?.name;
-  const unresolvedVenue = !performance.venue?.name;
+  // 関連公演の抽出（アーティストIDによる紐付けを優先し、名前を編集しても消えない）
+  const matchingPerformances = allPerformances.filter(
+    (p) =>
+      p.artistId === id ||
+      p.artist?.id === id ||
+      (typeof p.artists === 'object' && p.artists?.id === id) ||
+      p.artists === id
+  );
+
+  // アーティスト名などを下書き変更した場合、表示用データ上で関連公演カードにも反映
+  const currentArtist = artist;
+  const artistPerformances: Performance[] = matchingPerformances.map((p) => ({
+    ...p,
+    artistName: currentArtist.name,
+    artistNameEn: currentArtist.nameEn || currentArtist.name,
+    artist: currentArtist,
+  }));
 
   return (
     <div className="min-h-screen">
-      <PreviewBanner
-        unresolvedArtist={unresolvedArtist}
-        unresolvedVenue={unresolvedVenue}
+      <PreviewBanner showRelatedNotice={true} />
+      <ArtistDetailClient
+        artist={artist}
+        performances={artistPerformances}
       />
-      <PerformanceDetailClient performance={performance} />
     </div>
   );
 }
