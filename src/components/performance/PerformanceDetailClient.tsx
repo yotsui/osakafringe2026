@@ -23,9 +23,8 @@ import {
 } from 'lucide-react';
 import { TwitterIcon, InstagramIcon, YoutubeIcon } from '@/components/common/SnsIcons';
 import { formatScheduleDetailed, sortSchedules, deduplicateSchedules } from '@/utils/dateFormat';
-import { formatTicketPrice } from '@/utils/priceFormat';
 import { getArtistGenreLabel, getPerformanceGenreText } from '@/utils/genre';
-import { isPreFestivalSchedule, getPerformancePreFestivalStatus } from '@/utils/performanceUtils';
+import { isPreFestivalSchedule } from '@/utils/performanceUtils';
 
 interface PerformanceDetailClientProps {
   performance: Performance;
@@ -137,7 +136,6 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
   const snsYoutube = performance.artist?.snsYoutube;
 
   const sortedSchedules = deduplicateSchedules(sortSchedules(performance.schedules || []));
-  const preFestStatus = getPerformancePreFestivalStatus(performance);
 
   return (
     <div className="min-h-screen bg-[#fef9fc] py-8 sm:py-12">
@@ -199,15 +197,6 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
                 <span className="px-3 py-1 rounded-full bg-black/75 backdrop-blur-md text-white text-xs font-black uppercase tracking-wider border border-white/20">
                   {categoryLabel}
                 </span>
-                {preFestStatus.isAllPre ? (
-                  <span className="px-3 py-1 rounded-full bg-purple-600 text-white text-xs font-black uppercase tracking-wider shadow-sm">
-                    {t('preFestival')}
-                  </span>
-                ) : preFestStatus.hasPreFestival ? (
-                  <span className="px-3 py-1 rounded-full bg-purple-600 text-white text-xs font-black uppercase tracking-wider shadow-sm">
-                    {t('hasPreFestival')}
-                  </span>
-                ) : null}
                 {workGenreText && (
                   <span className="px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-slate-900 text-[11px] font-bold">
                     {workGenreText}

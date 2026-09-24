@@ -8,7 +8,7 @@ import {
   resolveTargetDate,
   FESTIVAL_START_DATE,
 } from '../src/utils/performanceUtils.ts';
-import type { Performance, PerformanceSchedule, ArtistGenre } from '../src/types/index.ts';
+import type { Performance, PerformanceSchedule } from '../src/types/index.ts';
 
 function createMockSchedule(overrides: Partial<PerformanceSchedule> = {}): PerformanceSchedule {
   return {
