@@ -101,8 +101,11 @@ export async function verifyPasswordTimingSafe(input: string, expected: string):
  * HMAC-SHA256 署名を生成
  */
 export async function createHmacSignature(data: string, secret: string): Promise<string> {
+  if (!secret) {
+    throw new Error('HMAC secret must not be empty');
+  }
   const encoder = new TextEncoder();
-  const keyData = encoder.encode(secret || 'default-secret-fallback');
+  const keyData = encoder.encode(secret);
   const messageData = encoder.encode(data);
 
   const key = await crypto.subtle.importKey(
@@ -121,6 +124,9 @@ export async function createHmacSignature(data: string, secret: string): Promise
  * 署名付き認証セッショントークンを生成
  */
 export async function generateAuthToken(secret: string): Promise<string> {
+  if (!secret) {
+    throw new Error('Secret is required to generate auth token');
+  }
   const now = Date.now();
   const payload: SessionPayload = {
     authenticated: true,
@@ -139,7 +145,7 @@ export async function generateAuthToken(secret: string): Promise<string> {
  * 署名付き認証セッショントークンを検証
  */
 export async function verifyAuthToken(token: string | null | undefined, secret: string): Promise<boolean> {
-  if (!token || typeof token !== 'string') {
+  if (!token || typeof token !== 'string' || !secret) {
     return false;
   }
 
@@ -225,6 +231,21 @@ export function getSafeReturnUrl(returnUrl?: string | null): string {
   } catch {
     return '/';
   }
+}
+
+/**
+ * サーバー側（App Router / Server Components）でプレビュー認証状態を検証
+ * MICROCMS_PREVIEW_ENABLED=true かつ明示設定された TEST_SITE_AUTH_SECRET で署名検証します。
+ */
+export async function isServerPreviewAuthenticated(token?: string | null): Promise<boolean> {
+  if (process.env.MICROCMS_PREVIEW_ENABLED !== 'true') {
+    return false;
+  }
+  const authSecret = process.env.TEST_SITE_AUTH_SECRET;
+  if (!authSecret) {
+    return false;
+  }
+  return verifyAuthToken(token, authSecret);
 }
 
 export { COOKIE_NAME, SEVEN_DAYS_SECONDS };

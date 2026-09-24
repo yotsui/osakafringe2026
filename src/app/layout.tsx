@@ -3,7 +3,7 @@ import './globals.css';
 import { LanguageProvider } from '@/context/LanguageContext';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { Analytics } from '@vercel/analytics/next';
+import VercelAnalyticsWrapper from '@/components/analytics/VercelAnalyticsWrapper';
 
 export const viewport: Viewport = {
   themeColor: '#E6007E',
@@ -80,7 +80,7 @@ export default async function RootLayout({
           </main>
           <Footer showAwards={showAwards} />
         </LanguageProvider>
-        <Analytics />
+        <VercelAnalyticsWrapper />
       </body>
     </html>
   );

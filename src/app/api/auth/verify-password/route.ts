@@ -37,8 +37,33 @@ export async function POST(request: Request) {
     const password = typeof body.password === 'string' ? body.password : '';
     const returnUrl = typeof body.returnUrl === 'string' ? body.returnUrl : '/';
 
+    const isPreviewTarget = returnUrl.startsWith('/preview/') || returnUrl.startsWith('/preview?');
+    const isPreviewEnabled = process.env.MICROCMS_PREVIEW_ENABLED === 'true';
+
     const expectedPassword = process.env.TEST_SITE_PASSWORD || '';
-    const authSecret = process.env.TEST_SITE_AUTH_SECRET || expectedPassword || 'default-fallback-secret';
+    const explicitAuthSecret = process.env.TEST_SITE_AUTH_SECRET || '';
+
+    // プレビュー利用時は TEST_SITE_PASSWORD と TEST_SITE_AUTH_SECRET の明示設定が必須（代用不可）
+    if (isPreviewTarget || isPreviewEnabled) {
+      if (!expectedPassword || !explicitAuthSecret) {
+        console.error('[Auth] TEST_SITE_PASSWORD and TEST_SITE_AUTH_SECRET must be explicitly set for preview.');
+        return NextResponse.json(
+          {
+            success: false,
+            message: 'プレビュー機能の認証設定が完了していません。管理者にお問い合わせください。',
+          },
+          {
+            status: 500,
+            headers: {
+              'Referrer-Policy': 'no-referrer',
+              'X-Robots-Tag': 'noindex, nofollow, noarchive',
+            },
+          }
+        );
+      }
+    }
+
+    const authSecret = explicitAuthSecret || expectedPassword || 'default-fallback-secret';
 
     if (!expectedPassword) {
       console.error('[Auth] TEST_SITE_PASSWORD is not configured in environment variables.');
@@ -47,7 +72,13 @@ export async function POST(request: Request) {
           success: false,
           message: 'サーバーの設定エラーが発生しました。管理者にお問い合わせください。',
         },
-        { status: 500 }
+        {
+          status: 500,
+          headers: {
+            'Referrer-Policy': 'no-referrer',
+            'X-Robots-Tag': 'noindex, nofollow, noarchive',
+          },
+        }
       );
     }
 
@@ -63,6 +94,7 @@ export async function POST(request: Request) {
         {
           status: 401,
           headers: {
+            'Referrer-Policy': 'no-referrer',
             'X-Robots-Tag': 'noindex, nofollow, noarchive',
           },
         }
@@ -90,6 +122,7 @@ export async function POST(request: Request) {
       maxAge: SEVEN_DAYS_SECONDS,
     });
 
+    response.headers.set('Referrer-Policy', 'no-referrer');
     response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
 
     return response;

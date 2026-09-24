@@ -1153,3 +1153,130 @@ export const getSiteInfo = cache(async (): Promise<SiteInfo> => {
     throw error;
   }
 });
+
+/**
+ * 下書きプレビュー用エラー定義
+ */
+export type DraftPreviewErrorCode =
+  | 'DRAFT_KEY_MISSING'
+  | 'INVALID_DRAFT_KEY'
+  | 'NOT_FOUND'
+  | 'NETWORK_ERROR'
+  | 'CONFIG_ERROR';
+
+export class DraftPreviewError extends Error {
+  readonly code: DraftPreviewErrorCode;
+
+  constructor(code: DraftPreviewErrorCode, message: string) {
+    super(message);
+    this.name = 'DraftPreviewError';
+    this.code = code;
+  }
+}
+
+/**
+ * 下書き公演詳細を取得（プレビュー専用・no-store・公開データとは完全分離）
+ * - draftKey はこの関数内でのみ使用し、他APIや公開データ取得には持ち込まない。
+ * - 取得失敗時は公開版やサンプルへ黙って差し替えない。
+ * - APIキーやdraftKeyをエラーやログに含めない。
+ */
+export async function getDraftPerformanceById(
+  id: string,
+  draftKey: string
+): Promise<Performance> {
+  const trimmedId = typeof id === 'string' ? id.trim() : '';
+  const trimmedDraftKey = typeof draftKey === 'string' ? draftKey.trim() : '';
+
+  if (!trimmedId) {
+    throw new DraftPreviewError(
+      'NOT_FOUND',
+      '公演IDが指定されていません。microCMSの管理画面からプレビューを開き直してください。'
+    );
+  }
+
+  if (!trimmedDraftKey) {
+    throw new DraftPreviewError(
+      'DRAFT_KEY_MISSING',
+      '下書きキー（draftKey）が指定されていません。microCMSの管理画面からプレビューを開き直してください。'
+    );
+  }
+
+  const currentServiceDomain = (
+    process.env.MICROCMS_SERVICE_DOMAIN || serviceDomain || ''
+  )
+    .trim()
+    .replace(/^https?:\/\//i, '')
+    .replace(/\.microcms\.io\/?$/i, '')
+    .replace(/\/$/, '');
+
+  const currentApiKey = (process.env.MICROCMS_API_KEY || apiKey || '').trim();
+
+  if (!currentServiceDomain || !currentApiKey) {
+    throw new DraftPreviewError(
+      'CONFIG_ERROR',
+      'microCMSの設定（MICROCMS_SERVICE_DOMAIN / MICROCMS_API_KEY）が完了していません。'
+    );
+  }
+
+  const endpointUrl = `https://${currentServiceDomain}.microcms.io/api/v1/performances/${encodeURIComponent(
+    trimmedId
+  )}?draftKey=${encodeURIComponent(trimmedDraftKey)}`;
+
+  let rawData: RawPerformanceData;
+  try {
+    const res = await fetch(endpointUrl, {
+      method: 'GET',
+      headers: {
+        'X-MICROCMS-API-KEY': currentApiKey,
+      },
+      cache: 'no-store',
+    });
+
+    if (res.status === 404) {
+      throw new DraftPreviewError(
+        'NOT_FOUND',
+        '指定された公演データが見つかりません。コンテンツIDをご確認ください。'
+      );
+    }
+
+    if (res.status === 401 || res.status === 403) {
+      throw new DraftPreviewError(
+        'INVALID_DRAFT_KEY',
+        '下書きキーが無効または期限切れです。microCMSからプレビューを開き直してください。'
+      );
+    }
+
+    if (!res.ok) {
+      throw new DraftPreviewError(
+        'NETWORK_ERROR',
+        'microCMSからのデータ取得に失敗しました。しばらく待ってから再度お試しください。'
+      );
+    }
+
+    rawData = (await res.json()) as RawPerformanceData;
+  } catch (error) {
+    if (error instanceof DraftPreviewError) {
+      throw error;
+    }
+    console.error('[MicroCMS Preview] Network or parsing error occurred.');
+    throw new DraftPreviewError(
+      'NETWORK_ERROR',
+      'microCMSとの通信中にエラーが発生しました。ネットワーク状況を確認し、再度お試しください。'
+    );
+  }
+
+  // 関連データ（会場・アーティスト・パートナー）は公開済みデータを利用して解決（公演のdraftKeyは流用しない）
+  const [venues, artists, partners] = await Promise.all([
+    getVenues().catch(() => []),
+    getArtists().catch(() => []),
+    getPartners().catch(() => []),
+  ]);
+
+  const venueMap = new Map(venues.map((v) => [v.id, v]));
+  const artistMap = new Map(artists.map((a) => [a.id, a]));
+  const partnerMap = new Map(partners.map((p) => [p.id, p]));
+
+  // normalizePerformance で通常詳細と同じ整形を実施（参照先が未公開でもクラッシュしない）
+  return normalizePerformance(rawData, venueMap, artistMap, partnerMap);
+}
+
