@@ -145,11 +145,22 @@
     },
     {
       "fieldId": "durationMinutes",
-      "name": "上演時間（分）",
-      "kind": "number",
-      "description": null,
+      "name": "上演時間",
+      "kind": "text",
+      "description": "単位を含む表示用テキスト。日時計算には使用しない（例: 約30分、45〜60分、約90分（休憩含む）、随時開催）",
       "required": false,
-      "numberSizeLimitValidation": null,
+      "isUnique": false,
+      "textValidation": null,
+      "initialValue": null
+    },
+    {
+      "fieldId": "durationMinutesEn",
+      "name": "上演時間（英語）",
+      "kind": "text",
+      "description": "Duration description in English (e.g. Approx. 30 min, 45-60 min, Ongoing)",
+      "required": false,
+      "isUnique": false,
+      "textValidation": null,
       "initialValue": null
     }
   ],

@@ -344,9 +344,11 @@ export default function PerformanceModal({
               </div>
 
               {performance.durationMinutes && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold">
-                  <Clock className="w-3.5 h-3.5 text-pink-600" />
-                  <span>{t('durationLabel')}: {performance.durationMinutes} {t('minutes')}</span>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold min-w-0 max-w-full">
+                  <Clock className="w-3.5 h-3.5 text-pink-600 shrink-0" />
+                  <span className="break-words">
+                    {t('durationLabel')}: {getText(performance.durationMinutes, performance.durationMinutesEn)}
+                  </span>
                 </div>
               )}
             </div>

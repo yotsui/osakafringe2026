@@ -141,7 +141,7 @@ export default function ContactClient({ siteInfo }: ContactClientProps) {
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form id="contact-form" onSubmit={handleSubmit} className="space-y-6 scroll-mt-24">
             {status === 'error' && (
               <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-3 text-rose-800 text-xs font-bold">
                 <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-500 mt-0.5" />

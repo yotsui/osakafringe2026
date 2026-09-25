@@ -294,6 +294,16 @@ export async function backfillPerformances(ctx: BackfillContext) {
       }
     }
 
+    const rawDuration = item.durationMinutes != null ? String(item.durationMinutes).trim() : '';
+    if (isFilled(rawDuration)) {
+      if (isFilled(item.durationMinutesEn)) {
+        ctx.stats.englishSkipped++;
+      } else {
+        const translated = await translateText(ctx, rawDuration, `Performance duration: ${itemLabel}`);
+        if (translated) patchData.durationMinutesEn = translated;
+      }
+    }
+
     if (Object.keys(patchData).length > 0) {
       ctx.stats.performancesScheduled++;
       console.log(`  - Performance [${item.id}] ${itemLabel}:`);

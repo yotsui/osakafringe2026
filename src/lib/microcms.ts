@@ -172,7 +172,8 @@ interface RawPerformanceData {
   ticketPriceEn?: string;
   ticketUrl?: string;
   flyer?: string | MicroCMSMedia;
-  durationMinutes?: number;
+  durationMinutes?: string | number;
+  durationMinutesEn?: string | number;
   isFeatured?: boolean;
   artists?: Artist | string | { id: string };
   artistId?: string;
@@ -522,6 +523,26 @@ export const getArtistById = cache(async (id: string): Promise<Artist | undefine
 });
 
 /**
+ * 上演時間テキストの正規化
+ * - 文字列: 前後の空白を除去して採用（空文字・空白のみは未設定）
+ * - 数値 (移行前互換): 正の有限数値のみ `${val}分` として採用（0、負数、NaN、Infinityは未設定）
+ * - その他（null, undefined, boolean, object, array等）: 未設定（undefined）
+ */
+export function normalizeDurationMinutes(val: unknown): string | undefined {
+  if (typeof val === 'string') {
+    const trimmed = val.trim();
+    return trimmed.length > 0 ? trimmed : undefined;
+  }
+  if (typeof val === 'number') {
+    if (Number.isFinite(val) && val > 0) {
+      return `${val}分`;
+    }
+    return undefined;
+  }
+  return undefined;
+}
+
+/**
  * 公演データの正規化
  */
 export function normalizePerformance(
@@ -808,7 +829,8 @@ export function normalizePerformance(
       ticketPriceEn: perf.ticketPriceEn || perf.ticketPrice || '',
       ticketUrl: cleanUrl(perf.ticketUrl),
       flyer: extractImageUrl(perf.flyer),
-      durationMinutes: typeof perf.durationMinutes === 'number' && perf.durationMinutes > 0 ? perf.durationMinutes : undefined,
+      durationMinutes: normalizeDurationMinutes(perf.durationMinutes),
+      durationMinutesEn: normalizeDurationMinutes(perf.durationMinutesEn),
       isFeatured: Boolean(perf.isFeatured),
       artists: resolvedArtist || resolvedArtistId,
       artistId: resolvedArtistId,

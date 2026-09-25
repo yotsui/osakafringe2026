@@ -78,7 +78,7 @@ describe('buildPerformanceJsonLd', () => {
     assert.strictEqual(offers?.availability, undefined);
   });
 
-  it('omits offers when ticket price is multi-tiered', () => {
+  it('omits offers and omits endDate when ticket price is multi-tiered and no end time is specified', () => {
     const perf: Performance = {
       id: 'perf-tiers',
       title: 'Multi Tier Performance',
@@ -91,6 +91,24 @@ describe('buildPerformanceJsonLd', () => {
 
     const jsonLd = buildPerformanceJsonLd(perf, 'https://osakafringe.com');
     assert.strictEqual(jsonLd.offers, undefined);
+    assert.strictEqual(jsonLd.startDate, '2026-10-15T18:00:00+09:00');
+    assert.strictEqual(jsonLd.endDate, undefined);
+  });
+
+  it('outputs date-only endDate when explicit endDate is given without endTime', () => {
+    const perf: Performance = {
+      id: 'perf-exhibition',
+      title: 'Art Exhibition',
+      description: 'Exhibition description',
+      ticketPrice: '無料',
+      schedules: [
+        { id: 's1', date: '2026-10-08', endDate: '2026-11-08', startTime: '' },
+      ],
+    };
+
+    const jsonLd = buildPerformanceJsonLd(perf, 'https://osakafringe.com');
+    assert.strictEqual(jsonLd.startDate, '2026-10-08');
+    assert.strictEqual(jsonLd.endDate, '2026-11-08');
   });
 
   it('creates subEvents when multiple schedules exist with different times/venues', () => {

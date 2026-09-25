@@ -57,6 +57,31 @@ export function formatScheduleIsoDateTime(date?: string, time?: string): string 
 }
 
 /**
+ * スケジュールの終了日時を Schema.org ISO形式（または日付形式）で構築
+ * - 明示的な終了日(endDate)がある場合: 終了時刻(endTime)があればISO、なければ日付のみ
+ * - 終了日はないが、終了時刻(endTime)と開始日(date)がある場合: 開始日+終了時刻のISO
+ * - 終了情報（終了日・終了時刻）がない場合は undefined（架空のendDateを出力しない）
+ */
+export function formatScheduleEndIsoDateTime(date?: string, endDate?: string, endTime?: string): string | undefined {
+  const cleanEndDate = endDate && /^\d{4}-\d{2}-\d{2}$/.test(endDate) ? endDate : undefined;
+  const cleanDate = date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : undefined;
+  const hasEndTime = Boolean(endTime && /^\d{2}:\d{2}$/.test(endTime));
+
+  if (cleanEndDate) {
+    if (hasEndTime) {
+      return `${cleanEndDate}T${endTime}:00+09:00`;
+    }
+    return cleanEndDate;
+  }
+
+  if (cleanDate && hasEndTime) {
+    return `${cleanDate}T${endTime}:00+09:00`;
+  }
+
+  return undefined;
+}
+
+/**
  * スケジュールに対応する Location (Place) 構造化データを生成
  */
 function buildLocation(schedule?: PerformanceSchedule, defaultVenue?: Performance['venue'], defaultVenueName?: string) {
@@ -124,12 +149,22 @@ export function buildPerformanceJsonLd(performance: Performance, siteBaseUrl: st
     const last = validSchedules[validSchedules.length - 1];
 
     mainStartDate = formatScheduleIsoDateTime(first.date, first.startTime);
-    mainEndDate = formatScheduleIsoDateTime(last.endDate || last.date, last.endTime);
+
+    if (validSchedules.length === 1) {
+      mainEndDate = formatScheduleEndIsoDateTime(first.date, first.endDate, first.endTime);
+    } else {
+      const explicitLastEnd = formatScheduleEndIsoDateTime(last.date, last.endDate, last.endTime);
+      if (explicitLastEnd) {
+        mainEndDate = explicitLastEnd;
+      } else if (last.date && last.date !== first.date) {
+        mainEndDate = last.date;
+      }
+    }
 
     if (validSchedules.length > 1) {
       subEvents = validSchedules.map((s, index) => {
         const subStart = formatScheduleIsoDateTime(s.date, s.startTime);
-        const subEnd = formatScheduleIsoDateTime(s.endDate || s.date, s.endTime);
+        const subEnd = formatScheduleEndIsoDateTime(s.date, s.endDate, s.endTime);
         const subLoc = buildLocation(s, performance.venue, defaultVenueName);
 
         return {

@@ -37,7 +37,7 @@ export default function Navbar({ showAwards = false }: NavbarProps) {
           {/* Main Vector Logo (Clickable to Home) */}
           <Link href="/" className="flex items-center hover:opacity-90 transition-opacity">
             <div className="w-48 sm:w-56 md:w-64 filter brightness-0 invert">
-              <BrandLogo variant="main-date" />
+              <BrandLogo variant="main-date" linkToHome={false} />
             </div>
           </Link>
 

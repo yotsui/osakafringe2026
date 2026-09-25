@@ -142,7 +142,8 @@ export interface Performance {
   image?: string;
   images?: string[];
   isFeatured?: boolean;
-  durationMinutes?: number;
+  durationMinutes?: string;
+  durationMinutesEn?: string;
 
   // トップレベルの開場時間（フォールバック用）
   open?: string;

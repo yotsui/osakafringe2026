@@ -238,7 +238,8 @@ export const mockPerformances: Performance[] = [
       'https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=800&q=80'
     ],
     isFeatured: true,
-    durationMinutes: 75,
+    durationMinutes: '75分',
+    durationMinutesEn: '75 min',
   },
   {
     id: 'perf-2',
@@ -275,7 +276,8 @@ export const mockPerformances: Performance[] = [
       'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80'
     ],
     isFeatured: true,
-    durationMinutes: 45,
+    durationMinutes: '45分',
+    durationMinutesEn: '45 min',
   },
   {
     id: 'perf-3',
@@ -307,7 +309,8 @@ export const mockPerformances: Performance[] = [
     ticketUrl: 'https://osakafringe.com',
     image: 'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?auto=format&fit=crop&w=800&q=80',
     isFeatured: true,
-    durationMinutes: 60,
+    durationMinutes: '60分',
+    durationMinutesEn: '60 min',
   },
   {
     id: 'perf-4',
@@ -338,7 +341,8 @@ export const mockPerformances: Performance[] = [
     ticketPriceEn: '¥2,000',
     ticketUrl: 'https://osakafringe.com',
     image: 'https://images.unsplash.com/photo-1528164344705-475426879c0d?auto=format&fit=crop&w=800&q=80',
-    durationMinutes: 60,
+    durationMinutes: '60分',
+    durationMinutesEn: '60 min',
   },
   {
     id: 'perf-5',
@@ -369,7 +373,8 @@ export const mockPerformances: Performance[] = [
     ticketPriceEn: 'Free Admission',
     ticketUrl: '',
     image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80',
-    durationMinutes: 40,
+    durationMinutes: '40分',
+    durationMinutesEn: '40 min',
   },
   {
     id: 'perf-6',
@@ -400,7 +405,8 @@ export const mockPerformances: Performance[] = [
     ticketPriceEn: 'Free Admission',
     ticketUrl: '',
     image: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=800&q=80',
-    durationMinutes: 60,
+    durationMinutes: '随時開催',
+    durationMinutesEn: 'Ongoing during exhibition hours',
   },
 ];
 

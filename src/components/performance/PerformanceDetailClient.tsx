@@ -347,9 +347,11 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
               </div>
 
               {performance.durationMinutes && (
-                <div className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold">
-                  <Clock className="w-4 h-4 text-[#E6007E]" />
-                  <span>{t('durationLabel')}: {performance.durationMinutes} {t('minutes')}</span>
+                <div className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold min-w-0 max-w-full">
+                  <Clock className="w-4 h-4 text-[#E6007E] shrink-0" />
+                  <span className="break-words">
+                    {t('durationLabel')}: {getText(performance.durationMinutes, performance.durationMinutesEn)}
+                  </span>
                 </div>
               )}
             </div>

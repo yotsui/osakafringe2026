@@ -14,6 +14,7 @@ export const translations: Dictionary = {
   navArtists: { ja: 'アーティスト', en: 'Artists' },
   navAwards: { ja: 'アワード', en: 'Awards' },
   navDonate: { ja: '応援・連携', en: 'Support' },
+  navMedia: { ja: 'メディア・取材', en: 'Media & Press' },
   navBrandAssets: { ja: 'ロゴ・ブランド素材', en: 'Brand Assets' },
   navContact: { ja: 'お問い合わせ', en: 'Contact' },
 
@@ -415,10 +416,10 @@ export const translations: Dictionary = {
   formMessagePlaceholder: { ja: 'お問い合わせ内容を詳しくご記入ください...', en: 'Please enter your inquiry details...' },
 
   footerOrganizerLabel: { ja: '主催：', en: 'Organized by: ' },
-  footerOrganizerName: { ja: '大阪文化万博 Osaka Fringe 2026 準備室', en: 'Osaka Cultural Expo - Osaka Fringe 2026 Preparatory Office' },
+  footerOrganizerName: { ja: '大阪文化フリンジ機構設立準備室', en: 'Preparatory Office for Osaka Cultural Fringe Organization' },
   footerSupporterLabel: { ja: '後援：', en: 'Supported by: ' },
   footerSupporterName: { ja: '公益財団法人大阪観光局', en: 'Osaka Convention & Tourism Bureau' },
-  footerCopyrightText: { ja: '© 2026 大阪文化万博 Osaka Fringe 2026 準備室 All rights reserved.', en: '© 2026 Osaka Cultural Expo - Osaka Fringe 2026 Preparatory Office. All rights reserved.' },
+  footerCopyrightText: { ja: '© 2026 大阪文化フリンジ機構設立準備室 All rights reserved.', en: '© 2026 Preparatory Office for Osaka Cultural Fringe Organization. All rights reserved.' },
 
   errorTitle: { ja: 'データの読み込みに失敗しました', en: 'Failed to Load Data' },
   errorDescription: { ja: 'ネットワーク接続またはシステムの一時的な問題により、情報を取得できませんでした。しばらく経ってから再度お試しください。', en: 'Unable to retrieve information due to a network connection or temporary system issue. Please try again shortly.' },
@@ -427,5 +428,47 @@ export const translations: Dictionary = {
 
   awardsSectionsAriaLabel: { ja: 'アワード紹介セクション', en: 'Awards Introduction Sections' },
   awardsPhotoAltEditor: { ja: '編集長写真', en: 'Editor photo' },
-  awardsPhotoAltMember: { ja: 'メンバー写真', en: 'Member photo' }
+  awardsPhotoAltMember: { ja: 'メンバー写真', en: 'Member photo' },
+
+  // Footer Sections
+  footerSectionFestival: { ja: 'フェスティバル', en: 'Festival' },
+  footerSectionMediaSupport: { ja: 'メディア・サポート', en: 'Media & Support' },
+  footerSectionContactSns: { ja: 'お問い合わせ・公式SNS', en: 'Contact & Official SNS' },
+
+  // Media Page
+  mediaPageBadge: { ja: 'PRESS & MEDIA', en: 'PRESS & MEDIA' },
+  mediaPageTitle: { ja: 'メディア・取材', en: 'Media & Press' },
+  mediaPageSubtitle: { 
+    ja: '大阪文化万博Osaka Fringe 2026 取材・メディア掲載のご案内', 
+    en: 'Press & Media Coverage Guidelines for Osaka Fringe 2026' 
+  },
+  mediaIntroText: { 
+    ja: '大阪文化万博Osaka Fringe 2026では、フェスティバルの様子を取材いただけます。会場の種類によって事前連絡や入場方法が異なりますので、以下をご確認ください。', 
+    en: 'Media are welcome to cover Osaka Fringe 2026. Advance arrangements and admission procedures vary by venue, so please review the guidelines below.' 
+  },
+  mediaFreeVenueTitle: { ja: '無料で入場できる会場', en: 'Free-admission Venues' },
+  mediaFreeVenueDesc: { 
+    ja: '原則として、一般のお客様が入場できる公演は取材いただけます。会場や出演者の案内に従い、観客や公演の妨げにならないようご協力ください。インタビュー、撮影・録音、機材の持ち込みを希望される場合は、事前にお問い合わせください。', 
+    en: 'As a general rule, media may attend performances that are open to the public. Please follow the venue’s and artists’ instructions, and avoid disrupting audiences or performances. Please contact us in advance if you would like to request an interview, take photos or record audio/video, or bring equipment.' 
+  },
+  mediaCommercialVenueTitle: { ja: '商業施設・連携イベント', en: 'Commercial Venues and Partner Events' },
+  mediaCommercialVenueDesc: { 
+    ja: '施設やイベント主催者との調整が必要なため、取材前にお問い合わせください。入場や撮影の条件は、各施設・イベントのルールに従ってください。', 
+    en: 'Advance coordination with the facility or event organizer is required. Please contact us before your visit. Admission and photography are subject to each venue’s and event’s rules.' 
+  },
+  mediaPaidVenueTitle: { ja: '有料会場', en: 'Paid Venues' },
+  mediaPaidVenueDesc: { 
+    ja: 'メディアパスを希望される場合は、事前にご相談ください。会場や公演の状況を確認のうえ、発行できる場合にご案内します。', 
+    en: 'Please contact us in advance if you would like to request a media pass. We will check with the venue and production and let you know if one can be arranged.' 
+  },
+  mediaInquiryTitle: { ja: '取材のお問い合わせ', en: 'Media Inquiries' },
+  mediaInquiryDesc: { 
+    ja: '媒体名、担当者名、連絡先、希望日時・会場、公演名、取材内容、撮影・録音の有無、掲載予定日をお知らせください。', 
+    en: 'Please include your media outlet, name, contact details, preferred date and venue, performance, coverage plan, whether you plan to photograph or record, and expected publication date.' 
+  },
+  mediaContactBtn: { ja: '取材について問い合わせる', en: 'Contact us about media coverage' },
+  mediaImportantNotes: { 
+    ja: '※ 取材にあたっては、各会場の利用規約、出演者の意向、および安全上の指示を最優先として尊重・遵守いただきますようお願いいたします。', 
+    en: '* All coverage must fully respect and adhere to individual venue rules, artist preferences, and safety instructions.' 
+  }
 };
