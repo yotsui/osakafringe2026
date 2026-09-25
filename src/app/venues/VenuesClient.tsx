@@ -7,6 +7,7 @@ import { Venue, Performance } from '@/types';
 import dynamic from 'next/dynamic';
 import { useLanguage } from '@/context/LanguageContext';
 import SafeImage from '@/components/common/SafeImage';
+import ArtistThumbnail from '@/components/common/ArtistThumbnail';
 import PerformanceModal from '@/components/audience/PerformanceModal';
 import {
   getAllFestivalDates,
@@ -519,18 +520,22 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                               href={`/performances/${item.performance.id}`}
                               className="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-pink-50/80 border border-slate-100 hover:border-pink-200 transition-all flex items-center justify-between gap-3 group"
                             >
-                              <div className="flex items-start gap-2.5 truncate pr-2">
-                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 shrink-0">
-                                  {item.schedule && isPreFestivalSchedule(item.schedule) && (
-                                    <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-purple-600 text-white text-[10px] font-black shrink-0">
-                                      {t('preFestival')}
+                              <div className="flex items-center gap-3 min-w-0 flex-1">
+                                <ArtistThumbnail
+                                  artist={item.performance.artist}
+                                  sizeClassName="w-12 h-12 sm:w-14 sm:h-14"
+                                />
+                                <div className="min-w-0 flex-1 space-y-0.5">
+                                  <div className="flex flex-wrap items-center gap-1">
+                                    {item.schedule && isPreFestivalSchedule(item.schedule) && (
+                                      <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-purple-600 text-white text-[10px] font-black shrink-0">
+                                        {t('preFestival')}
+                                      </span>
+                                    )}
+                                    <span className="inline-flex items-center justify-center px-2 py-0.5 rounded bg-[#E6007E]/10 text-[#E6007E] text-[11px] font-black shrink-0">
+                                      {item.displayTime || t('allDayShow')}
                                     </span>
-                                  )}
-                                  <span className="inline-flex items-center justify-center px-2 py-1 rounded bg-[#E6007E]/10 text-[#E6007E] text-[11px] font-black shrink-0">
-                                    {item.displayTime || t('allDayShow')}
-                                  </span>
-                                </div>
-                                <div className="truncate">
+                                  </div>
                                   <p className="text-xs font-bold text-slate-900 group-hover:text-[#E6007E] truncate">
                                     {getText(item.performance.title, item.performance.titleEn)}
                                   </p>
@@ -734,14 +739,20 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                               href={`/performances/${item.performance.id}`}
                               className="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-pink-50/80 border border-slate-100 hover:border-pink-200 transition-all flex flex-col gap-2 group"
                             >
-                              <div className="flex items-start justify-between gap-2">
-                                <div className="truncate">
-                                  <p className="text-xs font-bold text-slate-900 group-hover:text-[#E6007E] truncate">
-                                    {getText(item.performance.title, item.performance.titleEn)}
-                                  </p>
-                                  <p className="text-[10px] text-slate-400 font-medium truncate">
-                                    {getText(item.performance.artist?.name || item.performance.artistName, item.performance.artist?.nameEn || item.performance.artistNameEn)}
-                                  </p>
+                              <div className="flex items-center justify-between gap-3">
+                                <div className="flex items-center gap-3 min-w-0 flex-1">
+                                  <ArtistThumbnail
+                                    artist={item.performance.artist}
+                                    sizeClassName="w-12 h-12 sm:w-14 sm:h-14"
+                                  />
+                                  <div className="min-w-0 flex-1 space-y-0.5">
+                                    <p className="text-xs font-bold text-slate-900 group-hover:text-[#E6007E] truncate">
+                                      {getText(item.performance.title, item.performance.titleEn)}
+                                    </p>
+                                    <p className="text-[10px] text-slate-400 font-medium truncate">
+                                      {getText(item.performance.artist?.name || item.performance.artistName, item.performance.artist?.nameEn || item.performance.artistNameEn)}
+                                    </p>
+                                  </div>
                                 </div>
                                 <span className="text-[11px] font-bold text-[#E6007E] shrink-0">
                                   {t('showDetailsArrow')}

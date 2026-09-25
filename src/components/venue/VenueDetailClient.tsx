@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Venue, Performance } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import SafeImage from '@/components/common/SafeImage';
+import ArtistThumbnail from '@/components/common/ArtistThumbnail';
 import { 
   Building2, 
   MapPin, 
@@ -314,7 +315,7 @@ export default function VenueDetailClient({ venue, performances }: VenueDetailCl
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {performances.map((perf) => {
                     const perfTitle = getText(perf.title, perf.titleEn);
-                    const perfArtist = getText(perf.artistName, perf.artistNameEn);
+                    const perfArtist = getText(perf.artist?.name || perf.artistName, perf.artist?.nameEn || perf.artistNameEn);
                     const perfPrice = formatTicketPrice(perf.ticketPrice, perf.ticketPriceEn, language);
                     const matchingSchedules = (perf.schedules || []).filter((s) => {
                       const sVenueId = s.venueId || s.venue?.id || perf.venueId || perf.venue?.id;
@@ -328,22 +329,34 @@ export default function VenueDetailClient({ venue, performances }: VenueDetailCl
                       <Link
                         key={perf.id}
                         href={`/performances/${perf.id}`}
-                        className="group p-4 rounded-2xl border border-pink-100 bg-white hover:border-[#E6007E] hover:shadow-md transition-all flex flex-col justify-between space-y-3"
+                        className="group p-4 rounded-2xl border border-pink-100 bg-white hover:border-[#E6007E] hover:shadow-md transition-all flex flex-col justify-between gap-3"
                       >
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <span className="px-2 py-0.5 rounded bg-pink-100 text-[#E6007E] text-[10px] font-bold">
-                              {getPerformanceGenreText(perf, language) || getArtistGenreLabel(perf.artist?.genre, language)}
-                            </span>
-                            <span className="text-xs font-bold text-[#E6007E] truncate">
-                              {perfArtist}
-                            </span>
+                        <div className="space-y-3">
+                          {/* Top: Left Photo / Right Genre, Artist, Title */}
+                          <div className="flex items-start gap-3">
+                            <ArtistThumbnail
+                              artist={perf.artist}
+                              sizeClassName="w-16 h-16 sm:w-20 sm:h-20"
+                              sizes="(max-width: 640px) 64px, 80px"
+                            />
+                            <div className="min-w-0 flex-1 space-y-1">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="px-2 py-0.5 rounded bg-pink-100 text-[#E6007E] text-[10px] font-bold">
+                                  {getPerformanceGenreText(perf, language) || getArtistGenreLabel(perf.artist?.genre, language)}
+                                </span>
+                                <span className="text-xs font-bold text-[#E6007E] truncate">
+                                  {perfArtist}
+                                </span>
+                              </div>
+                              <h3 className="text-sm font-black text-slate-900 group-hover:text-[#E6007E] line-clamp-2 leading-snug transition-colors">
+                                {perfTitle}
+                              </h3>
+                            </div>
                           </div>
-                          <h3 className="text-sm font-black text-slate-900 group-hover:text-[#E6007E] line-clamp-2 leading-snug transition-colors">
-                            {perfTitle}
-                          </h3>
+
+                          {/* Schedules list wrapped below */}
                           {venueSchedules.length > 0 && (
-                            <div className="flex flex-wrap gap-1.5 pt-1">
+                            <div className="flex flex-wrap gap-1.5 pt-0.5">
                               {venueSchedules.map((s, sIdx) => (
                                 <span
                                   key={sIdx}
@@ -361,6 +374,7 @@ export default function VenueDetailClient({ venue, performances }: VenueDetailCl
                           )}
                         </div>
 
+                        {/* Bottom: Price and Details */}
                         <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
                           <span className="font-bold text-slate-700">{perfPrice}</span>
                           <span className="font-black text-[#E6007E] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
