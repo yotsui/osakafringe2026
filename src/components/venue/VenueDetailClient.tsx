@@ -316,22 +316,22 @@ export default function VenueDetailClient({ venue, performances }: VenueDetailCl
                   </div>
 
                   {dateGroups.length > 0 ? (
-                    <div className="space-y-8">
+                    <div className="space-y-6">
                       {dateGroups.map((group) => (
-                        <div key={group.dateKey} className="space-y-3">
-                          {/* Date Heading (18-20px Bold) */}
-                          <div className="flex items-center gap-2 pb-2 border-b-2 border-pink-100">
-                            <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-[#E6007E]" />
-                            <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+                        <div key={group.dateKey} className="space-y-2.5">
+                          {/* Date Heading */}
+                          <div className="flex items-center gap-2 pb-1.5 border-b border-pink-100">
+                            <Calendar className="w-4 h-4 text-[#E6007E]" />
+                            <h3 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
                               {group.heading}
                             </h3>
-                            <span className="text-xs font-bold text-slate-400 ml-auto">
+                            <span className="text-xs font-medium text-slate-400 ml-auto">
                               {group.sessions.length} {language === 'ja' ? '公演' : (group.sessions.length === 1 ? 'show' : 'shows')}
                             </span>
                           </div>
 
                           {/* 1-Column Performance List */}
-                          <div className="space-y-3">
+                          <div className="space-y-2.5">
                             {group.sessions.map((session) => {
                               const perf = session.performance;
                               const perfTitle = getText(perf.title, perf.titleEn);
@@ -342,22 +342,22 @@ export default function VenueDetailClient({ venue, performances }: VenueDetailCl
                                 <Link
                                   key={session.id}
                                   href={`/performances/${perf.id}`}
-                                  className="group block p-4 sm:p-5 rounded-2xl border border-pink-100 bg-white hover:border-[#E6007E] hover:shadow-md transition-all"
+                                  className="group block p-3.5 sm:p-4 rounded-2xl border border-pink-100 bg-white hover:border-[#E6007E] hover:shadow-sm transition-all"
                                 >
-                                  {/* PC Layout: [Time 24px] [Photo] [Info] [Price & Details] */}
-                                  <div className="hidden sm:flex sm:items-center sm:gap-6">
-                                    {/* 1. Time Column */}
-                                    <div className="w-48 shrink-0 space-y-1">
+                                  {/* PC Layout: [Time] [Photo] [Info] [Price & Details Bottom-Right] */}
+                                  <div className="hidden sm:flex sm:items-center sm:gap-4">
+                                    {/* 1. Time Column (Compact width) */}
+                                    <div className="w-24 sm:w-28 shrink-0 space-y-0.5">
                                       {session.isPreFestival && (
-                                        <span className="inline-block text-[10px] font-black bg-purple-600 text-white px-1.5 py-0.2 rounded-xs tracking-wider">
+                                        <span className="inline-block text-[9px] font-bold bg-purple-600 text-white px-1.5 py-0.2 rounded-xs tracking-wider">
                                           {t('preFestival')}
                                         </span>
                                       )}
-                                      <div className="text-2xl font-black text-slate-900 tabular-nums leading-tight">
+                                      <div className="text-lg sm:text-xl font-bold text-slate-900 tabular-nums leading-tight">
                                         {session.timeDisplay}
                                       </div>
                                       {session.schedule?.openTime && (
-                                        <div className="text-xs text-slate-500 font-medium">
+                                        <div className="text-[11px] text-slate-500 font-normal">
                                           {language === 'ja' ? `開場 ${session.schedule.openTime}` : `Doors ${session.schedule.openTime}`}
                                         </div>
                                       )}
@@ -367,56 +367,56 @@ export default function VenueDetailClient({ venue, performances }: VenueDetailCl
                                     <div className="shrink-0">
                                       <ArtistThumbnail
                                         artist={perf.artist}
-                                        sizeClassName="w-20 h-20 sm:w-24 sm:h-24"
-                                        sizes="96px"
+                                        sizeClassName="w-16 h-16 sm:w-20 sm:h-20"
+                                        sizes="80px"
                                       />
                                     </div>
 
                                     {/* 3. Performance Info */}
-                                    <div className="min-w-0 flex-1 space-y-1.5">
+                                    <div className="min-w-0 flex-1 space-y-1">
                                       <div className="flex items-center gap-2 flex-wrap">
-                                        <span className="px-2.5 py-0.5 rounded bg-pink-100 text-[#E6007E] text-xs font-bold">
+                                        <span className="px-2 py-0.5 rounded bg-pink-50 text-[#E6007E] border border-pink-100/80 text-[10px] sm:text-xs font-bold">
                                           {getPerformanceGenreText(perf, language) || getArtistGenreLabel(perf.artist?.genre, language)}
                                         </span>
-                                        <span className="text-sm sm:text-base font-bold text-[#E6007E] break-words">
+                                        <span className="text-xs sm:text-sm font-semibold text-[#E6007E] truncate">
                                           {perfArtist}
                                         </span>
                                       </div>
-                                      <h4 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-[#E6007E] transition-colors leading-snug break-words">
+                                      <h4 className="text-sm sm:text-base font-bold text-slate-900 group-hover:text-[#E6007E] transition-colors leading-snug break-words">
                                         {perfTitle}
                                       </h4>
                                     </div>
 
-                                    {/* 4. Price & Details */}
-                                    <div className="shrink-0 text-right space-y-2 pl-2">
+                                    {/* 4. Price & Details (Aligned to bottom-right) */}
+                                    <div className="shrink-0 self-end text-right space-y-1 pl-2">
                                       {perfPrice && (
-                                        <div className="text-sm sm:text-base font-bold text-slate-800 tabular-nums">
+                                        <div className="text-xs sm:text-sm font-bold text-slate-700 tabular-nums">
                                           {perfPrice}
                                         </div>
                                       )}
-                                      <div className="font-black text-xs sm:text-sm text-[#E6007E] flex items-center justify-end gap-1 group-hover:translate-x-1 transition-transform">
+                                      <div className="font-bold text-xs text-[#E6007E] flex items-center justify-end gap-1 group-hover:translate-x-1 transition-transform">
                                         <span>{t('cardDetails')}</span>
-                                        <ArrowRight className="w-4 h-4" />
+                                        <ArrowRight className="w-3.5 h-3.5" />
                                       </div>
                                     </div>
                                   </div>
 
-                                  {/* Smartphone Layout: Time top, Photo & Info below */}
-                                  <div className="sm:hidden space-y-3">
-                                    {/* Time at top (20px bold) */}
-                                    <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-100">
-                                      <div className="flex items-center gap-2 flex-wrap">
+                                  {/* Smartphone Layout */}
+                                  <div className="sm:hidden space-y-2.5">
+                                    {/* Top: Time */}
+                                    <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-slate-100">
+                                      <div className="flex items-center gap-1.5 flex-wrap">
                                         {session.isPreFestival && (
-                                          <span className="text-[10px] font-black bg-purple-600 text-white px-1.5 py-0.2 rounded-xs">
+                                          <span className="text-[9px] font-bold bg-purple-600 text-white px-1.5 py-0.2 rounded-xs">
                                             {t('preFestival')}
                                           </span>
                                         )}
-                                        <span className="text-xl font-black text-slate-900 tabular-nums">
+                                        <span className="text-base sm:text-lg font-bold text-slate-900 tabular-nums">
                                           {session.timeDisplay}
                                         </span>
                                       </div>
                                       {session.schedule?.openTime && (
-                                        <span className="text-[11px] text-slate-500 font-medium shrink-0">
+                                        <span className="text-[10px] text-slate-500 font-normal shrink-0">
                                           {language === 'ja' ? `開場 ${session.schedule.openTime}` : `Doors ${session.schedule.openTime}`}
                                         </span>
                                       )}
@@ -426,28 +426,28 @@ export default function VenueDetailClient({ venue, performances }: VenueDetailCl
                                     <div className="flex items-start gap-3">
                                       <ArtistThumbnail
                                         artist={perf.artist}
-                                        sizeClassName="w-20 h-20 shrink-0"
-                                        sizes="80px"
+                                        sizeClassName="w-16 h-16 shrink-0"
+                                        sizes="64px"
                                       />
-                                      <div className="min-w-0 flex-1 space-y-1">
+                                      <div className="min-w-0 flex-1 space-y-0.5">
                                         <div className="flex items-center gap-1.5 flex-wrap">
-                                          <span className="px-2 py-0.5 rounded bg-pink-100 text-[#E6007E] text-[10px] font-bold">
+                                          <span className="px-1.5 py-0.5 rounded bg-pink-50 text-[#E6007E] border border-pink-100 text-[10px] font-bold">
                                             {getPerformanceGenreText(perf, language) || getArtistGenreLabel(perf.artist?.genre, language)}
                                           </span>
-                                          <span className="text-xs font-bold text-[#E6007E] break-words">
+                                          <span className="text-xs font-semibold text-[#E6007E] truncate">
                                             {perfArtist}
                                           </span>
                                         </div>
-                                        <h4 className="text-sm sm:text-base font-black text-slate-900 group-hover:text-[#E6007E] transition-colors leading-snug break-words">
+                                        <h4 className="text-sm font-bold text-slate-900 group-hover:text-[#E6007E] transition-colors leading-snug break-words">
                                           {perfTitle}
                                         </h4>
                                       </div>
                                     </div>
 
-                                    {/* Bottom: Price and Details */}
-                                    <div className={`pt-2 border-t border-slate-100 flex items-center ${perfPrice ? 'justify-between' : 'justify-end'} text-xs`}>
-                                      {perfPrice && <span className="font-bold text-slate-700 tabular-nums">{perfPrice}</span>}
-                                      <span className="font-black text-[#E6007E] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                                    {/* Bottom: Price and Details at bottom right */}
+                                    <div className={`pt-1.5 border-t border-slate-100 flex items-center ${perfPrice ? 'justify-between' : 'justify-end'} text-xs`}>
+                                      {perfPrice && <span className="font-bold text-slate-700 tabular-nums text-xs">{perfPrice}</span>}
+                                      <span className="font-bold text-[#E6007E] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform text-xs">
                                         <span>{t('cardDetails')}</span>
                                         <ArrowRight className="w-3.5 h-3.5" />
                                       </span>
