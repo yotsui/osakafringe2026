@@ -1,16 +1,20 @@
 /**
  * 料金表示ヘルパー
- * 空欄時は「要問合せ / Inquire」に統一。
- * 「無料」「Free」「0円」等の明示的な登録値がある場合はその値をそのまま表示。
+ * - 表示言語の値を優先し、未設定・空文字・空白のみの場合は他言語へフォールバック。
+ * - 両方とも未設定・空文字・空白のみなら空文字（""）を返す。
+ * - 「無料」「Free」「0円」「投げ銭」「要問合せ」などの明示的な登録値がある場合はその値をそのまま表示。
  */
 export function formatTicketPrice(
   priceJa?: string,
   priceEn?: string,
   lang: 'ja' | 'en' = 'ja'
 ): string {
-  const customPrice = lang === 'en' ? (priceEn || priceJa) : (priceJa || priceEn);
-  if (customPrice && customPrice.trim() !== '') {
-    return customPrice.trim();
+  const trimmedJa = priceJa ? priceJa.trim() : '';
+  const trimmedEn = priceEn ? priceEn.trim() : '';
+
+  if (lang === 'en') {
+    return trimmedEn || trimmedJa;
   }
-  return lang === 'en' ? 'Inquire' : '要問合せ';
+  return trimmedJa || trimmedEn;
 }
+

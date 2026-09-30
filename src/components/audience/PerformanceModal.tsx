@@ -492,28 +492,32 @@ export default function PerformanceModal({
             )}
 
             {/* Ticket Price Info */}
-            <div className="p-5 rounded-2xl bg-pink-50/70 border border-pink-100 flex items-center justify-between gap-4">
-              <div className="space-y-0.5">
-                <span className="text-[11px] font-black text-[#E6007E] uppercase">
-                  {t('priceLabel')}
-                </span>
-                <p className="text-sm font-black text-slate-900">
-                  {priceDisplay}
-                </p>
-              </div>
+            {(priceDisplay || performance.ticketUrl) && (
+              <div className={`p-5 rounded-2xl bg-pink-50/70 border border-pink-100 flex items-center ${priceDisplay ? 'justify-between' : 'justify-end'} gap-4`}>
+                {priceDisplay && (
+                  <div className="space-y-0.5">
+                    <span className="text-[11px] font-black text-[#E6007E] uppercase">
+                      {t('priceLabel')}
+                    </span>
+                    <p className="text-sm font-black text-slate-900">
+                      {priceDisplay}
+                    </p>
+                  </div>
+                )}
 
-              {performance.ticketUrl && (
-                <a
-                  href={performance.ticketUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-2 rounded-xl bg-[#E6007E] hover:bg-[#c4006b] text-white font-black text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
-                >
-                  <Ticket className="w-3.5 h-3.5" />
-                  <span>{t('tickets')}</span>
-                </a>
-              )}
-            </div>
+                {performance.ticketUrl && (
+                  <a
+                    href={performance.ticketUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 rounded-xl bg-[#E6007E] hover:bg-[#c4006b] text-white font-black text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                  >
+                    <Ticket className="w-3.5 h-3.5" />
+                    <span>{t('tickets')}</span>
+                  </a>
+                )}
+              </div>
+            )}
 
             {/* Bottom Close Button */}
             <div className="pt-4 flex justify-center">

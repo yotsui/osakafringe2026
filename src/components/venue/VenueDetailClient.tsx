@@ -375,8 +375,8 @@ export default function VenueDetailClient({ venue, performances }: VenueDetailCl
                         </div>
 
                         {/* Bottom: Price and Details */}
-                        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                          <span className="font-bold text-slate-700">{perfPrice}</span>
+                        <div className={`pt-2 border-t border-slate-100 flex items-center ${perfPrice ? 'justify-between' : 'justify-end'} text-xs`}>
+                          {perfPrice && <span className="font-bold text-slate-700">{perfPrice}</span>}
                           <span className="font-black text-[#E6007E] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
                             <span>{t('cardDetails')}</span>
                             <ArrowRight className="w-3.5 h-3.5" />

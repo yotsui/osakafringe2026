@@ -185,10 +185,12 @@ export default function PerformanceCard({
             )}
             
             {/* Price Info */}
-            <div className="flex items-center gap-2 text-slate-700 pt-1">
-              <TicketIcon className="w-4 h-4 shrink-0 text-slate-400" />
-              <span className="font-bold">{priceDisplay}</span>
-            </div>
+            {priceDisplay && (
+              <div className="flex items-center gap-2 text-slate-700 pt-1">
+                <TicketIcon className="w-4 h-4 shrink-0 text-slate-400" />
+                <span className="font-bold">{priceDisplay}</span>
+              </div>
+            )}
           </div>
         </div>
 

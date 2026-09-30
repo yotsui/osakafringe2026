@@ -585,42 +585,48 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
             )}
 
             {/* Ticket Price & Links Box */}
-            <div className="p-6 rounded-2xl bg-pink-50/80 border border-pink-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <span className="text-xs font-black text-[#E6007E] uppercase">
-                  {t('priceLabel')}
-                </span>
-                <p className="text-lg sm:text-xl font-black text-slate-900">
-                  {priceDisplay}
-                </p>
-              </div>
+            {(priceDisplay || performance.flyer || performance.ticketUrl) && (
+              <div className={`p-6 rounded-2xl bg-pink-50/80 border border-pink-100 flex flex-col sm:flex-row sm:items-center ${priceDisplay ? 'justify-between' : 'justify-end'} gap-4`}>
+                {priceDisplay && (
+                  <div className="space-y-1">
+                    <span className="text-xs font-black text-[#E6007E] uppercase">
+                      {t('priceLabel')}
+                    </span>
+                    <p className="text-lg sm:text-xl font-black text-slate-900">
+                      {priceDisplay}
+                    </p>
+                  </div>
+                )}
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                {performance.flyer && (
-                  <a
-                    href={performance.flyer}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-5 py-3 rounded-2xl bg-white border border-pink-200 hover:border-[#E6007E] text-[#E6007E] font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
-                  >
-                    <span>{t('promotionalFlyer')}</span>
-                    <ExternalLink className="w-4 h-4 opacity-80" />
-                  </a>
-                )}
-                {performance.ticketUrl && (
-                  <a
-                    href={performance.ticketUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-6 py-3.5 rounded-2xl bg-[#E6007E] hover:bg-[#c4006b] text-white font-black text-sm flex items-center justify-center gap-2 shadow-md shadow-pink-500/20 transition-all cursor-pointer"
-                  >
-                    <Ticket className="w-4 h-4" />
-                    <span>{t('bookTickets')}</span>
-                    <ExternalLink className="w-4 h-4 opacity-80" />
-                  </a>
+                {(performance.flyer || performance.ticketUrl) && (
+                  <div className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-3 ${!priceDisplay ? 'w-full sm:w-auto' : ''}`}>
+                    {performance.flyer && (
+                      <a
+                        href={performance.flyer}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-5 py-3 rounded-2xl bg-white border border-pink-200 hover:border-[#E6007E] text-[#E6007E] font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
+                      >
+                        <span>{t('promotionalFlyer')}</span>
+                        <ExternalLink className="w-4 h-4 opacity-80" />
+                      </a>
+                    )}
+                    {performance.ticketUrl && (
+                      <a
+                        href={performance.ticketUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-6 py-3.5 rounded-2xl bg-[#E6007E] hover:bg-[#c4006b] text-white font-black text-sm flex items-center justify-center gap-2 shadow-md shadow-pink-500/20 transition-all cursor-pointer"
+                      >
+                        <Ticket className="w-4 h-4" />
+                        <span>{t('bookTickets')}</span>
+                        <ExternalLink className="w-4 h-4 opacity-80" />
+                      </a>
+                    )}
+                  </div>
                 )}
               </div>
-            </div>
+            )}
 
             {/* Bottom Back Button */}
             <div className="pt-6 border-t border-slate-100 flex justify-center">
