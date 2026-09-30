@@ -211,3 +211,109 @@ export function hasMultipleVenues(schedules: PerformanceSchedule[]): boolean {
   const firstVenue = schedules[0].venueId || schedules[0].venueName || '';
   return schedules.some((s) => (s.venueId || s.venueName || '') !== firstVenue);
 }
+
+/**
+ * 会場詳細・グループ化見出し用の日付フォーマット
+ * 例: "2026-10-03" -> 日本語: "10月3日（土）", 英語: "Oct 3 (Sat)"
+ */
+export function formatDateHeading(dateStr?: string, lang: 'ja' | 'en' = 'ja'): string {
+  if (!dateStr || !dateStr.trim() || dateStr === 'unscheduled') {
+    return lang === 'en' ? 'Schedule TBD' : '日程未定';
+  }
+
+  const cleanDate = dateStr.trim().replace(/\//g, '-');
+  const parts = cleanDate.split('-');
+
+  let month = 10;
+  let day = 1;
+  let dayOfWeek = '';
+
+  if (parts.length >= 3) {
+    const y = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10);
+    const d = parseInt(parts[2], 10);
+
+    if (!isNaN(m) && !isNaN(d)) {
+      month = m;
+      day = d;
+      const dateObj = new Date(y, m - 1, d);
+      if (!isNaN(dateObj.getTime())) {
+        const dayIdx = dateObj.getDay();
+        dayOfWeek = lang === 'en' ? EN_DAY_NAMES[dayIdx] : JA_DAY_NAMES[dayIdx];
+      }
+    }
+  }
+
+  if (lang === 'en') {
+    const monthName = EN_MONTH_NAMES[month - 1] || 'Oct';
+    const dayStr = dayOfWeek ? ` (${dayOfWeek})` : '';
+    return `${monthName} ${day}${dayStr}`.trim();
+  }
+
+  const dayStr = dayOfWeek ? `（${dayOfWeek}）` : '';
+  return `${month}月${day}日${dayStr}`.trim();
+}
+
+/**
+ * 会場詳細の開催回ごとの時刻・期間フォーマット
+ * - 終了時刻がある場合: 13:00〜13:30 / 13:00 - 13:30
+ * - 終了時刻がない場合: 13:00
+ * - 期間展示・日をまたぐ公演: 〜11/8（日） 10:00〜18:00 (または 〜11/8（日）)
+ * - durationMinutes から終了時刻を計算しない
+ */
+export function formatSessionTime(
+  schedule?: PerformanceSchedule,
+  isExhibition: boolean = false,
+  lang: 'ja' | 'en' = 'ja'
+): string {
+  if (!schedule) {
+    return lang === 'en' ? 'Time TBD' : '時間未定';
+  }
+
+  const cleanStart = schedule.startTime ? schedule.startTime.trim() : '';
+  const cleanEnd = schedule.endTime ? schedule.endTime.trim() : '';
+  const isMultiDay = Boolean(schedule.endDate && schedule.endDate !== schedule.date);
+
+  if (isMultiDay) {
+    const endFormatted = formatDatePart(schedule.endDate, lang);
+    if (lang === 'en') {
+      if (cleanStart && cleanEnd && cleanStart !== cleanEnd) {
+        return `Until ${endFormatted} ${cleanStart} - ${cleanEnd}`;
+      }
+      if (cleanStart) {
+        return `Until ${endFormatted} ${cleanStart}`;
+      }
+      return `Until ${endFormatted}`;
+    }
+
+    // 日本語
+    if (cleanStart && cleanEnd && cleanStart !== cleanEnd) {
+      return `〜${endFormatted} ${cleanStart}〜${cleanEnd}`;
+    }
+    if (cleanStart) {
+      return `〜${endFormatted} ${cleanStart}`;
+    }
+    return `〜${endFormatted}`;
+  }
+
+  // 同日開催
+  if (lang === 'en') {
+    if (cleanStart && cleanEnd && cleanStart !== cleanEnd) {
+      return `${cleanStart} - ${cleanEnd}`;
+    }
+    if (cleanStart) {
+      return cleanStart;
+    }
+    return isExhibition ? 'Open Hours' : 'All Day';
+  }
+
+  // 日本語
+  if (cleanStart && cleanEnd && cleanStart !== cleanEnd) {
+    return `${cleanStart}〜${cleanEnd}`;
+  }
+  if (cleanStart) {
+    return cleanStart;
+  }
+  return isExhibition ? '随時開催' : '終日';
+}
+

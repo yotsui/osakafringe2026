@@ -21,8 +21,7 @@ import {
 import { TwitterIcon, InstagramIcon } from '@/components/common/SnsIcons';
 import { formatTicketPrice } from '@/utils/priceFormat';
 import { getArtistGenreLabel, getPerformanceGenreText } from '@/utils/genre';
-import { formatScheduleCompact, sortSchedules, deduplicateSchedules } from '@/utils/dateFormat';
-import { isPreFestivalSchedule } from '@/utils/performanceUtils';
+import { getVenueDateGroups } from '@/utils/venueScheduleUtils';
 
 interface VenueDetailClientProps {
   venue: Venue;
@@ -297,101 +296,178 @@ export default function VenueDetailClient({ venue, performances }: VenueDetailCl
             )}
 
             {/* Shows at this Venue */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-base font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-[#E6007E]" />
-                  <span>{t('showsAtVenue')} ({performances.length})</span>
-                </h2>
-                <Link
-                  href="/audience"
-                  className="text-xs font-bold text-[#E6007E] hover:underline"
-                >
-                  {t('viewAllAudience')} →
-                </Link>
-              </div>
+            {(() => {
+              const dateGroups = getVenueDateGroups(venue.id, performances, language);
+              const totalSessions = dateGroups.reduce((acc, g) => acc + g.sessions.length, 0);
 
-              {performances.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {performances.map((perf) => {
-                    const perfTitle = getText(perf.title, perf.titleEn);
-                    const perfArtist = getText(perf.artist?.name || perf.artistName, perf.artist?.nameEn || perf.artistNameEn);
-                    const perfPrice = formatTicketPrice(perf.ticketPrice, perf.ticketPriceEn, language);
-                    const matchingSchedules = (perf.schedules || []).filter((s) => {
-                      const sVenueId = s.venueId || s.venue?.id || perf.venueId || perf.venue?.id;
-                      return !sVenueId || sVenueId === venue.id;
-                    });
-                    const venueSchedules = deduplicateSchedules(
-                      sortSchedules(matchingSchedules.length > 0 ? matchingSchedules : (perf.schedules || []))
-                    );
+              return (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-base font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-[#E6007E]" />
+                      <span>{t('showsAtVenue')} ({totalSessions})</span>
+                    </h2>
+                    <Link
+                      href="/audience"
+                      className="text-xs font-bold text-[#E6007E] hover:underline"
+                    >
+                      {t('viewAllAudience')} →
+                    </Link>
+                  </div>
 
-                    return (
-                      <Link
-                        key={perf.id}
-                        href={`/performances/${perf.id}`}
-                        className="group p-4 rounded-2xl border border-pink-100 bg-white hover:border-[#E6007E] hover:shadow-md transition-all flex flex-col justify-between gap-3"
-                      >
-                        <div className="space-y-3">
-                          {/* Top: Left Photo / Right Genre, Artist, Title */}
-                          <div className="flex items-start gap-3">
-                            <ArtistThumbnail
-                              artist={perf.artist}
-                              sizeClassName="w-16 h-16 sm:w-20 sm:h-20"
-                              sizes="(max-width: 640px) 64px, 80px"
-                            />
-                            <div className="min-w-0 flex-1 space-y-1">
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                <span className="px-2 py-0.5 rounded bg-pink-100 text-[#E6007E] text-[10px] font-bold">
-                                  {getPerformanceGenreText(perf, language) || getArtistGenreLabel(perf.artist?.genre, language)}
-                                </span>
-                                <span className="text-xs font-bold text-[#E6007E] truncate">
-                                  {perfArtist}
-                                </span>
-                              </div>
-                              <h3 className="text-sm font-black text-slate-900 group-hover:text-[#E6007E] line-clamp-2 leading-snug transition-colors">
-                                {perfTitle}
-                              </h3>
-                            </div>
+                  {dateGroups.length > 0 ? (
+                    <div className="space-y-8">
+                      {dateGroups.map((group) => (
+                        <div key={group.dateKey} className="space-y-3">
+                          {/* Date Heading (18-20px Bold) */}
+                          <div className="flex items-center gap-2 pb-2 border-b-2 border-pink-100">
+                            <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-[#E6007E]" />
+                            <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+                              {group.heading}
+                            </h3>
+                            <span className="text-xs font-bold text-slate-400 ml-auto">
+                              {group.sessions.length} {language === 'ja' ? '公演' : (group.sessions.length === 1 ? 'show' : 'shows')}
+                            </span>
                           </div>
 
-                          {/* Schedules list wrapped below */}
-                          {venueSchedules.length > 0 && (
-                            <div className="flex flex-wrap gap-1.5 pt-0.5">
-                              {venueSchedules.map((s, sIdx) => (
-                                <span
-                                  key={sIdx}
-                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-slate-50 text-slate-700 border border-slate-200/80"
-                                >
-                                  {isPreFestivalSchedule(s) && (
-                                    <span className="text-[9px] font-black bg-purple-600 text-white px-1.5 py-0.2 rounded-xs">
-                                      {t('preFestival')}
-                                    </span>
-                                  )}
-                                  <span>{formatScheduleCompact(s, language)}</span>
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                        </div>
+                          {/* 1-Column Performance List */}
+                          <div className="space-y-3">
+                            {group.sessions.map((session) => {
+                              const perf = session.performance;
+                              const perfTitle = getText(perf.title, perf.titleEn);
+                              const perfArtist = getText(perf.artist?.name || perf.artistName, perf.artist?.nameEn || perf.artistNameEn);
+                              const perfPrice = formatTicketPrice(perf.ticketPrice, perf.ticketPriceEn, language);
 
-                        {/* Bottom: Price and Details */}
-                        <div className={`pt-2 border-t border-slate-100 flex items-center ${perfPrice ? 'justify-between' : 'justify-end'} text-xs`}>
-                          {perfPrice && <span className="font-bold text-slate-700">{perfPrice}</span>}
-                          <span className="font-black text-[#E6007E] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                            <span>{t('cardDetails')}</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
-                          </span>
+                              return (
+                                <Link
+                                  key={session.id}
+                                  href={`/performances/${perf.id}`}
+                                  className="group block p-4 sm:p-5 rounded-2xl border border-pink-100 bg-white hover:border-[#E6007E] hover:shadow-md transition-all"
+                                >
+                                  {/* PC Layout: [Time 24px] [Photo] [Info] [Price & Details] */}
+                                  <div className="hidden sm:flex sm:items-center sm:gap-6">
+                                    {/* 1. Time Column */}
+                                    <div className="w-48 shrink-0 space-y-1">
+                                      {session.isPreFestival && (
+                                        <span className="inline-block text-[10px] font-black bg-purple-600 text-white px-1.5 py-0.2 rounded-xs tracking-wider">
+                                          {t('preFestival')}
+                                        </span>
+                                      )}
+                                      <div className="text-2xl font-black text-slate-900 tabular-nums leading-tight">
+                                        {session.timeDisplay}
+                                      </div>
+                                      {session.schedule?.openTime && (
+                                        <div className="text-xs text-slate-500 font-medium">
+                                          {language === 'ja' ? `開場 ${session.schedule.openTime}` : `Doors ${session.schedule.openTime}`}
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    {/* 2. Photo */}
+                                    <div className="shrink-0">
+                                      <ArtistThumbnail
+                                        artist={perf.artist}
+                                        sizeClassName="w-20 h-20 sm:w-24 sm:h-24"
+                                        sizes="96px"
+                                      />
+                                    </div>
+
+                                    {/* 3. Performance Info */}
+                                    <div className="min-w-0 flex-1 space-y-1.5">
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        <span className="px-2.5 py-0.5 rounded bg-pink-100 text-[#E6007E] text-xs font-bold">
+                                          {getPerformanceGenreText(perf, language) || getArtistGenreLabel(perf.artist?.genre, language)}
+                                        </span>
+                                        <span className="text-sm sm:text-base font-bold text-[#E6007E] break-words">
+                                          {perfArtist}
+                                        </span>
+                                      </div>
+                                      <h4 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-[#E6007E] transition-colors leading-snug break-words">
+                                        {perfTitle}
+                                      </h4>
+                                    </div>
+
+                                    {/* 4. Price & Details */}
+                                    <div className="shrink-0 text-right space-y-2 pl-2">
+                                      {perfPrice && (
+                                        <div className="text-sm sm:text-base font-bold text-slate-800 tabular-nums">
+                                          {perfPrice}
+                                        </div>
+                                      )}
+                                      <div className="font-black text-xs sm:text-sm text-[#E6007E] flex items-center justify-end gap-1 group-hover:translate-x-1 transition-transform">
+                                        <span>{t('cardDetails')}</span>
+                                        <ArrowRight className="w-4 h-4" />
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Smartphone Layout: Time top, Photo & Info below */}
+                                  <div className="sm:hidden space-y-3">
+                                    {/* Time at top (20px bold) */}
+                                    <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-100">
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        {session.isPreFestival && (
+                                          <span className="text-[10px] font-black bg-purple-600 text-white px-1.5 py-0.2 rounded-xs">
+                                            {t('preFestival')}
+                                          </span>
+                                        )}
+                                        <span className="text-xl font-black text-slate-900 tabular-nums">
+                                          {session.timeDisplay}
+                                        </span>
+                                      </div>
+                                      {session.schedule?.openTime && (
+                                        <span className="text-[11px] text-slate-500 font-medium shrink-0">
+                                          {language === 'ja' ? `開場 ${session.schedule.openTime}` : `Doors ${session.schedule.openTime}`}
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    {/* Photo & Info */}
+                                    <div className="flex items-start gap-3">
+                                      <ArtistThumbnail
+                                        artist={perf.artist}
+                                        sizeClassName="w-20 h-20 shrink-0"
+                                        sizes="80px"
+                                      />
+                                      <div className="min-w-0 flex-1 space-y-1">
+                                        <div className="flex items-center gap-1.5 flex-wrap">
+                                          <span className="px-2 py-0.5 rounded bg-pink-100 text-[#E6007E] text-[10px] font-bold">
+                                            {getPerformanceGenreText(perf, language) || getArtistGenreLabel(perf.artist?.genre, language)}
+                                          </span>
+                                          <span className="text-xs font-bold text-[#E6007E] break-words">
+                                            {perfArtist}
+                                          </span>
+                                        </div>
+                                        <h4 className="text-sm sm:text-base font-black text-slate-900 group-hover:text-[#E6007E] transition-colors leading-snug break-words">
+                                          {perfTitle}
+                                        </h4>
+                                      </div>
+                                    </div>
+
+                                    {/* Bottom: Price and Details */}
+                                    <div className={`pt-2 border-t border-slate-100 flex items-center ${perfPrice ? 'justify-between' : 'justify-end'} text-xs`}>
+                                      {perfPrice && <span className="font-bold text-slate-700 tabular-nums">{perfPrice}</span>}
+                                      <span className="font-black text-[#E6007E] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                                        <span>{t('cardDetails')}</span>
+                                        <ArrowRight className="w-3.5 h-3.5" />
+                                      </span>
+                                    </div>
+                                  </div>
+                                </Link>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </Link>
-                    );
-                  })}
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-8 text-center rounded-2xl bg-slate-50 border border-slate-100 text-slate-400 text-xs">
+                      {t('noShowsScheduled')}
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="p-8 text-center rounded-2xl bg-slate-50 border border-slate-100 text-slate-400 text-xs">
-                  {t('noShowsScheduled')}
-                </div>
-              )}
-            </div>
+              );
+            })()}
 
             {/* Bottom Back Button */}
             <div className="pt-6 border-t border-slate-100 flex justify-center">
