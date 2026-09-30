@@ -372,7 +372,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
               return (
                 <div
                   key={venue.id}
-                  className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden hover:border-[#E6007E] transition-all duration-300 flex flex-col justify-between shadow-2xs hover:shadow-md"
+                  className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden hover:border-[#E6007E] transition-all duration-300 flex flex-col shadow-2xs hover:shadow-md"
                 >
                   <div className="space-y-4">
                     {/* Venue Photo with Typographic Overlay */}
@@ -595,7 +595,7 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
               return (
                 <div
                   key={venue.id}
-                  className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden hover:border-[#E6007E] transition-all duration-300 flex flex-col justify-between shadow-2xs hover:shadow-md"
+                  className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden hover:border-[#E6007E] transition-all duration-300 flex flex-col shadow-2xs hover:shadow-md"
                 >
                   <div className="space-y-4">
                     {/* Venue Photo with Typographic Overlay */}
@@ -717,7 +717,6 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
                     <div className="pt-3 border-t border-slate-100 space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                          <Sparkles className="w-3.5 h-3.5 text-[#E6007E]" />
                           <span>{t('venuePerformancesTitle')}</span>
                         </span>
                         <a
