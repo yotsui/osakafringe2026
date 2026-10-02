@@ -514,6 +514,155 @@ export async function backfillPartners(ctx: BackfillContext) {
   }
 }
 
+/**
+ * Normalizes a single value for microCMS PATCH/POST API.
+ * - Image object { url: string, ... } -> URL string
+ * - Content reference object { id: string, createdAt: string, ... } -> ID string
+ * - Primitives (string, number, boolean) -> preserved
+ * - Arrays -> normalized recursively
+ * - Custom objects / repeaters -> normalized recursively with fieldId retained
+ */
+export function normalizeValueForMicroCmsPatch(val: any): any {
+  if (val === null || val === undefined) {
+    return val;
+  }
+
+  // If it's a microCMS image object: has `url` and (width or height or microcms-assets url) and NOT a general content
+  if (
+    typeof val === 'object' &&
+    !Array.isArray(val) &&
+    typeof val.url === 'string' &&
+    (typeof val.width === 'number' || typeof val.height === 'number' || val.url.includes('microcms-assets.io') || Object.keys(val).every((k) => ['url', 'width', 'height'].includes(k)))
+  ) {
+    return val.url;
+  }
+
+  // If it's a microCMS content reference object: has `id` string and standard microCMS metadata like `createdAt` / `publishedAt`
+  if (
+    typeof val === 'object' &&
+    !Array.isArray(val) &&
+    typeof val.id === 'string' &&
+    (val.createdAt || val.publishedAt || val.revisedAt)
+  ) {
+    return val.id;
+  }
+
+  if (Array.isArray(val)) {
+    return val.map((item) => normalizeValueForMicroCmsPatch(item));
+  }
+
+  if (typeof val === 'object') {
+    const result: Record<string, any> = {};
+    for (const [k, v] of Object.entries(val)) {
+      if (['createdAt', 'updatedAt', 'publishedAt', 'revisedAt'].includes(k)) {
+        continue;
+      }
+      result[k] = normalizeValueForMicroCmsPatch(v);
+    }
+    return result;
+  }
+
+  return val;
+}
+
+export function extractBasePayload(item: any, enKeys: string[]): any {
+  if (item === null || item === undefined) return item;
+  const normalized = normalizeValueForMicroCmsPatch(item);
+  if (Array.isArray(normalized)) {
+    return normalized.map((i) => extractBasePayload(i, enKeys));
+  }
+  if (typeof normalized === 'object') {
+    const res: Record<string, any> = {};
+    for (const [k, v] of Object.entries(normalized)) {
+      if (enKeys.includes(k)) continue;
+      res[k] = extractBasePayload(v, enKeys);
+    }
+    return res;
+  }
+  return normalized;
+}
+
+export function mergeFreshRepeater(
+  initialItems: any[],
+  freshItems: any[],
+  plannedItems: any[],
+  enKeys: string[],
+  fieldName: string,
+  ctx: BackfillContext
+): any[] | null {
+  if (!Array.isArray(freshItems) || initialItems.length !== freshItems.length) {
+    console.warn(`  ⚠️ Site Info: ${fieldName} element count changed in microCMS during translation. Skipping update to avoid overwriting newer data. Please re-run the script.`);
+    return null;
+  }
+
+  const initialBase = JSON.stringify(extractBasePayload(initialItems, enKeys));
+  const freshBase = JSON.stringify(extractBasePayload(freshItems, enKeys));
+  if (initialBase !== freshBase) {
+    console.warn(`  ⚠️ Site Info: ${fieldName} content was modified in microCMS during translation. Skipping update to avoid overwriting newer data. Please re-run the script.`);
+    return null;
+  }
+
+  let hasNewEnglish = false;
+  const mergedItems = [];
+
+  for (let i = 0; i < freshItems.length; i++) {
+    const freshItem = freshItems[i] || {};
+    const plannedItem = plannedItems[i] || {};
+    const merged = { ...plannedItem };
+
+    for (const enKey of enKeys) {
+      if (isFilled(freshItem[enKey])) {
+        merged[enKey] = freshItem[enKey];
+        if (isFilled(plannedItem[enKey]) && plannedItem[enKey] !== freshItem[enKey]) {
+          ctx.stats.englishSkipped++;
+        }
+      } else if (isFilled(merged[enKey])) {
+        hasNewEnglish = true;
+      }
+    }
+    mergedItems.push(normalizeValueForMicroCmsPatch(merged));
+  }
+
+  return hasNewEnglish ? mergedItems : null;
+}
+
+export function mergeFreshObject(
+  initialObj: any,
+  freshObj: any,
+  plannedObj: any,
+  enKeys: string[],
+  fieldName: string,
+  ctx: BackfillContext
+): any | null {
+  if (!freshObj || typeof freshObj !== 'object') {
+    console.warn(`  ⚠️ Site Info: ${fieldName} was removed/modified in microCMS during translation. Skipping update to avoid overwriting newer data. Please re-run the script.`);
+    return null;
+  }
+
+  const initialBase = JSON.stringify(extractBasePayload(initialObj, enKeys));
+  const freshBase = JSON.stringify(extractBasePayload(freshObj, enKeys));
+  if (initialBase !== freshBase) {
+    console.warn(`  ⚠️ Site Info: ${fieldName} content was modified in microCMS during translation. Skipping update to avoid overwriting newer data. Please re-run the script.`);
+    return null;
+  }
+
+  let hasNewEnglish = false;
+  const merged = { ...plannedObj };
+
+  for (const enKey of enKeys) {
+    if (isFilled(freshObj[enKey])) {
+      merged[enKey] = freshObj[enKey];
+      if (isFilled(plannedObj[enKey]) && plannedObj[enKey] !== freshObj[enKey]) {
+        ctx.stats.englishSkipped++;
+      }
+    } else if (isFilled(merged[enKey])) {
+      hasNewEnglish = true;
+    }
+  }
+
+  return hasNewEnglish ? normalizeValueForMicroCmsPatch(merged) : null;
+}
+
 export async function backfillSiteInfo(ctx: BackfillContext) {
   console.log('\n[5/5] Processing Site Info...');
   try {
@@ -609,7 +758,7 @@ export async function backfillSiteInfo(ctx: BackfillContext) {
     }
 
     if (storiesChanged) {
-      patchData.donationStories = updatedStories;
+      patchData.donationStories = normalizeValueForMicroCmsPatch(updatedStories);
     }
 
     // 3. donationImpacts Repeater
@@ -657,7 +806,7 @@ export async function backfillSiteInfo(ctx: BackfillContext) {
     }
 
     if (impactsChanged) {
-      patchData.donationImpacts = updatedImpacts;
+      patchData.donationImpacts = normalizeValueForMicroCmsPatch(updatedImpacts);
     }
 
     // 4. awardsInfo Object
@@ -693,7 +842,7 @@ export async function backfillSiteInfo(ctx: BackfillContext) {
       }
 
       if (awardsInfoChanged) {
-        patchData.awardsInfo = updatedAwardsInfo;
+        patchData.awardsInfo = normalizeValueForMicroCmsPatch(updatedAwardsInfo);
       }
     }
 
@@ -740,7 +889,7 @@ export async function backfillSiteInfo(ctx: BackfillContext) {
       }
 
       if (sectionsChanged) {
-        patchData.awardsSections = updatedSections;
+        patchData.awardsSections = normalizeValueForMicroCmsPatch(updatedSections);
       }
     }
 
@@ -777,7 +926,7 @@ export async function backfillSiteInfo(ctx: BackfillContext) {
       }
 
       if (editorChanged) {
-        patchData.awardsEditor = updatedEditor;
+        patchData.awardsEditor = normalizeValueForMicroCmsPatch(updatedEditor);
       }
     }
 
@@ -821,23 +970,126 @@ export async function backfillSiteInfo(ctx: BackfillContext) {
       }
 
       if (membersChanged) {
-        patchData.awardsMembers = updatedMembers;
+        patchData.awardsMembers = normalizeValueForMicroCmsPatch(updatedMembers);
       }
     }
 
     // Perform patch if any changes
     if (Object.keys(patchData).length > 0) {
-      console.log(`  - Site Info summary: ${Object.keys(patchData).length} fields/repeaters updated.`);
+      console.log(`  - Site Info summary: ${Object.keys(patchData).length} fields/repeaters scheduled for update.`);
       if (!ctx.isDryRun) {
         try {
           // Re-fetch latest site_info to prevent race condition overwrite
           const freshRaw = await ctx.client.getObject({ endpoint: 'site_info' });
           const fresh = freshRaw?.siteTitle ? freshRaw : (Array.isArray(freshRaw?.contents) ? freshRaw.contents[0] : freshRaw);
 
+          // 1. Regular fields
           for (const [_, enKey] of regularFieldPairs) {
             if (patchData[enKey] && isFilled(fresh?.[enKey])) {
               delete patchData[enKey];
               ctx.stats.englishSkipped++;
+            }
+          }
+
+          // 2. donationStories
+          if (patchData.donationStories) {
+            const merged = mergeFreshRepeater(
+              existingStories,
+              fresh?.donationStories,
+              patchData.donationStories,
+              ['titleEn', 'textEn'],
+              'donationStories',
+              ctx
+            );
+            if (merged) {
+              patchData.donationStories = merged;
+            } else {
+              delete patchData.donationStories;
+            }
+          }
+
+          // 3. donationImpacts
+          if (patchData.donationImpacts) {
+            const merged = mergeFreshRepeater(
+              existingImpacts,
+              fresh?.donationImpacts,
+              patchData.donationImpacts,
+              ['titleEn', 'textEn'],
+              'donationImpacts',
+              ctx
+            );
+            if (merged) {
+              patchData.donationImpacts = merged;
+            } else {
+              delete patchData.donationImpacts;
+            }
+          }
+
+          // 4. awardsInfo
+          if (patchData.awardsInfo) {
+            const merged = mergeFreshObject(
+              info.awardsInfo,
+              fresh?.awardsInfo,
+              patchData.awardsInfo,
+              ['titleEn', 'taglineEn', 'summaryEn', 'noticeEn'],
+              'awardsInfo',
+              ctx
+            );
+            if (merged) {
+              patchData.awardsInfo = merged;
+            } else {
+              delete patchData.awardsInfo;
+            }
+          }
+
+          // 5. awardsSections
+          if (patchData.awardsSections) {
+            const merged = mergeFreshRepeater(
+              info.awardsSections,
+              fresh?.awardsSections,
+              patchData.awardsSections,
+              ['titleEn', 'textEn'],
+              'awardsSections',
+              ctx
+            );
+            if (merged) {
+              patchData.awardsSections = merged;
+            } else {
+              delete patchData.awardsSections;
+            }
+          }
+
+          // 6. awardsEditor
+          if (patchData.awardsEditor) {
+            const merged = mergeFreshObject(
+              info.awardsEditor,
+              fresh?.awardsEditor,
+              patchData.awardsEditor,
+              ['nameEn', 'roleEn', 'titleEn', 'profileEn'],
+              'awardsEditor',
+              ctx
+            );
+            if (merged) {
+              patchData.awardsEditor = merged;
+            } else {
+              delete patchData.awardsEditor;
+            }
+          }
+
+          // 7. awardsMembers
+          if (patchData.awardsMembers) {
+            const merged = mergeFreshRepeater(
+              info.awardsMembers,
+              fresh?.awardsMembers,
+              patchData.awardsMembers,
+              ['nameEn', 'roleEn', 'titleEn', 'profileEn'],
+              'awardsMembers',
+              ctx
+            );
+            if (merged) {
+              patchData.awardsMembers = merged;
+            } else {
+              delete patchData.awardsMembers;
             }
           }
 
@@ -857,7 +1109,7 @@ export async function backfillSiteInfo(ctx: BackfillContext) {
             ctx.stats.writesCount++;
             console.log(`    ✅ Updated site_info (${targetContentId || 'object'})`);
           } else {
-            console.log('    ℹ️ Site Info: Fresh data already contains all translations; write skipped.');
+            console.log('    ℹ️ Site Info: Fresh data already contains all translations (or was skipped due to conflict); write skipped.');
           }
         } catch (err: any) {
           ctx.stats.updateFailed++;

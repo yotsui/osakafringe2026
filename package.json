@@ -11,6 +11,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "node --test --experimental-strip-types \"tests/*.test.ts\"",
+    "translate": "node --experimental-strip-types scripts/backfillTranslations.ts",
     "translate:backfill": "node --experimental-strip-types scripts/backfillTranslations.ts"
   },
   "dependencies": {

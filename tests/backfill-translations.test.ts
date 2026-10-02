@@ -174,7 +174,7 @@ describe('Translation Backfill Tests', () => {
     assert.strictEqual(ctx.stats.awardsSectionsScheduled, 3);
   });
 
-  it('4. awardsEditor: translates editor fields and preserves photo', async () => {
+  it('4. awardsEditor: translates editor fields and normalizes photo object to URL string', async () => {
     let updatedPayload: SiteInfoUpdatePayload | null = null;
     const mockClient = {
       getObject: async () => ({
@@ -185,7 +185,11 @@ describe('Translation Backfill Tests', () => {
           role: '編集長',
           title: '演劇評論家',
           profile: 'プロフィール文章',
-          photo: { url: 'https://images.microcms-assets.io/editor.jpg' },
+          photo: {
+            url: 'https://images.microcms-assets.io/editor.jpg',
+            width: 800,
+            height: 600,
+          },
         },
       }),
       update: async (args: { endpoint: string; contentId?: string; content: SiteInfoUpdatePayload }) => {
@@ -209,12 +213,13 @@ describe('Translation Backfill Tests', () => {
     assert.strictEqual(editor.roleEn, 'EN: 編集長');
     assert.strictEqual(editor.titleEn, 'EN: 演劇評論家');
     assert.strictEqual(editor.profileEn, 'EN: プロフィール文章');
-    assert.deepStrictEqual(editor.photo, { url: 'https://images.microcms-assets.io/editor.jpg' });
+    // Photo must be normalized to string URL for microCMS update API
+    assert.strictEqual(editor.photo, 'https://images.microcms-assets.io/editor.jpg');
     assert.strictEqual(editor.fieldId, 'editorField');
     assert.strictEqual(ctx.stats.awardsEditorScheduled, 4);
   });
 
-  it('5. awardsMembers: translates members, preserves order and photos', async () => {
+  it('5. awardsMembers: translates members, preserves order, and normalizes photos', async () => {
     let updatedPayload: SiteInfoUpdatePayload | null = null;
     const mockClient = {
       getObject: async () => ({
@@ -226,7 +231,11 @@ describe('Translation Backfill Tests', () => {
             role: '審査員',
             title: 'ディレクター',
             profile: 'プロフィールA',
-            photo: 'https://images.microcms-assets.io/a.jpg',
+            photo: {
+              url: 'https://images.microcms-assets.io/a.jpg',
+              width: 1200,
+              height: 900,
+            },
           },
           {
             fieldId: 'mem2',
@@ -261,9 +270,12 @@ describe('Translation Backfill Tests', () => {
     assert.strictEqual(members[0].titleEn, 'EN: ディレクター');
     assert.strictEqual(members[0].profileEn, 'EN: プロフィールA');
     assert.strictEqual(members[0].photo, 'https://images.microcms-assets.io/a.jpg');
+    assert.strictEqual(members[0].fieldId, 'mem1');
     assert.strictEqual(members[1].nameEn, 'Member B');
     assert.strictEqual(members[1].roleEn, 'EN: 審査員');
     assert.strictEqual(members[1].profileEn, 'EN: プロフィールB');
+    assert.strictEqual(members[1].photo, undefined);
+    assert.strictEqual(members[1].fieldId, 'mem2');
     assert.strictEqual(ctx.stats.awardsMembersScheduled, 6);
   });
 
@@ -433,4 +445,220 @@ describe('Translation Backfill Tests', () => {
     const result = await runBackfill(ctx);
     assert.strictEqual(result, false, 'runBackfill should return false on errors');
   });
+
+  it('10. awardsMembers conflict handling: skips update if members changed in CMS during translation', async () => {
+    let updateCalled = false;
+    let callCount = 0;
+    const initialMembers = [
+      {
+        fieldId: 'awardperson',
+        name: '服部滋樹',
+        role: 'Awards Editor',
+        title: 'graf代表',
+        profile: '初期プロフィール',
+      },
+    ];
+
+    // CMS data changed remotely while translation was in-flight (member changed text)
+    const freshMembers = [
+      {
+        fieldId: 'awardperson',
+        name: '服部滋樹',
+        role: 'Awards Editor',
+        title: 'graf代表',
+        profile: 'CMS側で更新された最新プロフィール',
+      },
+    ];
+
+    const mockClient = {
+      getObject: async () => {
+        callCount++;
+        return {
+          id: 'site_info_id',
+          awardsMembers: callCount === 1 ? initialMembers : freshMembers,
+        };
+      },
+      update: async () => {
+        updateCalled = true;
+      },
+    };
+
+    const ctx: BackfillContext = {
+      client: mockClient,
+      stats: createDefaultStats(),
+      isDryRun: false,
+      translator: async (text) => `EN: ${text}`,
+    };
+
+    await backfillSiteInfo(ctx);
+
+    // Update must be skipped because CMS data was modified
+    assert.strictEqual(updateCalled, false, 'Should not overwrite changed CMS data');
+  });
+
+  it('11. awardsMembers fresh merge: adopts English filled in CMS and does not overwrite it', async () => {
+    let updatedPayload: SiteInfoUpdatePayload | null = null;
+    let callCount = 0;
+    const initialMembers = [
+      {
+        fieldId: 'awardperson',
+        name: '服部滋樹',
+        role: 'Awards Editor',
+        title: 'graf代表',
+        profile: 'プロフィール',
+      },
+    ];
+
+    // Someone filled in nameEn remotely in CMS during translation
+    const freshMembers = [
+      {
+        fieldId: 'awardperson',
+        name: '服部滋樹',
+        nameEn: 'Shigeki Hattori (from CMS)',
+        role: 'Awards Editor',
+        title: 'graf代表',
+        profile: 'プロフィール',
+      },
+    ];
+
+    const mockClient = {
+      getObject: async () => {
+        callCount++;
+        return {
+          id: 'site_info_id',
+          awardsMembers: callCount === 1 ? initialMembers : freshMembers,
+        };
+      },
+      update: async (args: { endpoint: string; contentId?: string; content: SiteInfoUpdatePayload }) => {
+        updatedPayload = args.content;
+      },
+    };
+
+    const ctx: BackfillContext = {
+      client: mockClient,
+      stats: createDefaultStats(),
+      isDryRun: false,
+      translator: async (text) => `EN: ${text}`,
+    };
+
+    await backfillSiteInfo(ctx);
+
+    assert.ok(updatedPayload);
+    const members = (updatedPayload as SiteInfoUpdatePayload).awardsMembers;
+    assert.ok(members);
+    assert.strictEqual(members[0].nameEn, 'Shigeki Hattori (from CMS)', 'Should retain fresh EN from CMS');
+    assert.strictEqual(members[0].roleEn, 'EN: Awards Editor');
+    assert.strictEqual(members[0].profileEn, 'EN: プロフィール');
+    assert.strictEqual(ctx.stats.englishSkipped, 1);
+  });
+
+  it('12. donationStories and donationImpacts: preserves select arrays and labels upon normalization', async () => {
+    let updatedPayload: Record<string, Array<Record<string, unknown>>> | null = null;
+    const mockClient = {
+      getObject: async () => ({
+        id: 'site_info_id',
+        donationStories: [
+          {
+            fieldId: 'donationstory',
+            sectionKey: ['PREFORM'],
+            title: '寄付ストーリー',
+            text: '本文テキスト',
+          },
+        ],
+        donationImpacts: [
+          {
+            fieldId: 'donationimpact',
+            label: 'CREATE OPPORTUNITIES',
+            title: 'インパクト見出し',
+            text: 'インパクト本文',
+          },
+        ],
+      }),
+      update: async (args: { endpoint: string; contentId?: string; content: Record<string, Array<Record<string, unknown>>> }) => {
+        updatedPayload = args.content;
+      },
+    };
+
+    const ctx: BackfillContext = {
+      client: mockClient,
+      stats: createDefaultStats(),
+      isDryRun: false,
+      translator: async (text) => `EN: ${text}`,
+    };
+
+    await backfillSiteInfo(ctx);
+
+    assert.ok(updatedPayload);
+    const payload = updatedPayload as Record<string, Array<Record<string, unknown>>>;
+    const story = payload.donationStories[0];
+    assert.strictEqual(story.fieldId, 'donationstory');
+    assert.deepStrictEqual(story.sectionKey, ['PREFORM']);
+    assert.strictEqual(story.titleEn, 'EN: 寄付ストーリー');
+    assert.strictEqual(story.textEn, 'EN: 本文テキスト');
+
+    const impact = payload.donationImpacts[0];
+    assert.strictEqual(impact.fieldId, 'donationimpact');
+    assert.strictEqual(impact.label, 'CREATE OPPORTUNITIES');
+    assert.strictEqual(impact.titleEn, 'EN: インパクト見出し');
+    assert.strictEqual(impact.textEn, 'EN: インパクト本文');
+  });
+
+  it('13. dry-run mode: does not invoke update and does not increment writesCount', async () => {
+    let updateCalled = false;
+    const mockClient = {
+      getObject: async () => ({
+        id: 'site_info_id',
+        awardsMembers: [
+          {
+            fieldId: 'awardperson',
+            name: '服部滋樹',
+            role: 'Awards Editor',
+            title: 'graf代表',
+            profile: 'プロフィール',
+          },
+        ],
+      }),
+      update: async () => {
+        updateCalled = true;
+      },
+    };
+
+    const ctx: BackfillContext = {
+      client: mockClient,
+      stats: createDefaultStats(),
+      isDryRun: true,
+      translator: async (text) => `EN: ${text}`,
+    };
+
+    await backfillSiteInfo(ctx);
+
+    assert.strictEqual(updateCalled, false);
+    assert.strictEqual(ctx.stats.writesCount, 0);
+  });
+
+  it('14. write error handling: update failure increments updateFailed and does not increment writesCount', async () => {
+    const mockClient = {
+      getObject: async () => ({
+        id: 'site_info_id',
+        siteTitle: '大阪フリンジ',
+        siteTitleEn: '',
+      }),
+      update: async () => {
+        throw new Error('microCMS API 400 Bad Request');
+      },
+    };
+
+    const ctx: BackfillContext = {
+      client: mockClient,
+      stats: createDefaultStats(),
+      isDryRun: false,
+      translator: async (text) => `EN: ${text}`,
+    };
+
+    await backfillSiteInfo(ctx);
+
+    assert.strictEqual(ctx.stats.writesCount, 0, 'writesCount should remain 0 on error');
+    assert.strictEqual(ctx.stats.updateFailed, 1, 'updateFailed should be incremented');
+  });
 });
+
