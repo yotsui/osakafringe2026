@@ -220,7 +220,7 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
                     href={`/artists/${performance.artist.id}`}
                     className="text-pink-300 hover:text-white text-xs sm:text-sm font-black tracking-wider uppercase drop-shadow-sm hover:underline"
                   >
-                    {artistName} →
+                    {artistName}
                   </Link>
                 ) : (
                   <p className="text-pink-300 text-xs sm:text-sm font-black tracking-wider uppercase drop-shadow-sm">
