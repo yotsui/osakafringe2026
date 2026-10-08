@@ -84,7 +84,46 @@ export default function AwardsClient({ siteInfo }: AwardsClientProps) {
           </section>
         )}
 
-        {/* 3. Editor-in-Chief Introduction */}
+        {/* 3. Nomination Section */}
+        <section
+          className="bg-white text-slate-900 rounded-3xl p-8 sm:p-12 border-2 border-pink-200/90 shadow-lg shadow-pink-500/5 space-y-6"
+          aria-label={t('awardsNominateHeading')}
+        >
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-50 text-[#E6007E] text-xs font-black uppercase tracking-wide">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>OSAKA FRINGE AWARDS 2026</span>
+            </div>
+
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight border-l-4 border-[#E6007E] pl-4 leading-snug">
+              {t('awardsNominateHeading')}
+            </h2>
+
+            <div className="space-y-4 text-base sm:text-lg text-slate-700 font-normal leading-relaxed">
+              <p className="whitespace-pre-line">
+                {t('awardsNominateP1')}
+              </p>
+              <p className="font-bold text-slate-900">
+                {t('awardsNominateP2')}
+              </p>
+              <div className="bg-pink-50/60 border border-pink-100 rounded-2xl p-5 sm:p-6 text-sm sm:text-base text-slate-700 leading-relaxed whitespace-pre-line">
+                {t('awardsNominateP3')}
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-2">
+            <Link
+              href="/vote"
+              className="inline-flex items-center justify-center gap-3 w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 rounded-2xl bg-[#E6007E] hover:bg-[#c4006b] text-white font-black text-base sm:text-lg tracking-wide shadow-xl shadow-pink-500/20 hover:-translate-y-0.5 transition-all cursor-pointer group text-center"
+            >
+              <span>{t('awardsNominateBtn')}</span>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+        </section>
+
+        {/* 4. Editor-in-Chief Introduction */}
         {editor && (editor.name || editor.role) && (
           <section className="bg-white text-slate-900 rounded-3xl p-8 sm:p-12 border border-slate-200/80 shadow-xs space-y-6">
             <div className="flex items-center gap-2 text-xs font-black text-[#E6007E] uppercase tracking-widest border-b border-slate-100 pb-3">
@@ -133,7 +172,7 @@ export default function AwardsClient({ siteInfo }: AwardsClientProps) {
           </section>
         )}
 
-        {/* 4. Editorial Team Members (Only rendered if members > 0) */}
+        {/* 5. Editorial Team Members (Only rendered if members > 0) */}
         {members.length > 0 && (
           <section className="bg-white text-slate-900 rounded-3xl p-8 sm:p-12 border border-slate-200/80 shadow-xs space-y-8">
             <div className="space-y-2 border-b border-slate-100 pb-4">
@@ -196,7 +235,7 @@ export default function AwardsClient({ siteInfo }: AwardsClientProps) {
           </section>
         )}
 
-        {/* 5. Upcoming Notice (If available) */}
+        {/* 6. Upcoming Notice (If available) */}
         {notice && (
           <aside className="bg-pink-50/60 border border-pink-200/80 rounded-3xl p-8 sm:p-10 text-slate-900 space-y-4">
             <div className="flex items-center gap-2 text-xs font-black text-[#E6007E] uppercase tracking-widest">
@@ -209,7 +248,7 @@ export default function AwardsClient({ siteInfo }: AwardsClientProps) {
           </aside>
         )}
 
-        {/* 6. CTA: Find Shows */}
+        {/* 7. CTA: Find Shows */}
         <div className="text-center pt-4">
           <Link
             href="/audience"

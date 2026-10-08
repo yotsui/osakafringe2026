@@ -177,14 +177,42 @@ export default function HomeClient({
                 </div>
               )}
 
-              <div className="pt-2">
+              <div className="pt-1">
                 <Link
                   href="/awards"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#E6007E] hover:bg-[#c4006b] text-white text-sm font-black tracking-wide shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-pink-50 hover:bg-pink-100/80 text-[#E6007E] hover:text-[#c4006b] text-sm font-bold tracking-wide transition-colors cursor-pointer group"
                 >
                   <span>{t('aboutAwardsBtn')}</span>
                   <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
+              </div>
+            </div>
+
+            {/* Nomination CTA Card */}
+            <div className="pt-6 border-t border-pink-100">
+              <div className="bg-white border-2 border-pink-200/80 rounded-2xl p-6 sm:p-8 space-y-4 shadow-sm">
+                <div className="space-y-2">
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                    {t('homeNominateTitle')}
+                  </h3>
+                  <p className="text-sm sm:text-base text-slate-700 font-medium leading-relaxed whitespace-pre-line">
+                    {t('homeNominateText')}
+                  </p>
+                </div>
+
+                <div className="pt-1">
+                  <Link
+                    href="/vote"
+                    className="inline-flex items-center justify-center gap-2.5 w-full sm:w-auto px-8 py-4 rounded-2xl bg-[#E6007E] hover:bg-[#c4006b] text-white text-base font-black tracking-wide shadow-lg shadow-pink-500/20 hover:-translate-y-0.5 transition-all cursor-pointer group text-center"
+                  >
+                    <span>{t('homeNominateBtn')}</span>
+                    <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </div>
+
+                <p className="text-xs text-slate-500 font-medium leading-relaxed pt-1">
+                  {t('homeNominateNote')}
+                </p>
               </div>
             </div>
           </div>

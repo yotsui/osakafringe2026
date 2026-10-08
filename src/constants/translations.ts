@@ -25,6 +25,33 @@ export const translations: Dictionary = {
   awardsFindShowsBtn: { ja: '公演を探す', en: 'Find Shows' },
   awardsUpcomingTitle: { ja: '今後のご案内', en: 'Upcoming Information' },
 
+  // Awards Nomination (Home & Awards Page)
+  homeNominateTitle: { ja: 'OSAKA FRINGE AWARDS 2026', en: 'OSAKA FRINGE AWARDS 2026' },
+  homeNominateText: {
+    ja: 'あなたが「もっと多くの人に知ってほしい」と感じた\nアーティスト・団体を教えてください。\n自薦・他薦、どちらでも推薦できます。',
+    en: 'Tell us about the artists or groups you would love more people to discover.\nBoth self-nominations and third-party recommendations are welcome.',
+  },
+  homeNominateBtn: { ja: 'アワード候補を推薦する', en: 'Recommend Award Nominees' },
+  homeNominateNote: {
+    ja: '※推薦は人気投票ではありません。推薦数による投票・加点は行わず、Award編集部が候補を検討するための参考情報として使用します。',
+    en: '* Nominations are not a popularity poll. The number of recommendations is not counted as votes or score points; it serves as reference information for the Award Editorial Team to consider candidates.',
+  },
+
+  awardsNominateHeading: { ja: 'アワード候補を推薦する', en: 'Recommend Award Nominees' },
+  awardsNominateP1: {
+    ja: 'OSAKA FRINGE AWARDS 2026では、審査委員・Award編集部が候補を検討する際の参考として、アーティスト・団体の推薦を受け付けています。',
+    en: 'At OSAKA FRINGE AWARDS 2026, we welcome recommendations of artists and groups as reference material for the jury and Award Editorial Team to consider candidates.',
+  },
+  awardsNominateP2: {
+    ja: '自薦・他薦、いずれも可能です。',
+    en: 'Both self-nominations and third-party recommendations are welcome.',
+  },
+  awardsNominateP3: {
+    ja: '本フォームは人気投票ではありません。推薦数だけで順位や受賞を決定するものではなく、推薦数そのものが審査上の得点になることもありません。\n\n同一のアーティスト・団体に複数の推薦があった場合も、推薦数による投票・加点は行いません。推薦内容は、Award編集部が候補を検討するための情報として使用します。',
+    en: 'This form is not a popularity contest. Rankings or awards are not determined solely by the number of recommendations, nor does the count itself count as score points in the judging process.\n\nEven if multiple recommendations are received for the same artist or group, votes or points based on count will not be given. The submitted details will be used as reference information for the Award Editorial Team to evaluate candidates.',
+  },
+  awardsNominateBtn: { ja: 'アーティスト・団体を推薦する', en: 'Recommend Artists & Groups' },
+
   
   // Brand Assets & Logo Download
   aboutBrandAssetsBadge: { ja: 'BRAND ASSETS', en: 'BRAND ASSETS' },
