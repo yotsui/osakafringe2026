@@ -222,40 +222,40 @@ export default function AudienceApp({
 
       {/* Main Tabs (Search / Map / Favorites) */}
       <div className="flex items-center justify-center">
-        <div className="flex p-1.5 rounded-2xl bg-slate-100 border border-slate-200 shadow-inner max-w-md w-full">
+        <div className="grid grid-cols-3 p-1 sm:p-1.5 rounded-2xl bg-slate-100 border border-slate-200 shadow-inner max-w-md w-full">
           <button
             onClick={() => setActiveTab('search')}
-            className={`flex-1 py-2.5 px-3 rounded-xl text-sm font-black flex items-center justify-center gap-1.5 transition-all min-h-[44px] ${
+            className={`py-2 sm:py-2.5 px-1.5 sm:px-3 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center gap-1 sm:gap-1.5 transition-all min-h-[44px] whitespace-nowrap ${
               activeTab === 'search'
                 ? 'bg-white text-pink-600 shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Layers className="w-4 h-4" />
+            <Layers className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span>{t('tabSearch')}</span>
           </button>
 
           <button
             onClick={() => setActiveTab('map')}
-            className={`flex-1 py-2.5 px-3 rounded-xl text-sm font-black flex items-center justify-center gap-1.5 transition-all min-h-[44px] ${
+            className={`py-2 sm:py-2.5 px-1.5 sm:px-3 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center gap-1 sm:gap-1.5 transition-all min-h-[44px] whitespace-nowrap ${
               activeTab === 'map'
                 ? 'bg-white text-pink-600 shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <MapIcon className="w-4 h-4" />
+            <MapIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span>{t('tabMap')}</span>
           </button>
 
           <button
             onClick={() => setActiveTab('favorites')}
-            className={`flex-1 py-2.5 px-3 rounded-xl text-sm font-black flex items-center justify-center gap-1.5 transition-all min-h-[44px] ${
+            className={`py-2 sm:py-2.5 px-1.5 sm:px-3 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center gap-1 sm:gap-1.5 transition-all min-h-[44px] whitespace-nowrap ${
               activeTab === 'favorites'
                 ? 'bg-pink-600 text-white shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Heart className="w-4 h-4" />
+            <Heart className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span>{t('tabFavorites')} ({favorites.length})</span>
           </button>
         </div>
