@@ -51,6 +51,13 @@ export const translations: Dictionary = {
     en: 'This form is not a popularity contest. Rankings or awards are not determined solely by the number of recommendations, nor does the count itself count as score points in the judging process.\n\nEven if multiple recommendations are received for the same artist or group, votes or points based on count will not be given. The submitted details will be used as reference information for the Award Editorial Team to evaluate candidates.',
   },
   awardsNominateBtn: { ja: 'アーティスト・団体を推薦する', en: 'Recommend Artists & Groups' },
+  awardsNominateNoteHeading: { ja: '※ ご確認ください（人気投票ではありません）', en: '* Please Note (Not a Popularity Contest)' },
+  awardsEditorialDirectorRole: { ja: 'アワード編集長', en: 'AWARDS EDITORIAL DIRECTOR' },
+  awardsDirectorSectionTitle: { ja: 'アワード編集長・選考関係者', en: 'Awards Director & Editorial Team' },
+  awardsAboutTitle: { ja: 'OSAKA FRINGE AWARDSとは', en: 'About OSAKA FRINGE AWARDS' },
+  awardsSelectionTitle: { ja: '審査・選考について', en: 'Judging & Selection' },
+  awardsPerspectivesTitle: { ja: 'アワードの考え方・特徴', en: 'Vision & Features' },
+  awardsBottomNominatePrompt: { ja: '気になるアーティスト・団体を推薦する', en: 'Recommend Artists & Groups You Love' },
 
   
   // Brand Assets & Logo Download
