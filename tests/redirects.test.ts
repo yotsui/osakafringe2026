@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import nextConfig from '../next.config.ts';
 
 describe('Redirects configuration', () => {
-  it('defines redirects for /reception and /vote with permanent: false (307/302)', async () => {
+  it('defines redirects for /reception, /vote, and /closing with permanent: false (307/302)', async () => {
     assert.ok(typeof nextConfig.redirects === 'function', 'redirects function must be defined');
     const redirects = await nextConfig.redirects();
 
@@ -22,6 +22,14 @@ describe('Redirects configuration', () => {
       'https://docs.google.com/forms/d/e/1FAIpQLSetzOadXi8HlLxe1J696puFOrkUdcplkCy5WkLgFGTvwe6KHA/viewform?usp=dialog'
     );
     assert.equal(voteRedirect.permanent, false);
+
+    const closingRedirect = redirects.find((r) => r.source === '/closing');
+    assert.ok(closingRedirect, '/closing redirect should exist');
+    assert.equal(
+      closingRedirect.destination,
+      'https://forms.gle/jCkfQxfd5dVE8vsP8'
+    );
+    assert.equal(closingRedirect.permanent, false);
   });
 
   it('verifies redirect URL building preserves query parameters', () => {

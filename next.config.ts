@@ -41,6 +41,11 @@ const nextConfig: NextConfig = {
         destination: 'https://docs.google.com/forms/d/e/1FAIpQLSetzOadXi8HlLxe1J696puFOrkUdcplkCy5WkLgFGTvwe6KHA/viewform?usp=dialog',
         permanent: false,
       },
+      {
+        source: '/closing',
+        destination: 'https://forms.gle/jCkfQxfd5dVE8vsP8',
+        permanent: false,
+      },
     ];
   },
   async headers() {
