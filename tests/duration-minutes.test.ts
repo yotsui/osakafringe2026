@@ -3,6 +3,7 @@ import { describe, it } from 'node:test';
 import { normalizeDurationMinutes, normalizePerformance } from '../src/lib/microcms.ts';
 import {
   getPerformanceTimingInfo,
+  selectFeaturedPerformances,
   sortPerformances,
 } from '../src/utils/performanceUtils.ts';
 import { formatScheduleCompact, formatScheduleDetailed } from '../src/utils/dateFormat.ts';
@@ -107,7 +108,7 @@ describe('durationMinutes text specification tests', () => {
     });
 
     it('sorting and featured selection are unaffected by durationMinutes', () => {
-      const perfs: Performance[] = [
+      const perfsA: Performance[] = [
         {
           id: 'p1',
           title: 'Show 1',
@@ -124,9 +125,42 @@ describe('durationMinutes text specification tests', () => {
         },
       ];
 
-      const sorted = sortPerformances(perfs, 'date');
-      assert.strictEqual(sorted[0].id, 'p2');
-      assert.strictEqual(sorted[1].id, 'p1');
+      const perfsB: Performance[] = [
+        {
+          id: 'p1',
+          title: 'Show 1',
+          description: 'Desc 1',
+          durationMinutes: '未定',
+          schedules: [{ date: '2026-10-12', startTime: '10:00' }],
+        },
+        {
+          id: 'p2',
+          title: 'Show 2',
+          description: 'Desc 2',
+          durationMinutes: undefined,
+          schedules: [{ date: '2026-10-10', startTime: '10:00' }],
+        },
+      ];
+
+      const fixedNow = new Date('2026-10-09T12:00:00+09:00');
+      const sortedA = sortPerformances(perfsA, 'date', 'ja', 'all', fixedNow);
+      const sortedB = sortPerformances(perfsB, 'date', 'ja', 'all', fixedNow);
+
+      assert.strictEqual(sortedA[0].id, 'p2');
+      assert.strictEqual(sortedA[1].id, 'p1');
+      assert.deepStrictEqual(
+        sortedA.map((p) => p.id),
+        sortedB.map((p) => p.id)
+      );
+
+      const featuredA = selectFeaturedPerformances(perfsA, 6, fixedNow);
+      const featuredB = selectFeaturedPerformances(perfsB, 6, fixedNow);
+      assert.strictEqual(featuredA[0].id, 'p2');
+      assert.strictEqual(featuredA[1].id, 'p1');
+      assert.deepStrictEqual(
+        featuredA.map((p) => p.id),
+        featuredB.map((p) => p.id)
+      );
     });
 
     it('dateFormat output relies solely on schedule date and time, never on durationMinutes', () => {
