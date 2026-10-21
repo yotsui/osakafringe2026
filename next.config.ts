@@ -42,7 +42,7 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
       {
-        source: '/closing',
+        source: '/closing2026',
         destination: 'https://forms.gle/jCkfQxfd5dVE8vsP8',
         permanent: false,
       },
