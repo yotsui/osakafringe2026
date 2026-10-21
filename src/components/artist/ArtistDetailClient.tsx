@@ -302,10 +302,9 @@ export default function ArtistDetailClient({ artist, performances }: ArtistDetai
 
                                 {allSchedules.length > 0 && (
                                   <div className="pt-1 space-y-1.5">
-                                    {allSchedules.map((schedule) => {
+                                    {allSchedules.map((schedule, idx) => {
                                       const formattedDate = formatScheduleDetailed(
-                                        schedule.startTime,
-                                        schedule.endTime,
+                                        schedule,
                                         language
                                       );
                                       const sVenueName =
@@ -313,14 +312,11 @@ export default function ArtistDetailClient({ artist, performances }: ArtistDetai
                                           schedule.venue?.name || schedule.venueName,
                                           schedule.venue?.nameEn || schedule.venueNameEn
                                         ) || perfVenue;
-                                      const isPreSchedule = isPreFestivalSchedule(
-                                        schedule.startTime,
-                                        perf.isPreFestival
-                                      );
+                                      const isPreSchedule = isPreFestivalSchedule(schedule);
 
                                       return (
                                         <div
-                                          key={schedule.id}
+                                          key={schedule.id || idx}
                                           className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-100 text-xs"
                                         >
                                           <div className="flex items-center gap-1.5 flex-wrap">
