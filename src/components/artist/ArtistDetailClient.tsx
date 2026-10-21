@@ -17,6 +17,8 @@ import {
   Check
 } from 'lucide-react';
 import { TwitterIcon, InstagramIcon, YoutubeIcon } from '@/components/common/SnsIcons';
+import { formatScheduleDetailed, sortSchedules, deduplicateSchedules } from '@/utils/dateFormat';
+import { isPreFestivalSchedule } from '@/utils/performanceUtils';
 import { formatTicketPrice } from '@/utils/priceFormat';
 import { getArtistGenreLabel, getPerformanceGenreText } from '@/utils/genre';
 
@@ -232,65 +234,137 @@ export default function ArtistDetailClient({ artist, performances }: ArtistDetai
 
             {/* Performances by this Artist */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-base font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-[#E6007E]" />
-                  <span>{t('artistShowsTitle')} ({performances.length})</span>
-                </h2>
-                <Link
-                  href="/audience"
-                  className="text-xs font-bold text-[#E6007E] hover:underline"
-                >
-                  {t('viewAllAudience')} →
-                </Link>
-              </div>
+              {(() => {
+                const totalShowsCount = performances.reduce((sum, perf) => {
+                  const schedules = deduplicateSchedules(sortSchedules(perf.schedules || []));
+                  return sum + (schedules.length > 0 ? schedules.length : 1);
+                }, 0);
 
-              {performances.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {performances.map((perf) => {
-                    const perfTitle = getText(perf.title, perf.titleEn);
-                    const perfVenue = getText(perf.venue?.name || perf.venueName, perf.venue?.nameEn || perf.venueNameEn);
-                    const perfPrice = formatTicketPrice(perf.ticketPrice, perf.ticketPriceEn, language);
-
-                    return (
+                return (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-base font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-[#E6007E]" />
+                        <span>{t('artistShowsTitle')} ({totalShowsCount})</span>
+                      </h2>
                       <Link
-                        key={perf.id}
-                        href={`/performances/${perf.id}`}
-                        className="group p-4 rounded-2xl border border-pink-100 bg-white hover:border-[#E6007E] hover:shadow-md transition-all flex flex-col justify-between space-y-3"
+                        href="/audience"
+                        className="text-xs font-bold text-[#E6007E] hover:underline"
                       >
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <span className="px-2 py-0.5 rounded bg-pink-100 text-[#E6007E] text-[10px] font-bold">
-                              {getPerformanceGenreText(perf, language) || getArtistGenreLabel(perf.artist?.genre || artist.genre, language)}
-                            </span>
-                            {perfVenue && (
-                              <span className="text-xs text-slate-500 font-medium truncate flex items-center gap-1">
-                                <MapPin className="w-3 h-3 text-[#E6007E]" />
-                                {perfVenue}
-                              </span>
-                            )}
-                          </div>
-                          <h3 className="text-sm font-black text-slate-900 group-hover:text-[#E6007E] line-clamp-2 leading-snug transition-colors">
-                            {perfTitle}
-                          </h3>
-                        </div>
-
-                        <div className={`pt-2 border-t border-slate-100 flex items-center ${perfPrice ? 'justify-between' : 'justify-end'} text-xs`}>
-                          {perfPrice && <span className="font-bold text-slate-700">{perfPrice}</span>}
-                          <span className="font-black text-[#E6007E] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                            <span>{t('cardDetails')}</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
-                          </span>
-                        </div>
+                        {t('viewAllAudience')} →
                       </Link>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="p-8 text-center rounded-2xl bg-slate-50 border border-slate-100 text-slate-400 text-xs">
-                  {t('noShowsForArtist')}
-                </div>
-              )}
+                    </div>
+
+                    {performances.length > 0 ? (
+                      <div className={`grid grid-cols-1 ${performances.length > 1 ? 'md:grid-cols-2' : ''} gap-4`}>
+                        {performances.map((perf) => {
+                          const perfTitle = getText(perf.title, perf.titleEn);
+                          const perfVenue = getText(perf.venue?.name || perf.venueName, perf.venue?.nameEn || perf.venueNameEn);
+                          const perfPrice = formatTicketPrice(perf.ticketPrice, perf.ticketPriceEn, language);
+                          const allSchedules = deduplicateSchedules(sortSchedules(perf.schedules || []));
+
+                          const uniqueVenueNames = Array.from(
+                            new Set(
+                              allSchedules
+                                .map((s) =>
+                                  getText(
+                                    s.venue?.name || s.venueName,
+                                    s.venue?.nameEn || s.venueNameEn
+                                  ) || perfVenue
+                                )
+                                .filter((v): v is string => Boolean(v))
+                            )
+                          );
+                          const headerVenueText =
+                            uniqueVenueNames.length > 0 ? uniqueVenueNames.join(' / ') : perfVenue;
+
+                          return (
+                            <Link
+                              key={perf.id}
+                              href={`/performances/${perf.id}`}
+                              className="group p-4 sm:p-5 rounded-2xl border border-pink-100 bg-white hover:border-[#E6007E] hover:shadow-md transition-all flex flex-col justify-between space-y-3"
+                            >
+                              <div className="space-y-2.5">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="px-2 py-0.5 rounded bg-pink-100 text-[#E6007E] text-[10px] font-bold">
+                                    {getPerformanceGenreText(perf, language) || getArtistGenreLabel(perf.artist?.genre || artist.genre, language)}
+                                  </span>
+                                  {headerVenueText && (
+                                    <span className="text-xs text-slate-500 font-medium truncate flex items-center gap-1">
+                                      <MapPin className="w-3 h-3 text-[#E6007E] shrink-0" />
+                                      <span className="truncate">{headerVenueText}</span>
+                                    </span>
+                                  )}
+                                </div>
+                                <h3 className="text-sm sm:text-base font-black text-slate-900 group-hover:text-[#E6007E] line-clamp-2 leading-snug transition-colors">
+                                  {perfTitle}
+                                </h3>
+
+                                {allSchedules.length > 0 && (
+                                  <div className="pt-1 space-y-1.5">
+                                    {allSchedules.map((schedule) => {
+                                      const formattedDate = formatScheduleDetailed(
+                                        schedule.startTime,
+                                        schedule.endTime,
+                                        language
+                                      );
+                                      const sVenueName =
+                                        getText(
+                                          schedule.venue?.name || schedule.venueName,
+                                          schedule.venue?.nameEn || schedule.venueNameEn
+                                        ) || perfVenue;
+                                      const isPreSchedule = isPreFestivalSchedule(
+                                        schedule.startTime,
+                                        perf.isPreFestival
+                                      );
+
+                                      return (
+                                        <div
+                                          key={schedule.id}
+                                          className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-100 text-xs"
+                                        >
+                                          <div className="flex items-center gap-1.5 flex-wrap">
+                                            {isPreSchedule && (
+                                              <span className="px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 font-black text-[10px] leading-tight shrink-0">
+                                                {t('preFestivalTag')}
+                                              </span>
+                                            )}
+                                            <span className="font-bold text-slate-800 whitespace-pre-line">
+                                              {formattedDate}
+                                            </span>
+                                          </div>
+                                          {sVenueName && (
+                                            <span className="text-slate-600 font-medium flex items-center gap-1">
+                                              <MapPin className="w-3 h-3 text-[#E6007E] shrink-0" />
+                                              <span>{sVenueName}</span>
+                                            </span>
+                                          )}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className={`pt-2 border-t border-slate-100 flex items-center ${perfPrice ? 'justify-between' : 'justify-end'} text-xs`}>
+                                {perfPrice && <span className="font-bold text-slate-700">{perfPrice}</span>}
+                                <span className="font-black text-[#E6007E] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                                  <span>{t('cardDetails')}</span>
+                                  <ArrowRight className="w-3.5 h-3.5" />
+                                </span>
+                              </div>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="p-8 text-center rounded-2xl bg-slate-50 border border-slate-100 text-slate-400 text-xs">
+                        {t('noShowsForArtist')}
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </div>
 
             {/* Bottom Back Button */}
