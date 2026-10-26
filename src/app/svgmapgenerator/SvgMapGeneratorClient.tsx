@@ -11,6 +11,7 @@ import {
   LayerToggles,
   calculateBbox,
   parseOverpassData,
+  fetchGeoDataFromCartoMvt,
   generateIllustratorSvg,
   ParsedGeoData,
   MapExportOptions,
@@ -97,8 +98,6 @@ export default function SvgMapGeneratorClient({ initialVenues }: SvgMapGenerator
             centerLng: lng,
             radiusKm: r,
             paperSizeId: 'square',
-            stylePresetId,
-            layers,
             venues: initialVenues,
             format: 'json',
           }),
@@ -114,31 +113,36 @@ export default function SvgMapGeneratorClient({ initialVenues }: SvgMapGenerator
         setStatusMessage('');
       } catch (err: unknown) {
         console.error('[SVG Generator Error]', err);
-        setStatusMessage('データ取得に失敗しました。ローカルデータで再構成します。');
-
-        // Fallback with empty/local data
-        const fallbackData = parseOverpassData({ elements: [] });
-        setParsedData(fallbackData);
+        try {
+          const bbox = calculateBbox(lat, lng, r, 1.0);
+          const directMvtData = await fetchGeoDataFromCartoMvt(bbox, r);
+          setParsedData(directMvtData);
+          setStatusMessage('');
+        } catch {
+          setStatusMessage('データ取得に失敗しました。ローカルデータで再構成します。');
+          setParsedData((prev) => prev || parseOverpassData({ elements: [] }));
+        }
       } finally {
         setIsLoading(false);
       }
     },
-    [centerLat, centerLng, radiusKm, stylePresetId, layers, initialVenues]
+    [centerLat, centerLng, radiusKm, initialVenues]
   );
 
-  // Initial Load
+  // Initial Load (once on mount)
   useEffect(() => {
     let isCancelled = false;
     const fetchInitial = async () => {
       await Promise.resolve();
       if (isCancelled) return;
-      await handleGenerateMap();
+      await handleGenerateMap(centerLat, centerLng, radiusKm);
     };
     fetchInitial();
     return () => {
       isCancelled = true;
     };
-  }, [handleGenerateMap]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Helper to update the bounding box polygon layer on MapLibre map
   const updateMapBboxLayer = useCallback(
@@ -271,6 +275,7 @@ export default function SvgMapGeneratorClient({ initialVenues }: SvgMapGenerator
         setCenterLat(newLat);
         setCenterLng(newLng);
         updateMapBboxLayer(map, newLat, newLng, radiusKmRef.current);
+        handleGenerateMap(newLat, newLng, radiusKmRef.current);
       });
 
       markerRef.current = marker;
@@ -284,6 +289,7 @@ export default function SvgMapGeneratorClient({ initialVenues }: SvgMapGenerator
         setCenterLng(newLng);
         marker.setLngLat([newLng, newLat]);
         updateMapBboxLayer(map, newLat, newLng, radiusKmRef.current);
+        handleGenerateMap(newLat, newLng, radiusKmRef.current);
       });
 
       mapInstanceRef.current = map;
@@ -551,6 +557,7 @@ export default function SvgMapGeneratorClient({ initialVenues }: SvgMapGenerator
                         if (mapInstanceRef.current) {
                           updateMapBboxLayer(mapInstanceRef.current, centerLat, centerLng, r.value);
                         }
+                        handleGenerateMap(centerLat, centerLng, r.value);
                       }}
                       className={`py-1.5 px-1 rounded-xl text-[10px] font-bold transition-all text-center cursor-pointer ${
                         radiusKm === r.value
@@ -666,7 +673,6 @@ export default function SvgMapGeneratorClient({ initialVenues }: SvgMapGenerator
                   return (
                     <label
                       key={key}
-                      onClick={() => toggleLayer(key as keyof LayerToggles)}
                       className={`flex items-center gap-2 p-2.5 rounded-xl border transition-all cursor-pointer ${
                         isChecked
                           ? 'bg-slate-900 border-emerald-500/40 text-white'
@@ -676,7 +682,7 @@ export default function SvgMapGeneratorClient({ initialVenues }: SvgMapGenerator
                       <input
                         type="checkbox"
                         checked={isChecked}
-                        onChange={() => {}}
+                        onChange={() => toggleLayer(key as keyof LayerToggles)}
                         className="rounded border-slate-700 text-[#E6007E] focus:ring-0 focus:outline-none"
                       />
                       <span className="text-[11px] font-bold truncate">
@@ -785,6 +791,7 @@ export default function SvgMapGeneratorClient({ initialVenues }: SvgMapGenerator
                     <div className="hidden sm:flex items-center gap-3 text-[11px] text-slate-400">
                       <span>💧 水域: {parsedData.waterPolygons.length + parsedData.waterLines.length}</span>
                       <span>🌳 緑地: {parsedData.greeneryPolygons.length}</span>
+                      <span>🏢 建物: {parsedData.buildingPolygons.length}</span>
                       <span>🛣️ 道路: {parsedData.roadsMajor.length + parsedData.roadsMinor.length}</span>
                       <span>🚆 線路: {parsedData.railways.length}</span>
                     </div>

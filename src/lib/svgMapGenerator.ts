@@ -3,8 +3,8 @@
  * 緯度経度からAdobe Illustrator編集用のレイヤー構造化SVGマップを生成するエンジン
  */
 
-import { Venue } from '@/types';
-import { OSAKA_TRANSIT_LINES, OSAKA_TRANSIT_STATIONS } from '@/data/transitData';
+import type { Venue } from '../types/index.ts';
+import { OSAKA_TRANSIT_LINES, OSAKA_TRANSIT_STATIONS } from '../data/transitData.ts';
 
 export interface BoundingBox {
   south: number;
@@ -322,12 +322,11 @@ export function buildOverpassQuery(bbox: BoundingBox): string {
   const bboxStr = `${south.toFixed(6)},${west.toFixed(6)},${north.toFixed(6)},${east.toFixed(6)}`;
 
   return `
-[out:json][timeout:25];
+[out:json][timeout:15];
 (
   // 水域 (Water)
   way["waterway"](${bboxStr});
   way["natural"="water"](${bboxStr});
-  relation["natural"="water"](${bboxStr});
   
   // 緑地 (Greenery)
   way["leisure"="park"](${bboxStr});
@@ -452,6 +451,591 @@ export function parseOverpassData(osmJson: OsmOverpassResponse | null | undefine
       }
     }
   });
+
+  return data;
+}
+
+// ============================================================================
+// Carto Vector Tile (MVT) デコーダ & 高速フェッチャー
+// Overpass API の高負荷・502タイムアウト時にも安定して200ms台で全レイヤーを取得
+// ============================================================================
+
+const CARTO_MVT_KEY = 'cb1_2u9e_1_e673ff91216e39ecfb52f65d';
+const CARTO_SUBDOMAINS = ['a', 'b', 'c', 'd'];
+const utf8Decoder = new TextDecoder('utf-8');
+
+interface MvtCursor {
+  pos: number;
+}
+
+interface MvtRawFeature {
+  type: number;
+  tags: number[];
+  geometry: number[];
+}
+
+interface MvtParsedFeature {
+  type: number;
+  properties: Record<string, string | number | boolean | null>;
+  geometry: number[];
+}
+
+interface MvtParsedLayer {
+  name: string;
+  extent: number;
+  features: MvtParsedFeature[];
+}
+
+function readVarint(buf: Uint8Array, cursor: MvtCursor): number {
+  let result = 0;
+  let shift = 0;
+  while (cursor.pos < buf.length) {
+    const b = buf[cursor.pos++];
+    result += (b & 0x7f) * Math.pow(2, shift);
+    if ((b & 0x80) === 0) return result;
+    shift += 7;
+  }
+  return result;
+}
+
+function readSVarint(buf: Uint8Array, cursor: MvtCursor): number {
+  const n = readVarint(buf, cursor);
+  return n % 2 === 0 ? n / 2 : -((n + 1) / 2);
+}
+
+function skipMvtField(buf: Uint8Array, cursor: MvtCursor, wireType: number): void {
+  if (wireType === 0) {
+    readVarint(buf, cursor);
+  } else if (wireType === 1) {
+    cursor.pos += 8;
+  } else if (wireType === 2) {
+    const len = readVarint(buf, cursor);
+    cursor.pos += len;
+  } else if (wireType === 5) {
+    cursor.pos += 4;
+  } else {
+    cursor.pos = buf.length;
+  }
+}
+
+function parseMvtValue(
+  buf: Uint8Array,
+  view: DataView,
+  start: number,
+  end: number
+): string | number | boolean | null {
+  const cursor: MvtCursor = { pos: start };
+  let val: string | number | boolean | null = null;
+  while (cursor.pos < end) {
+    const tag = readVarint(buf, cursor);
+    const field = tag >>> 3;
+    const wire = tag & 7;
+    if (field === 1 && wire === 2) {
+      const len = readVarint(buf, cursor);
+      val = utf8Decoder.decode(buf.subarray(cursor.pos, cursor.pos + len));
+      cursor.pos += len;
+    } else if (field === 2 && wire === 5) {
+      val = view.getFloat32(cursor.pos, true);
+      cursor.pos += 4;
+    } else if (field === 3 && wire === 1) {
+      val = view.getFloat64(cursor.pos, true);
+      cursor.pos += 8;
+    } else if ((field === 4 || field === 5) && wire === 0) {
+      val = readVarint(buf, cursor);
+    } else if (field === 6 && wire === 0) {
+      val = readSVarint(buf, cursor);
+    } else if (field === 7 && wire === 0) {
+      val = Boolean(readVarint(buf, cursor));
+    } else {
+      skipMvtField(buf, cursor, wire);
+    }
+  }
+  return val;
+}
+
+function parseMvtFeature(buf: Uint8Array, start: number, end: number): MvtRawFeature {
+  const cursor: MvtCursor = { pos: start };
+  let type = 0;
+  const tags: number[] = [];
+  const geometry: number[] = [];
+  while (cursor.pos < end) {
+    const tag = readVarint(buf, cursor);
+    const field = tag >>> 3;
+    const wire = tag & 7;
+    if (field === 2 && wire === 2) {
+      const len = readVarint(buf, cursor);
+      const subEnd = cursor.pos + len;
+      while (cursor.pos < subEnd) tags.push(readVarint(buf, cursor));
+    } else if (field === 3 && wire === 0) {
+      type = readVarint(buf, cursor);
+    } else if (field === 4 && wire === 2) {
+      const len = readVarint(buf, cursor);
+      const subEnd = cursor.pos + len;
+      while (cursor.pos < subEnd) geometry.push(readVarint(buf, cursor));
+    } else if (field === 4 && wire === 0) {
+      geometry.push(readVarint(buf, cursor));
+    } else {
+      skipMvtField(buf, cursor, wire);
+    }
+  }
+  return { type, tags, geometry };
+}
+
+function parseMvtLayer(buf: Uint8Array, view: DataView, start: number, end: number): MvtParsedLayer {
+  const cursor: MvtCursor = { pos: start };
+  let name = '';
+  let extent = 4096;
+  const keys: string[] = [];
+  const values: Array<string | number | boolean | null> = [];
+  const rawFeatures: MvtRawFeature[] = [];
+
+  while (cursor.pos < end) {
+    const tag = readVarint(buf, cursor);
+    const field = tag >>> 3;
+    const wire = tag & 7;
+    if (field === 1 && wire === 2) {
+      const len = readVarint(buf, cursor);
+      name = utf8Decoder.decode(buf.subarray(cursor.pos, cursor.pos + len));
+      cursor.pos += len;
+    } else if (field === 2 && wire === 2) {
+      const len = readVarint(buf, cursor);
+      rawFeatures.push(parseMvtFeature(buf, cursor.pos, cursor.pos + len));
+      cursor.pos += len;
+    } else if (field === 3 && wire === 2) {
+      const len = readVarint(buf, cursor);
+      keys.push(utf8Decoder.decode(buf.subarray(cursor.pos, cursor.pos + len)));
+      cursor.pos += len;
+    } else if (field === 4 && wire === 2) {
+      const len = readVarint(buf, cursor);
+      values.push(parseMvtValue(buf, view, cursor.pos, cursor.pos + len));
+      cursor.pos += len;
+    } else if (field === 5 && wire === 0) {
+      extent = readVarint(buf, cursor);
+    } else {
+      skipMvtField(buf, cursor, wire);
+    }
+  }
+
+  return {
+    name,
+    extent,
+    features: rawFeatures.map((f) => {
+      const props: Record<string, string | number | boolean | null> = {};
+      for (let i = 0; i + 1 < f.tags.length; i += 2) {
+        const k = keys[f.tags[i]];
+        if (k !== undefined) {
+          props[k] = values[f.tags[i + 1]] ?? null;
+        }
+      }
+      return { type: f.type, properties: props, geometry: f.geometry };
+    }),
+  };
+}
+
+async function decompressGzipIfNeeded(rawBytes: Uint8Array): Promise<Uint8Array> {
+  if (rawBytes.length >= 2 && rawBytes[0] === 0x1f && rawBytes[1] === 0x8b) {
+    if (typeof DecompressionStream !== 'undefined') {
+      const ds = new DecompressionStream('gzip');
+      const writer = ds.writable.getWriter();
+      writer.write(new Uint8Array(rawBytes));
+      writer.close();
+      const ab = await new Response(ds.readable).arrayBuffer();
+      return new Uint8Array(ab);
+    }
+  }
+  return rawBytes;
+}
+
+async function parseMvtTileBuffer(arrayBuffer: ArrayBuffer): Promise<Record<string, MvtParsedLayer>> {
+  const buf = await decompressGzipIfNeeded(new Uint8Array(arrayBuffer));
+  const view = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
+  const cursor: MvtCursor = { pos: 0 };
+  const layers: Record<string, MvtParsedLayer> = {};
+
+  while (cursor.pos < buf.length) {
+    const tag = readVarint(buf, cursor);
+    const field = tag >>> 3;
+    const wire = tag & 7;
+    if (field === 3 && wire === 2) {
+      const len = readVarint(buf, cursor);
+      const layer = parseMvtLayer(buf, view, cursor.pos, cursor.pos + len);
+      layers[layer.name] = layer;
+      cursor.pos += len;
+    } else {
+      skipMvtField(buf, cursor, wire);
+    }
+  }
+
+  return layers;
+}
+
+interface DecodedMvtRing {
+  coords: [number, number][];
+  signedArea: number;
+  cx: number;
+  cy: number;
+  inTileExtent: boolean;
+}
+
+function decodeMvtGeometry(
+  geom: number[],
+  extent: number,
+  z: number,
+  tileX: number,
+  tileY: number
+): DecodedMvtRing[] {
+  const rawRings: [number, number][][] = [];
+  let current: [number, number][] = [];
+  let x = 0;
+  let y = 0;
+  let i = 0;
+
+  while (i < geom.length) {
+    const cmdInt = geom[i++];
+    const cmd = cmdInt & 0x7;
+    const count = cmdInt >>> 3;
+    if (cmd === 1) {
+      for (let c = 0; c < count && i + 1 < geom.length; c++) {
+        if (current.length > 0) rawRings.push(current);
+        const dx = geom[i++];
+        const dy = geom[i++];
+        x += (dx >>> 1) ^ -(dx & 1);
+        y += (dy >>> 1) ^ -(dy & 1);
+        current = [[x, y]];
+      }
+    } else if (cmd === 2) {
+      for (let c = 0; c < count && i + 1 < geom.length; c++) {
+        const dx = geom[i++];
+        const dy = geom[i++];
+        x += (dx >>> 1) ^ -(dx & 1);
+        y += (dy >>> 1) ^ -(dy & 1);
+        current.push([x, y]);
+      }
+    } else if (cmd === 7) {
+      if (current.length > 0) {
+        current.push([current[0][0], current[0][1]]);
+        rawRings.push(current);
+        current = [];
+      }
+    } else {
+      break;
+    }
+  }
+  if (current.length > 0) rawRings.push(current);
+
+  const n = Math.pow(2, z);
+  const toLngLat = (px: number, py: number): [number, number] => {
+    const lon = ((tileX + px / extent) / n) * 360 - 180;
+    const latRad = Math.atan(Math.sinh(Math.PI * (1 - (2 * (tileY + py / extent)) / n)));
+    const lat = (latRad * 180) / Math.PI;
+    return [Math.round(lon * 1e6) / 1e6, Math.round(lat * 1e6) / 1e6];
+  };
+
+  return rawRings.map((ring) => {
+    let signedArea = 0;
+    let sumX = 0;
+    let sumY = 0;
+    let minPx = Infinity;
+    let maxPx = -Infinity;
+    let minPy = Infinity;
+    let maxPy = -Infinity;
+
+    for (let j = 0; j < ring.length; j++) {
+      const [px, py] = ring[j];
+      sumX += px;
+      sumY += py;
+      if (px < minPx) minPx = px;
+      if (px > maxPx) maxPx = px;
+      if (py < minPy) minPy = py;
+      if (py > maxPy) maxPy = py;
+      if (j + 1 < ring.length) {
+        const [nx, ny] = ring[j + 1];
+        signedArea += px * ny - nx * py;
+      }
+    }
+
+    const len = Math.max(ring.length, 1);
+    return {
+      coords: ring.map(([px, py]) => toLngLat(px, py)),
+      signedArea,
+      cx: sumX / len,
+      cy: sumY / len,
+      inTileExtent: maxPx >= 0 && minPx <= extent && maxPy >= 0 && minPy <= extent,
+    };
+  });
+}
+
+function coordsIntersectBbox(coords: [number, number][], bbox: BoundingBox): boolean {
+  let minLng = Infinity;
+  let maxLng = -Infinity;
+  let minLat = Infinity;
+  let maxLat = -Infinity;
+  for (const [lng, lat] of coords) {
+    if (lng < minLng) minLng = lng;
+    if (lng > maxLng) maxLng = lng;
+    if (lat < minLat) minLat = lat;
+    if (lat > maxLat) maxLat = lat;
+  }
+  return !(maxLng < bbox.west || minLng > bbox.east || maxLat < bbox.south || minLat > bbox.north);
+}
+
+/**
+ * Carto Vector Tiles (MVT) から指定バウンディングボックスの地理ベクターデータを高速取得
+ */
+export async function fetchGeoDataFromCartoMvt(
+  bbox: BoundingBox,
+  radiusKm = 1.0
+): Promise<ParsedGeoData> {
+  const data: ParsedGeoData = {
+    waterPolygons: [],
+    waterLines: [],
+    greeneryPolygons: [],
+    buildingPolygons: [],
+    roadsMajor: [],
+    roadsMinor: [],
+    railways: [],
+    stations: [],
+    labels: [],
+  };
+
+  const z = radiusKm <= 2.5 ? 14 : 13;
+  const n = Math.pow(2, z);
+  const lngToTileX = (lon: number) => Math.floor(((lon + 180) / 360) * n);
+  const latToTileY = (lat: number) => {
+    const rad = (lat * Math.PI) / 180;
+    return Math.floor(((1 - Math.log(Math.tan(rad) + 1 / Math.cos(rad)) / Math.PI) / 2) * n);
+  };
+
+  const minX = lngToTileX(bbox.west);
+  const maxX = lngToTileX(bbox.east);
+  const minY = latToTileY(bbox.north);
+  const maxY = latToTileY(bbox.south);
+
+  const tiles: { z: number; x: number; y: number }[] = [];
+  for (let x = minX; x <= maxX; x++) {
+    for (let y = minY; y <= maxY; y++) {
+      tiles.push({ z, x, y });
+    }
+  }
+
+  // 安全のため最大タイル数を制限 (36タイルまで)
+  const targetTiles = tiles.slice(0, 36);
+
+  await Promise.all(
+    targetTiles.map(async ({ z: tz, x: tx, y: ty }, idx) => {
+      const sub = CARTO_SUBDOMAINS[idx % CARTO_SUBDOMAINS.length];
+      const url = `https://tiles-${sub}.basemaps.cartocdn.com/vectortiles/carto.streets/v1/${tz}/${tx}/${ty}.mvt?key=${CARTO_MVT_KEY}`;
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+      try {
+        const res = await fetch(url, { signal: controller.signal });
+        if (!res.ok) return;
+        const ab = await res.arrayBuffer();
+        const layers = await parseMvtTileBuffer(ab);
+
+        // 1. 水域ポリゴン (water)
+        if (layers.water) {
+          const ext = layers.water.extent;
+          for (const f of layers.water.features) {
+            if (f.type === 3) {
+              for (const ring of decodeMvtGeometry(f.geometry, ext, tz, tx, ty)) {
+                if (
+                  ring.signedArea > 0 &&
+                  ring.inTileExtent &&
+                  ring.coords.length >= 4 &&
+                  coordsIntersectBbox(ring.coords, bbox)
+                ) {
+                  data.waterPolygons.push(ring.coords);
+                }
+              }
+            }
+          }
+        }
+
+        // 2. 河川・水路ライン (waterway)
+        if (layers.waterway) {
+          const ext = layers.waterway.extent;
+          for (const f of layers.waterway.features) {
+            if (f.type === 2) {
+              for (const line of decodeMvtGeometry(f.geometry, ext, tz, tx, ty)) {
+                if (
+                  line.inTileExtent &&
+                  line.coords.length >= 2 &&
+                  coordsIntersectBbox(line.coords, bbox)
+                ) {
+                  data.waterLines.push(line.coords);
+                }
+              }
+            } else if (f.type === 3) {
+              for (const ring of decodeMvtGeometry(f.geometry, ext, tz, tx, ty)) {
+                if (
+                  ring.signedArea > 0 &&
+                  ring.inTileExtent &&
+                  ring.coords.length >= 4 &&
+                  coordsIntersectBbox(ring.coords, bbox)
+                ) {
+                  data.waterPolygons.push(ring.coords);
+                }
+              }
+            }
+          }
+        }
+
+        // 3. 緑地・公園ポリゴン (park, landcover, landuse)
+        for (const lName of ['park', 'landcover', 'landuse']) {
+          const layer = layers[lName];
+          if (!layer) continue;
+          const ext = layer.extent;
+          for (const f of layer.features) {
+            if (f.type !== 3) continue;
+            const cls = String(f.properties.class || '');
+            const subCls = String(f.properties.subclass || '');
+            const isGreenery =
+              lName === 'park' ||
+              [
+                'grass',
+                'wood',
+                'park',
+                'garden',
+                'playground',
+                'pitch',
+                'cemetery',
+                'recreation_ground',
+                'forest',
+              ].includes(cls) ||
+              ['park', 'garden', 'recreation_ground', 'forest', 'grass', 'wood'].includes(subCls);
+
+            if (isGreenery) {
+              for (const ring of decodeMvtGeometry(f.geometry, ext, tz, tx, ty)) {
+                if (
+                  ring.signedArea > 0 &&
+                  ring.inTileExtent &&
+                  ring.coords.length >= 4 &&
+                  coordsIntersectBbox(ring.coords, bbox)
+                ) {
+                  data.greeneryPolygons.push(ring.coords);
+                }
+              }
+            }
+          }
+        }
+
+        // 4. 建物フットプリント (building)
+        if (layers.building) {
+          const ext = layers.building.extent;
+          for (const f of layers.building.features) {
+            if (f.type === 3) {
+              for (const ring of decodeMvtGeometry(f.geometry, ext, tz, tx, ty)) {
+                // タイル境界バッファによる建物の重複を防ぐため重心が [0, ext) 内のものを採用
+                if (
+                  ring.signedArea > 0 &&
+                  ring.cx >= 0 &&
+                  ring.cx < ext &&
+                  ring.cy >= 0 &&
+                  ring.cy < ext &&
+                  ring.coords.length >= 4 &&
+                  coordsIntersectBbox(ring.coords, bbox)
+                ) {
+                  data.buildingPolygons.push(ring.coords);
+                }
+              }
+            }
+          }
+        }
+
+        // 5. 道路・鉄道 (transportation)
+        if (layers.transportation) {
+          const ext = layers.transportation.extent;
+          for (const f of layers.transportation.features) {
+            if (f.type !== 2) continue;
+            const cls = String(f.properties.class || '');
+            const subCls = String(f.properties.subclass || '');
+            const lines = decodeMvtGeometry(f.geometry, ext, tz, tx, ty)
+              .filter(
+                (l) => l.inTileExtent && l.coords.length >= 2 && coordsIntersectBbox(l.coords, bbox)
+              )
+              .map((l) => l.coords);
+
+            if (lines.length === 0) continue;
+
+            if (
+              [
+                'motorway',
+                'trunk',
+                'primary',
+                'secondary',
+                'motorway_construction',
+                'trunk_construction',
+                'primary_construction',
+                'secondary_construction',
+              ].includes(cls)
+            ) {
+              data.roadsMajor.push(...lines);
+            } else if (
+              ['tertiary', 'minor', 'service', 'street', 'living_street', 'track'].includes(cls) ||
+              (cls === 'path' && ['pedestrian', 'footway', 'steps'].includes(subCls))
+            ) {
+              data.roadsMinor.push(...lines);
+            } else if (['rail', 'transit'].includes(cls)) {
+              data.railways.push(...lines);
+            }
+          }
+        }
+
+        // 6. 鉄道駅 (poi)
+        if (layers.poi) {
+          const ext = layers.poi.extent;
+          for (const f of layers.poi.features) {
+            if (f.type !== 1) continue;
+            const cls = String(f.properties.class || '');
+            const subCls = String(f.properties.subclass || '');
+            if (cls === 'railway' && ['station', 'subway', 'halt'].includes(subCls)) {
+              const name = String(
+                f.properties['name:ja'] || f.properties.name || f.properties.name_en || ''
+              );
+              const pts = decodeMvtGeometry(f.geometry, ext, tz, tx, ty);
+              if (name && pts.length > 0 && pts[0].coords.length > 0) {
+                const { cx, cy } = pts[0];
+                const [lon, la] = pts[0].coords[0];
+                if (
+                  cx >= 0 &&
+                  cx < ext &&
+                  cy >= 0 &&
+                  cy < ext &&
+                  lon >= bbox.west &&
+                  lon <= bbox.east &&
+                  la >= bbox.south &&
+                  la <= bbox.north
+                ) {
+                  const isDup = data.stations.some(
+                    (st) =>
+                      st.name === name &&
+                      Math.abs(st.lat - la) < 0.0015 &&
+                      Math.abs(st.lng - lon) < 0.0015
+                  );
+                  if (!isDup) {
+                    data.stations.push({
+                      name,
+                      nameEn: f.properties.name_en ? String(f.properties.name_en) : undefined,
+                      lat: la,
+                      lng: lon,
+                      isMetro: subCls === 'subway',
+                    });
+                  }
+                }
+              }
+            }
+          }
+        }
+      } catch {
+        // 個別タイルの取得失敗は無視して他タイルを継続
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    })
+  );
 
   return data;
 }
@@ -876,13 +1460,24 @@ export function generateIllustratorSvg(
     }
   }
 
-  // レイヤー7: 一般鉄道 (Railways)
-  if (options.layers.railways && geoData.railways.length > 0) {
+  // レイヤー7: 一般鉄道 (Railways: JR・私鉄)
+  if (options.layers.railways) {
     const railPaths: string[] = [];
-    geoData.railways.forEach((line) => {
-      const ds = coordsToPolylinePathDs(line, projector, clipBounds);
-      railPaths.push(...ds);
-    });
+    if (geoData.railways.length > 0) {
+      geoData.railways.forEach((line) => {
+        const ds = coordsToPolylinePathDs(line, projector, clipBounds);
+        railPaths.push(...ds);
+      });
+    } else {
+      const fallbackRailFeatures = (OSAKA_TRANSIT_LINES?.features || []).filter(
+        (feat) => feat.properties?.isMetro === false
+      );
+      fallbackRailFeatures.forEach((feat) => {
+        if (!feat.geometry || !feat.geometry.coordinates) return;
+        const ds = coordsToPolylinePathDs(feat.geometry.coordinates, projector, clipBounds);
+        railPaths.push(...ds);
+      });
+    }
 
     if (railPaths.length > 0) {
       svgParts.push(`  <!-- ========================================== -->
@@ -902,7 +1497,9 @@ export function generateIllustratorSvg(
 
   // レイヤー8: Osaka Metro・地域路線（ローカル高精度データ連携）
   if (options.layers.metroLines) {
-    const metroFeatures = OSAKA_TRANSIT_LINES?.features || [];
+    const metroFeatures = (OSAKA_TRANSIT_LINES?.features || []).filter(
+      (feat) => feat.properties?.isMetro !== false
+    );
     const metroSvgLines: string[] = [];
 
     metroFeatures.forEach((feat) => {

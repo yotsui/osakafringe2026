@@ -1,6 +1,7 @@
 import {
   buildOverpassQuery,
   parseOverpassData,
+  fetchGeoDataFromCartoMvt,
   generateIllustratorSvg,
   calculateBbox,
   PAPER_SIZES,
@@ -18,6 +19,7 @@ import {
 
 // Overpass API mirror endpoints for fallback
 const OVERPASS_ENDPOINTS = [
+  'https://overpass.private.coffee/api/interpreter',
   'https://overpass-api.de/api/interpreter',
   'https://lz4.overpass-api.de/api/interpreter',
   'https://overpass.kumi.systems/api/interpreter',
@@ -115,46 +117,63 @@ export async function POST(req: Request) {
     const paper = PAPER_SIZES[selectedPaperSizeId] || PAPER_SIZES['square'];
     const aspectRatio = paper.widthPt / paper.heightPt;
     const bbox = calculateBbox(centerLat, centerLng, radiusKm, aspectRatio);
-    const query = buildOverpassQuery(bbox);
 
-    // Overpass API fetch with mirror fallbacks
-    let osmJson: OsmOverpassResponse | null = null;
+    // 1. Primary fast vector source: Carto OpenStreetMap MVT Vector Tiles (~200ms)
+    let parsedData = await fetchGeoDataFromCartoMvt(bbox, radiusKm);
+    let totalFeatureCount =
+      parsedData.waterPolygons.length +
+      parsedData.waterLines.length +
+      parsedData.greeneryPolygons.length +
+      parsedData.buildingPolygons.length +
+      parsedData.roadsMajor.length +
+      parsedData.roadsMinor.length +
+      parsedData.railways.length +
+      parsedData.stations.length;
 
-    for (const endpoint of OVERPASS_ENDPOINTS) {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 18000); // 18s timeout
+    // 2. Fallback: Overpass API mirror endpoints if MVT tiles returned empty
+    if (totalFeatureCount === 0) {
+      const query = buildOverpassQuery(bbox);
+      let osmJson: OsmOverpassResponse | null = null;
 
-        const res = await fetch(endpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            'User-Agent': 'OsakaFringeMapGenerator/1.0',
-          },
-          body: `data=${encodeURIComponent(query)}`,
-          signal: controller.signal,
-          next: { revalidate: 3600 },
-        });
+      for (const endpoint of OVERPASS_ENDPOINTS) {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
 
-        clearTimeout(timeoutId);
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+              'User-Agent': 'OsakaFringeMapGenerator/1.0',
+            },
+            body: `data=${encodeURIComponent(query)}`,
+            signal: controller.signal,
+            next: { revalidate: 3600 },
+          });
 
-        if (res.ok) {
-          osmJson = (await res.json()) as OsmOverpassResponse;
-          break;
+          clearTimeout(timeoutId);
+
+          if (res.ok) {
+            osmJson = (await res.json()) as OsmOverpassResponse;
+            break;
+          }
+        } catch (err: unknown) {
+          const errMsg = err instanceof Error ? err.message : String(err);
+          console.warn(`[Overpass API] Failed at ${endpoint}:`, errMsg);
         }
-      } catch (err: unknown) {
-        const errMsg = err instanceof Error ? err.message : String(err);
-        console.warn(`[Overpass API] Failed at ${endpoint}:`, errMsg);
+      }
+
+      if (osmJson?.elements && osmJson.elements.length > 0) {
+        parsedData = parseOverpassData(osmJson);
+        totalFeatureCount = osmJson.elements.length;
       }
     }
-
-    const parsedData = parseOverpassData(osmJson || { elements: [] });
 
     if (format === 'json') {
       return Response.json({
         bbox,
         data: parsedData,
-        elementCount: osmJson?.elements?.length || 0,
+        elementCount: totalFeatureCount,
       });
     }
 
