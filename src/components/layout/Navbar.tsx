@@ -19,9 +19,10 @@ export default function Navbar({ showAwards = false }: NavbarProps) {
   const navItems = [
     { href: '/', label: t('navHome'), hideOnDesktop: true },
     { href: '/audience', label: t('navAudience'), highlight: true },
-    { href: '/venues', label: t('navVenues') },
     { href: '/artists', label: t('navArtists') },
-    ...(showAwards ? [{ href: '/awards', label: t('navAwards') }] : []),
+    { href: '/venues', label: t('navVenues') },
+    { href: '/#awards', label: t('navAwards') },
+    { href: '/#fringe2027', label: t('navFringe2027') },
     { href: '/about', label: t('navAbout') },
     { href: '/donate', label: t('navDonate') },
     { href: '/contact', label: t('navContact'), hideOnDesktop: true },

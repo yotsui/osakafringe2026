@@ -68,8 +68,13 @@ export default function ArtistsClient({ artists, performances }: ArtistsClientPr
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
       {/* 3-Step Editorial Header */}
       <div className="border-l-4 border-[#E6007E] pl-4 sm:pl-6 space-y-2 py-2">
-        <div className="text-xs font-black tracking-widest text-[#E6007E] uppercase">
-          ARTISTS
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="text-xs font-black tracking-widest text-[#E6007E] uppercase">
+            ARTISTS
+          </div>
+          <span className="px-2.5 py-0.5 rounded-full bg-slate-800 text-white text-xs font-bold">
+            {t('artist2026Badge')}
+          </span>
         </div>
         <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
           {t('artistsPageTitle')}
@@ -131,6 +136,11 @@ export default function ArtistsClient({ artists, performances }: ArtistsClientPr
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent pointer-events-none" />
+                  <div className="absolute top-3 left-3 z-10 pointer-events-none">
+                    <span className="px-2 py-0.5 rounded bg-black/75 backdrop-blur-xs text-white text-[10px] font-bold tracking-wider">
+                      {t('artist2026Badge')}
+                    </span>
+                  </div>
                 </Link>
 
                 {/* Editorial Flow: Genre/Origin -> Name -> Bio */}

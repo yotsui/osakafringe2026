@@ -263,6 +263,9 @@ export default function PerformanceModal({
           <div className="px-6 sm:px-8 pb-8 space-y-8">
             {/* Category & Work Genre Metadata Section */}
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-wrap items-center gap-4 text-xs">
+              <span className="px-2.5 py-1 rounded-xl bg-slate-800 text-white font-bold">
+                {t('festivalEndedBadge')}
+              </span>
               <div className="flex items-center gap-2">
                 <span className="text-slate-500 font-bold">{language === 'ja' ? 'カテゴリー' : 'Category'}:</span>
                 <span className="px-2.5 py-1 rounded-xl bg-pink-100 text-[#E6007E] font-black">
@@ -281,18 +284,14 @@ export default function PerformanceModal({
             {/* Action Bar */}
             <div className="flex flex-wrap items-center justify-between gap-3 pb-6 border-b border-slate-100">
               <div className="flex flex-wrap items-center gap-2">
-                {performance.ticketUrl && (
-                  <a
-                    href={performance.ticketUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-5 py-2.5 rounded-2xl bg-[#E6007E] hover:bg-[#c4006b] text-white font-black text-xs flex items-center gap-2 shadow-md shadow-pink-500/20 transition-all cursor-pointer"
-                  >
-                    <Ticket className="w-4 h-4" />
-                    <span>{t('bookTickets')}</span>
-                    <ExternalLink className="w-3.5 h-3.5 opacity-80" />
-                  </a>
-                )}
+                <button
+                  type="button"
+                  disabled
+                  className="px-5 py-2.5 rounded-2xl bg-slate-200 text-slate-500 font-bold text-xs flex items-center gap-2 cursor-not-allowed select-none border border-slate-300"
+                >
+                  <Ticket className="w-4 h-4 text-slate-400" />
+                  <span>{t('performanceEnded')}</span>
+                </button>
 
                 {websiteUrl && (
                   <a

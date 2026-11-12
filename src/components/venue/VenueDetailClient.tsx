@@ -127,8 +127,11 @@ export default function VenueDetailClient({ venue, performances }: VenueDetailCl
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent" />
 
               {/* Badges on Top */}
-              <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 z-10">
-                <div className="flex items-center gap-2">
+              <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 z-10 flex-wrap">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="px-3 py-1 rounded-full bg-slate-900/90 backdrop-blur-md text-white text-xs font-bold border border-slate-600/50">
+                    {t('venue2026Badge')}
+                  </span>
                   <span className="px-3 py-1 rounded-full bg-[#E6007E] text-white text-xs font-black uppercase tracking-wider shadow-xs">
                     {area}
                   </span>

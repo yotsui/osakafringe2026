@@ -504,5 +504,67 @@ export const translations: Dictionary = {
   mediaImportantNotes: { 
     ja: '※ 取材にあたっては、各会場の利用規約、出演者の意向、および安全上の指示を最優先として尊重・遵守いただきますようお願いいたします。', 
     en: '* All coverage must fully respect and adhere to individual venue rules, artist preferences, and safety instructions.' 
+  },
+
+  // Post-Event 2026 & Fringe 2027
+  navFringe2027: { ja: '2027年開催情報', en: 'Osaka Fringe 2027' },
+  performanceEnded: { ja: 'この公演は終了しました', en: 'This performance has ended' },
+  festivalEndedBadge: { ja: '2026年・開催終了', en: '2026 Event Ended' },
+  artist2026Badge: { ja: '2026年参加', en: '2026 Participant' },
+  venue2026Badge: { ja: '2026年会場', en: '2026 Venue' },
+
+  heroPostEventHeading: {
+    ja: 'Osaka Fringe 2026に関わってくださった、すべての皆さまへ。',
+    en: 'To everyone who was part of Osaka Fringe 2026.'
+  },
+  heroPostEventBody: {
+    ja: 'Osaka Fringe 2026は、11月8日をもって終了しました。\nご来場くださった皆さま、参加アーティスト、会場の皆さま、そして開催を支えてくださったすべての皆さまに、心より感謝申し上げます。',
+    en: 'Osaka Fringe 2026 concluded on November 8.\nWe would like to express our deepest gratitude to all visitors, participating artists, venues, and supporters who made this festival possible.'
+  },
+  heroPostEventAnnounce1Title: { ja: 'フリンジアワード2026 発表', en: 'Fringe Awards 2026 Announcement' },
+  heroPostEventAnnounce1Desc: {
+    ja: '今年のフリンジで出会った表現を、次の機会へ。4つのアワードを発表します。',
+    en: 'Carrying forward the expressions encountered at this year’s Fringe. Announcing four festival awards.'
+  },
+  heroPostEventAnnounce2Title: { ja: 'Osaka Fringe 2027 開催決定', en: 'Osaka Fringe 2027 Confirmed' },
+  heroPostEventAnnounce2Date: { ja: '2027年10月15日〜11月15日', en: 'October 15 – November 15, 2027' },
+  heroPostEventAnnounce2Desc: {
+    ja: '来年の開催会期と、会場・アーティストの参加スケジュールをお知らせします。',
+    en: 'Announcing next year’s festival dates and participation schedules for venues and artists.'
+  },
+  heroBtnAwards: { ja: 'アワードを見る', en: 'View Awards' },
+  heroBtn2027: { ja: '2027年の開催・参加情報を見る', en: 'View 2027 Information' },
+
+  review2026Heading: { ja: '2026年のフリンジを振り返る', en: 'Review Osaka Fringe 2026' },
+  review2026Body: {
+    ja: '今年のフリンジに集まった公演、アーティスト、会場をご紹介します。気になった作品や表現、その舞台となった場所を、ぜひご覧ください。',
+    en: 'Explore the performances, artists, and venues that came together for this year’s Fringe. Discover the works, expressions, and spaces that made it memorable.'
+  },
+  reviewEntrance1Title: { ja: '公演を見る', en: 'Explore Performances' },
+  reviewEntrance1Desc: { ja: '2026年に開催された公演と、その内容をご覧いただけます。', en: 'Browse the performances and programs held during Osaka Fringe 2026.' },
+  reviewEntrance2Title: { ja: 'アーティストを見る', en: 'Meet the Artists' },
+  reviewEntrance2Desc: { ja: '2026年の参加アーティストと、それぞれの活動をご紹介します。', en: 'Meet the participating artists of 2026 and their creative activities.' },
+  reviewEntrance3Title: { ja: '会場を見る', en: 'Discover the Venues' },
+  reviewEntrance3Desc: { ja: '2026年のフリンジをともにつくった会場をご紹介します。', en: 'Discover the spaces and stages across Osaka that co-created the Fringe.' },
+
+  awardsSectionHeading: { ja: 'フリンジアワード2026', en: 'OSAKA FRINGE AWARDS 2026' },
+  awardsSectionDesc: {
+    ja: 'Osaka Fringe 2026の参加公演・アーティストを対象に、表現の魅力や挑戦、地域や人々とのつながりを称える4つの賞を決定しました。',
+    en: 'Celebrating creative brilliance, bold challenges, and connections with communities and people across four award categories.'
+  },
+  awardsTargetLabel: { ja: '選考対象', en: 'Target' },
+  awardsSelectionLabel: { ja: '選考', en: 'Selection' },
+  awardsPrizeLabel: { ja: '贈呈', en: 'Award Prize' },
+  awardsPendingWinnerNotice: { ja: '受賞者・講評は順次掲載されます', en: 'Winners and citations will be published shortly' },
+
+  fringe2027Heading: { ja: 'Osaka Fringe 2027 開催概要', en: 'Osaka Fringe 2027 Overview' },
+  fringe2027PeriodLabel: { ja: '会期', en: 'Period' },
+  fringe2027PeriodValue: { ja: '2027年10月15日（金）〜11月15日（月）', en: 'October 15 (Fri) – November 15 (Mon), 2027' },
+  fringe2027LocationLabel: { ja: '開催地', en: 'Location' },
+  fringe2027LocationValue: { ja: '大阪市内各所の劇場・カフェ・ギャラリー・特設空間 ほか', en: 'Theatres, cafes, galleries, and pop-up spaces across Osaka' },
+  fringe2027ScheduleHeading: { ja: '参加スケジュール', en: 'Participation Schedule' },
+  fringe2027Note: {
+    ja: '※スケジュールは準備状況により前後する場合があります。詳細な募集要項は、各受付開始時に公式サイトでお知らせします。',
+    en: '* Schedule may be subject to minor adjustments. Detailed guidelines will be announced on the official website as each registration phase opens.'
   }
 };

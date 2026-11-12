@@ -134,8 +134,13 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
       {/* 3-Step Editorial Header */}
       <div className="border-l-4 border-[#E6007E] pl-4 sm:pl-6 space-y-2 py-2">
-        <div className="text-sm font-black tracking-widest text-[#E6007E] uppercase">
-          VENUES & SCHEDULE
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="text-sm font-black tracking-widest text-[#E6007E] uppercase">
+            VENUES & SCHEDULE
+          </div>
+          <span className="px-2.5 py-0.5 rounded-full bg-slate-800 text-white text-xs font-bold">
+            {t('venue2026Badge')}
+          </span>
         </div>
         <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
           {t('venuesPageTitle')}
@@ -152,7 +157,18 @@ export default function VenuesClient({ venues, performances }: VenuesClientProps
       </div>
 
       {/* Information Banner */}
-      {festivalStatus === 'before' ? (
+      {festivalStatus === 'after' ? (
+        <div className="bg-slate-100 border border-slate-200 rounded-xl p-4 flex items-center gap-3">
+          <span className="px-2.5 py-1 rounded-full bg-slate-800 text-white text-xs font-bold shrink-0">
+            {t('festivalEndedBadge')}
+          </span>
+          <p className="text-sm font-medium text-slate-700">
+            {language === 'en'
+              ? 'Osaka Fringe 2026 has concluded. You can explore all venues and spaces that participated in 2026 below.'
+              : 'Osaka Fringe 2026は11月8日をもって終了しました。2026年に舞台となった会場とプログラムアーカイブをご覧いただけます。'}
+          </p>
+        </div>
+      ) : festivalStatus === 'before' ? (
         <div className="bg-pink-50 border border-pink-100 rounded-xl p-4 flex items-start gap-3">
           <Sparkles className="w-5 h-5 text-pink-500 shrink-0 mt-0.5" />
           <p className="text-sm font-medium text-pink-900">

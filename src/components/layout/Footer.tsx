@@ -63,13 +63,23 @@ export default function Footer({ showAwards = false }: FooterProps) {
                 </Link>
               </li>
               <li>
+                <Link href="/artists" className="inline-block py-1 text-white/90 hover:text-white transition-colors">
+                  {t('navArtists')}
+                </Link>
+              </li>
+              <li>
                 <Link href="/venues" className="inline-block py-1 text-white/90 hover:text-white transition-colors">
                   {t('navVenues')}
                 </Link>
               </li>
               <li>
-                <Link href="/artists" className="inline-block py-1 text-white/90 hover:text-white transition-colors">
-                  {t('navArtists')}
+                <Link href="/#awards" className="inline-block py-1 text-white/90 hover:text-white transition-colors">
+                  {t('navAwards')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/#fringe2027" className="inline-block py-1 text-white/90 hover:text-white transition-colors">
+                  {t('navFringe2027')}
                 </Link>
               </li>
               <li>
@@ -77,13 +87,6 @@ export default function Footer({ showAwards = false }: FooterProps) {
                   {t('navAbout')}
                 </Link>
               </li>
-              {showAwards && (
-                <li>
-                  <Link href="/awards" className="inline-block py-1 text-white/90 hover:text-white transition-colors">
-                    {t('navAwards')}
-                  </Link>
-                </li>
-              )}
             </ul>
           </div>
 

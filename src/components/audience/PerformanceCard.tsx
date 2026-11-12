@@ -8,7 +8,7 @@ import SafeImage from '@/components/common/SafeImage';
 import { CalendarIcon, MapPinIcon, TicketIcon, ArrowRightIcon } from '@/components/common/CustomIcons';
 import { formatScheduleCompact, sortSchedules, deduplicateSchedules, hasMultipleVenues } from '@/utils/dateFormat';
 import { formatTicketPrice } from '@/utils/priceFormat';
-import { getPerformanceTimingInfo, getPerformancePreFestivalStatus, isPreFestivalSchedule } from '@/utils/performanceUtils';
+import { getPerformanceTimingInfo, getPerformancePreFestivalStatus, isPreFestivalSchedule, getFestivalStatus } from '@/utils/performanceUtils';
 import { getArtistGenreLabel, getPerformanceGenreText } from '@/utils/genre';
 import { Heart } from 'lucide-react';
 
@@ -47,6 +47,8 @@ export default function PerformanceCard({
   const timingInfo = getPerformanceTimingInfo(performance);
   const preFestStatus = getPerformancePreFestivalStatus(performance);
 
+  const festivalStatus = getFestivalStatus();
+
   return (
     <div className="group relative bg-white rounded-2xl overflow-hidden border border-slate-200/90 hover:border-[#E6007E] shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between">
       {/* Thumbnail */}
@@ -69,25 +71,33 @@ export default function PerformanceCard({
           <span className="px-2.5 py-0.5 rounded bg-black/75 backdrop-blur-xs text-white text-[10px] font-bold tracking-wider uppercase border border-white/10">
             {categoryLabel}
           </span>
-          {preFestStatus.isAllPre ? (
-            <span className="px-2.5 py-0.5 rounded-full bg-purple-600 text-white text-[10px] font-black tracking-wider uppercase shadow-sm border border-purple-400/40">
-              {t('preFestival')}
+          {festivalStatus === 'after' ? (
+            <span className="px-2.5 py-0.5 rounded-full bg-slate-900/90 text-white text-[10px] font-bold tracking-wider shadow-sm border border-slate-600/50">
+              {t('festivalEndedBadge')}
             </span>
-          ) : preFestStatus.hasPreFestival ? (
-            <span className="px-2.5 py-0.5 rounded-full bg-purple-600 text-white text-[10px] font-black tracking-wider uppercase shadow-sm border border-purple-400/40">
-              {t('hasPreFestival')}
-            </span>
-          ) : null}
-          {timingInfo.status === 'ongoing' ? (
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black tracking-wider uppercase flex items-center gap-1 shadow-sm border border-emerald-400/40">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-200 animate-ping" />
-              {t('statusOngoing')}
-            </span>
-          ) : timingInfo.isToday ? (
-            <span className="px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black tracking-wider uppercase shadow-sm border border-amber-300/40">
-              {t('statusToday')}
-            </span>
-          ) : null}
+          ) : (
+            <>
+              {preFestStatus.isAllPre ? (
+                <span className="px-2.5 py-0.5 rounded-full bg-purple-600 text-white text-[10px] font-black tracking-wider uppercase shadow-sm border border-purple-400/40">
+                  {t('preFestival')}
+                </span>
+              ) : preFestStatus.hasPreFestival ? (
+                <span className="px-2.5 py-0.5 rounded-full bg-purple-600 text-white text-[10px] font-black tracking-wider uppercase shadow-sm border border-purple-400/40">
+                  {t('hasPreFestival')}
+                </span>
+              ) : null}
+              {timingInfo.status === 'ongoing' ? (
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black tracking-wider uppercase flex items-center gap-1 shadow-sm border border-emerald-400/40">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-200 animate-ping" />
+                  {t('statusOngoing')}
+                </span>
+              ) : timingInfo.isToday ? (
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black tracking-wider uppercase shadow-sm border border-amber-300/40">
+                  {t('statusToday')}
+                </span>
+              ) : null}
+            </>
+          )}
         </div>
 
         {/* Favorite Button */}

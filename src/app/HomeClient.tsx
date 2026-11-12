@@ -2,16 +2,16 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Performance, SiteInfo, Partner } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import HomeHeroClient from './HomeHeroClient';
-import PerformanceCard from '@/components/audience/PerformanceCard';
+import HomeReviewSection from '@/components/home/HomeReviewSection';
+import HomeAwardsSection from '@/components/home/HomeAwardsSection';
+import Home2027Section from '@/components/home/Home2027Section';
 import PerformanceModal from '@/components/audience/PerformanceModal';
 import PartnerSection from '@/components/common/PartnerSection';
 import { ArrowRightIcon } from '@/components/common/CustomIcons';
-import { selectFeaturedPerformances, getFestivalStatus } from '@/utils/performanceUtils';
-
+import { selectFeaturedPerformances } from '@/utils/performanceUtils';
 
 interface HomeClientProps {
   venues?: unknown[];
@@ -25,203 +25,35 @@ export default function HomeClient({
   partners = [],
   siteInfo,
 }: HomeClientProps) {
-  const { t, getText, language } = useLanguage();
+  const { t, getText } = useLanguage();
   const [selectedPerformance, setSelectedPerformance] = useState<Performance | null>(null);
 
-  // Smart selection for up to 6 featured shows (excludes ended shows)
+  // Up to 6 featured shows for the 2026 review archive
   const displayPerformances = selectFeaturedPerformances(performances, 6);
 
   const aboutTitle = getText(siteInfo.aboutTitle, siteInfo.aboutTitleEn);
   const aboutText = getText(siteInfo.aboutText, siteInfo.aboutTextEn);
 
-  const festivalStatus = getFestivalStatus();
-  let pickUpTitle = '';
-  let pickUpLabel = '';
-  let pickUpDesc = '';
-
-  if (festivalStatus === 'before') {
-    pickUpLabel = 'PICK UP PROGRAMS';
-    pickUpTitle = language === 'en' ? 'Featured Programs' : '注目の公演・プログラム';
-    pickUpDesc = language === 'en' 
-      ? 'Introducing featured performances and exhibitions leading up to the opening on October 8.'
-      : '10月8日の開幕に向け、注目の公演や展示をご紹介します。';
-  } else if (festivalStatus === 'during') {
-    pickUpLabel = 'PICK UP SHOWS';
-    pickUpTitle = language === 'en' ? 'Upcoming Featured Shows' : '今週の注目公演';
-    pickUpDesc = language === 'en'
-      ? 'Featured performances coming up soon.'
-      : 'まもなく開催される注目のパフォーマンス';
-  } else {
-    pickUpLabel = 'PROGRAM ARCHIVE';
-    pickUpTitle = language === 'en' ? 'Programs Archive' : '開催プログラム';
-    pickUpDesc = language === 'en'
-      ? 'Introducing past performances and exhibitions held at Osaka Fringe 2026.'
-      : 'Osaka Fringe 2026で開催された公演や展示をご紹介します。';
-  }
-
   return (
-    <div className="space-y-20 pb-20 bg-[#fef9fc]">
-      {/* Hero Section */}
+    <div className="space-y-20 sm:space-y-24 pb-20 bg-[#fef9fc]">
+      {/* ① 終了のお礼＋アワード発表＋2027年開催決定 */}
       <HomeHeroClient siteInfo={siteInfo} />
 
-      {/* Featured / Pick Up Shows (Only show if at least 1 show is available) */}
-      {displayPerformances.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-pink-100 pb-5">
-            <div className="space-y-1.5">
-              <div className="text-[#E6007E] font-black text-xs uppercase tracking-wider">
-                <span>{pickUpLabel}</span>
-              </div>
-              <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                {pickUpTitle}
-              </h2>
-              <p className="text-sm text-slate-600 font-medium">
-                {pickUpDesc}
-              </p>
-            </div>
-            <Link
-              href="/audience"
-              className="inline-flex items-center gap-1.5 text-sm font-black text-[#E6007E] hover:text-[#c4006b] bg-pink-50 hover:bg-pink-100/70 px-5 py-2.5 rounded-full transition-colors self-start sm:self-auto cursor-pointer"
-            >
-              <span>{t('viewAllAudience')}</span>
-              <ArrowRightIcon className="w-4 h-4" />
-            </Link>
-          </div>
+      {/* ② 2026年の公演・アーティスト・会場の一覧への入口 */}
+      <HomeReviewSection
+        performances={displayPerformances}
+        onSelectPerformance={(p) => setSelectedPerformance(p)}
+      />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {displayPerformances.map((perf) => (
-              <PerformanceCard 
-                key={perf.id} 
-                performance={perf} 
-                onSelect={(p) => setSelectedPerformance(p)}
-              />
-            ))}
-          </div>
-        </section>
-      )}
+      {/* ③ フリンジアワード2026（4部門） */}
+      <HomeAwardsSection />
 
-      {/* Audience App CTA Banner */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#E6007E] via-[#d60075] to-[#7928ca] p-8 sm:p-14 text-white shadow-xl shadow-pink-500/15">
-          <div className="relative z-10 max-w-2xl space-y-6">
-            <div className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-black uppercase tracking-wider border border-white/30">
-              <span>{t('appCtaBadge')}</span>
-            </div>
-            <h2 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight text-white">
-              {t('appCtaTitle')}
-            </h2>
-            <p className="text-sm sm:text-base text-pink-100 font-medium leading-relaxed max-w-xl">
-              {t('appCtaDesc')}
-            </p>
-            <div className="pt-2">
-              <Link
-                href="/audience"
-                className="inline-flex items-center gap-2.5 px-8 py-4 rounded-2xl bg-white hover:bg-[#FFF100] text-slate-900 font-black text-sm tracking-wide shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer group"
-              >
-                <span>{t('launchApp')}</span>
-                <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ④ 2027年の開催・参加スケジュール */}
+      <Home2027Section />
 
-      {/* OSAKA FRINGE AWARDS Preview */}
-      {siteInfo.awardsInfo && (
-        <section id="awards-preview" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-white via-white to-pink-50/40 border border-pink-100 rounded-3xl p-8 sm:p-12 space-y-8 shadow-sm">
-
-            <div className="max-w-3xl space-y-4">
-              <div className="inline-flex items-center px-3 py-1 rounded-full bg-pink-50 text-[#E6007E] text-xs font-black uppercase tracking-wide">
-                <span>OSAKA FRINGE AWARDS 2026</span>
-              </div>
-              <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                {getText(siteInfo.awardsInfo.title, siteInfo.awardsInfo.titleEn)}
-              </h2>
-              {siteInfo.awardsInfo.tagline && (
-                <p className="text-base sm:text-xl font-bold text-[#E6007E]">
-                  {getText(siteInfo.awardsInfo.tagline, siteInfo.awardsInfo.taglineEn)}
-                </p>
-              )}
-              {siteInfo.awardsInfo.summary && (
-                <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-medium whitespace-pre-line">
-                  {getText(siteInfo.awardsInfo.summary, siteInfo.awardsInfo.summaryEn)}
-                </p>
-              )}
-
-              {/* Editor in chief highlight if available */}
-              {siteInfo.awardsEditor && (siteInfo.awardsEditor.name || siteInfo.awardsEditor.role) && (
-                <div className="pt-2 flex items-center gap-4">
-                  {siteInfo.awardsEditor.photo && (
-                    <div className="relative w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-2xl overflow-hidden border border-slate-200 bg-slate-100">
-                      <Image
-                        src={siteInfo.awardsEditor.photo}
-                        alt={getText(siteInfo.awardsEditor.name, siteInfo.awardsEditor.nameEn) || 'Editor'}
-                        fill
-                        sizes="64px"
-                        className="object-cover object-center"
-                        unoptimized
-                      />
-                    </div>
-                  )}
-                  <div className="space-y-0.5">
-                    {siteInfo.awardsEditor.role && (
-                      <div className="text-xs font-black text-[#E6007E] uppercase tracking-wide">
-                        {getText(siteInfo.awardsEditor.role, siteInfo.awardsEditor.roleEn)}
-                      </div>
-                    )}
-                    <div className="text-base sm:text-lg font-black text-slate-900">
-                      {getText(siteInfo.awardsEditor.name, siteInfo.awardsEditor.nameEn)}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div className="pt-1">
-                <Link
-                  href="/awards"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-pink-50 hover:bg-pink-100/80 text-[#E6007E] hover:text-[#c4006b] text-sm font-bold tracking-wide transition-colors cursor-pointer group"
-                >
-                  <span>{t('aboutAwardsBtn')}</span>
-                  <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Nomination CTA Card */}
-            <div className="pt-6 border-t border-pink-100">
-              <div className="bg-white border-2 border-pink-200/80 rounded-2xl p-6 sm:p-8 space-y-4 shadow-sm">
-                <div className="space-y-2">
-                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                    {t('homeNominateTitle')}
-                  </h3>
-                  <p className="text-sm sm:text-base text-slate-700 font-medium leading-relaxed whitespace-pre-line">
-                    {t('homeNominateText')}
-                  </p>
-                </div>
-
-                <div className="pt-1">
-                  <Link
-                    href="/vote"
-                    className="inline-flex items-center justify-center gap-2.5 w-full sm:w-auto px-8 py-4 rounded-2xl bg-[#E6007E] hover:bg-[#c4006b] text-white text-base font-black tracking-wide shadow-lg shadow-pink-500/20 hover:-translate-y-0.5 transition-all cursor-pointer group text-center"
-                  >
-                    <span>{t('homeNominateBtn')}</span>
-                    <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </div>
-
-                <p className="text-xs text-slate-500 font-medium leading-relaxed pt-1">
-                  {t('homeNominateNote')}
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
+      {/* ⑤ 既存のお知らせ・フリンジ紹介・主催協賛等 */}
       {/* About Osaka Fringe & Venue Categories Preview */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
         <div className="bg-white border border-pink-100 rounded-3xl p-8 sm:p-12 space-y-8 shadow-sm">
           <div className="max-w-3xl space-y-4">
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-pink-50 text-[#E6007E] text-xs font-black uppercase tracking-wide">

@@ -205,6 +205,9 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
             {/* Badges on Top */}
             <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 z-10">
               <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-3 py-1 rounded-full bg-slate-900/90 backdrop-blur-md text-white text-xs font-bold border border-slate-600/50">
+                  {t('festivalEndedBadge')}
+                </span>
                 <span className="px-3 py-1 rounded-full bg-black/75 backdrop-blur-md text-white text-xs font-black uppercase tracking-wider border border-white/20">
                   {categoryLabel}
                 </span>
@@ -275,6 +278,9 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
           <div className="p-6 sm:p-10 space-y-8">
             {/* Category & Work Genre Metadata Section */}
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-wrap items-center gap-4 text-xs">
+              <span className="px-2.5 py-1 rounded-xl bg-slate-800 text-white font-bold">
+                {t('festivalEndedBadge')}
+              </span>
               <div className="flex items-center gap-2">
                 <span className="text-slate-500 font-bold">{language === 'ja' ? 'カテゴリー' : 'Category'}:</span>
                 <span className="px-2.5 py-1 rounded-xl bg-pink-100 text-[#E6007E] font-black">
@@ -294,18 +300,14 @@ export default function PerformanceDetailClient({ performance }: PerformanceDeta
             {/* Action Bar */}
             <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100">
               <div className="flex flex-wrap items-center gap-2.5">
-                {isValidUrl(performance.ticketUrl) && (
-                  <a
-                    href={performance.ticketUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-6 py-3 rounded-2xl bg-[#E6007E] hover:bg-[#c4006b] text-white font-black text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-pink-500/20 transition-all cursor-pointer"
-                  >
-                    <Ticket className="w-4 h-4" />
-                    <span>{t('bookTickets')}</span>
-                    <ExternalLink className="w-3.5 h-3.5 opacity-80" />
-                  </a>
-                )}
+                <button
+                  type="button"
+                  disabled
+                  className="px-6 py-3 rounded-2xl bg-slate-200 text-slate-500 font-bold text-xs sm:text-sm flex items-center gap-2 cursor-not-allowed select-none border border-slate-300"
+                >
+                  <Ticket className="w-4 h-4 text-slate-400" />
+                  <span>{t('performanceEnded')}</span>
+                </button>
 
                 {isValidUrl(websiteUrl) && (
                   <a

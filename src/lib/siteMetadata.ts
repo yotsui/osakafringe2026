@@ -6,7 +6,7 @@ export const SITE_BASE_URL = 'https://osakafringe.com';
 export const DEFAULT_OG_IMAGE = '/ogp.jpg';
 
 export const DEFAULT_DESCRIPTION =
-  '大阪文化万博Osaka Fringe 2026（2026年10月8日〜11月8日開催）公式サイト。spill over 文化芸術が街にあふれだす。劇場、広場、歴史的建築、カフェなど大阪各地の会場とイベントをめぐるオープンアクセス型芸術祭。';
+  'Osaka Fringe 2026は11月8日に終了しました。フリンジアワード2026と、2027年10月15日〜11月15日の次回開催・参加スケジュールをご案内します。2026年の公演・アーティスト・会場もご覧いただけます。';
 
 export interface PageMetadataOptions {
   title?: string;

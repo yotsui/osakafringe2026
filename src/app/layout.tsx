@@ -17,13 +17,13 @@ export const metadata: Metadata = {
     default: '大阪文化万博Osaka Fringe 2026',
     template: '%s | 大阪文化万博Osaka Fringe 2026',
   },
-  description: '大阪文化万博Osaka Fringe 2026（2026年10月8日〜11月8日開催）公式サイト。spill over 文化芸術が街にあふれだす。劇場、広場、歴史的建築、カフェなど大阪各地の会場とイベントをめぐるオープンアクセス型芸術祭。',
+  description: 'Osaka Fringe 2026は11月8日に終了しました。フリンジアワード2026と、2027年10月15日〜11月15日の次回開催・参加スケジュールをご案内します。2026年の公演・アーティスト・会場もご覧いただけます。',
   alternates: {
     canonical: '/',
   },
   openGraph: {
     title: '大阪文化万博Osaka Fringe 2026',
-    description: 'spill over 文化芸術が街にあふれだす。2026年10月8日〜11月8日開催。大阪の街じゅうが舞台になるオープンアクセス型芸術祭。',
+    description: 'Osaka Fringe 2026は11月8日に終了しました。フリンジアワード2026と、2027年10月15日〜11月15日の次回開催・参加スケジュールをご案内します。2026年の公演・アーティスト・会場もご覧いただけます。',
     url: 'https://osakafringe.com',
     siteName: '大阪文化万博Osaka Fringe 2026',
     images: [
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: '大阪文化万博Osaka Fringe 2026',
-    description: 'spill over 文化芸術が街にあふれだす。2026年10月8日〜11月8日開催。大阪の街じゅうが舞台になるオープンアクセス型芸術祭。',
+    description: 'Osaka Fringe 2026は11月8日に終了しました。フリンジアワード2026と、2027年10月15日〜11月15日の次回開催・参加スケジュールをご案内します。2026年の公演・アーティスト・会場もご覧いただけます。',
     images: ['/ogp.jpg'],
   },
   icons: {
