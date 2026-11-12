@@ -57,6 +57,16 @@ npm run build
 npm run start
 ```
 
+### 公開公演一覧CSVエクスポート（ローカル専用）
+microCMSに登録されている公開済みの公演情報を全件取得し、日付順の一覧CSV（4列: `日付, 出演者, 作品名, 会場名` / UTF-8 BOM付き）と自動検証レポートを `exports/` 配下に出力します。
+```bash
+npm run export:public-performances
+```
+- 出力先:
+  - `exports/public_performances_2026.csv`（公開公演一覧CSV）
+  - `exports/public_performances_audit.json`（出力漏れ・重複・会場名・整合性の検証レポートJSON）
+  - `exports/public_performances_audit.txt`（人間確認用テキストレポート）
+
 ---
 
 ## ⚙️ 環境変数の設定 (`.env.local`)
