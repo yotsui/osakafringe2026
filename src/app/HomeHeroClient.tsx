@@ -79,10 +79,10 @@ export default function HomeHeroClient({}: HomeHeroClientProps) {
                     <Calendar className="w-3.5 h-3.5" />
                     <span>NEXT FRINGE 2027</span>
                   </div>
-                  <h2 className="text-lg font-black text-white leading-tight">
+                  <h2 className="text-base sm:text-lg font-black text-white leading-tight">
                     {t('heroPostEventAnnounce2Title')}
                   </h2>
-                  <div className="text-xs font-black text-[#FFF100] tracking-wide">
+                  <div className="text-xl sm:text-2xl font-black text-[#FFF100] tracking-tight py-0.5 drop-shadow-sm">
                     {t('heroPostEventAnnounce2Date')}
                   </div>
                   <p className="text-xs sm:text-sm text-white/90 font-medium leading-relaxed">
@@ -134,6 +134,7 @@ export default function HomeHeroClient({}: HomeHeroClientProps) {
                   src="/images/spillover.svg"
                   alt="Spill Over - 文化芸術が街にあふれだす"
                   fill
+                  sizes="(max-width: 640px) 100vw, 448px"
                   priority
                   className="object-contain"
                 />
@@ -146,6 +147,7 @@ export default function HomeHeroClient({}: HomeHeroClientProps) {
                 src="/images/osakafringe_visuals.webp"
                 alt="Osaka Fringe 2026 Official Visual"
                 fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 384px, 384px"
                 priority
                 className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
               />
@@ -166,6 +168,7 @@ export default function HomeHeroClient({}: HomeHeroClientProps) {
                   src="/images/osakafringe04.svg"
                   alt="Osaka Fringe"
                   fill
+                  sizes="(max-width: 640px) 100vw, 320px"
                   className="object-contain"
                 />
               </div>

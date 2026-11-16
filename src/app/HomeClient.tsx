@@ -46,7 +46,7 @@ export default function HomeClient({
       />
 
       {/* ③ フリンジアワード2026（4部門） */}
-      <HomeAwardsSection />
+      <HomeAwardsSection performances={performances} />
 
       {/* ④ 2027年の開催・参加スケジュール */}
       <Home2027Section />

@@ -17,13 +17,13 @@ export const metadata: Metadata = {
     default: '大阪文化万博Osaka Fringe 2026',
     template: '%s | 大阪文化万博Osaka Fringe 2026',
   },
-  description: 'Osaka Fringe 2026は11月8日に終了しました。フリンジアワード2026と、2027年10月15日〜11月15日の次回開催・参加スケジュールをご案内します。2026年の公演・アーティスト・会場もご覧いただけます。',
+  description: 'Osaka Fringe 2026は11月8日に終了しました。フリンジアワード2026と、2027年10月15日〜11月14日の次回開催・参加スケジュールをご案内します。2026年の公演・アーティスト・会場もご覧いただけます。',
   alternates: {
     canonical: '/',
   },
   openGraph: {
     title: '大阪文化万博Osaka Fringe 2026',
-    description: 'Osaka Fringe 2026は11月8日に終了しました。フリンジアワード2026と、2027年10月15日〜11月15日の次回開催・参加スケジュールをご案内します。2026年の公演・アーティスト・会場もご覧いただけます。',
+    description: 'Osaka Fringe 2026は11月8日に終了しました。フリンジアワード2026と、2027年10月15日〜11月14日の次回開催・参加スケジュールをご案内します。2026年の公演・アーティスト・会場もご覧いただけます。',
     url: 'https://osakafringe.com',
     siteName: '大阪文化万博Osaka Fringe 2026',
     images: [
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: '大阪文化万博Osaka Fringe 2026',
-    description: 'Osaka Fringe 2026は11月8日に終了しました。フリンジアワード2026と、2027年10月15日〜11月15日の次回開催・参加スケジュールをご案内します。2026年の公演・アーティスト・会場もご覧いただけます。',
+    description: 'Osaka Fringe 2026は11月8日に終了しました。フリンジアワード2026と、2027年10月15日〜11月14日の次回開催・参加スケジュールをご案内します。2026年の公演・アーティスト・会場もご覧いただけます。',
     images: ['/ogp.jpg'],
   },
   icons: {
@@ -71,7 +71,7 @@ export default async function RootLayout({
   const showAwards = isAwardsVisible(siteInfo);
 
   return (
-    <html lang="ja" className="scroll-smooth">
+    <html lang="ja" className="scroll-smooth" data-scroll-behavior="smooth">
       <body className="min-h-screen flex flex-col bg-slate-950 text-slate-100">
         <LanguageProvider>
           <Navbar showAwards={showAwards} />

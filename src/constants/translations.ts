@@ -527,7 +527,7 @@ export const translations: Dictionary = {
     en: 'Carrying forward the expressions encountered at this year’s Fringe. Announcing four festival awards.'
   },
   heroPostEventAnnounce2Title: { ja: 'Osaka Fringe 2027 開催決定', en: 'Osaka Fringe 2027 Confirmed' },
-  heroPostEventAnnounce2Date: { ja: '2027年10月15日〜11月15日', en: 'October 15 – November 15, 2027' },
+  heroPostEventAnnounce2Date: { ja: '2027年10月15日〜11月14日', en: 'October 15 – November 14, 2027' },
   heroPostEventAnnounce2Desc: {
     ja: '来年の開催会期と、会場・アーティストの参加スケジュールをお知らせします。',
     en: 'Announcing next year’s festival dates and participation schedules for venues and artists.'
@@ -559,7 +559,7 @@ export const translations: Dictionary = {
 
   fringe2027Heading: { ja: 'Osaka Fringe 2027 開催概要', en: 'Osaka Fringe 2027 Overview' },
   fringe2027PeriodLabel: { ja: '会期', en: 'Period' },
-  fringe2027PeriodValue: { ja: '2027年10月15日（金）〜11月15日（月）', en: 'October 15 (Fri) – November 15 (Mon), 2027' },
+  fringe2027PeriodValue: { ja: '2027年10月15日（金）〜11月14日（日）', en: 'October 15 (Fri) – November 14 (Sun), 2027' },
   fringe2027LocationLabel: { ja: '開催地', en: 'Location' },
   fringe2027LocationValue: { ja: '大阪市内各所の劇場・カフェ・ギャラリー・特設空間 ほか', en: 'Theatres, cafes, galleries, and pop-up spaces across Osaka' },
   fringe2027ScheduleHeading: { ja: '参加スケジュール', en: 'Participation Schedule' },
